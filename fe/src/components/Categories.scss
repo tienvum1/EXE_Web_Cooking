@@ -1,0 +1,38 @@
+$primary: #2e7d32;
+$bg: #fafafa;
+$border: #f4f4f4;
+$radius: 1rem;
+
+.categories {
+  margin: 2rem 0;
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    h2 {
+      font-size: 2rem;
+      color: $primary;
+      margin: 0;
+    }
+    .categories__viewall {
+      padding: 0.5rem 1.5rem;
+      border-radius: $radius;
+      border: none;
+      background: $border;
+      font-weight: bold;
+      color: $primary;
+      cursor: pointer;
+      transition: background 0.2s;
+      &:hover {
+        background: lighten($border, 10%);
+      }
+    }
+  }
+  &__list {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+} 

@@ -1,0 +1,31 @@
+$primary: #2e7d32;
+$card-bg: #fff;
+$shadow: 0 2px 8px #eee;
+$radius: 1rem;
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: $card-bg;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  padding: 1.5rem 2rem;
+  min-width: 100px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  &:hover {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 6px 24px #e0e0e0;
+  }
+  &__icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  &__name {
+    color: $primary;
+    font-weight: 500;
+    font-size: 1.1rem;
+    margin-top: 0.25rem;
+  }
+} 

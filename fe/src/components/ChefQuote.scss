@@ -1,0 +1,50 @@
+.chef-quote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4rem 0 3rem 0;
+  gap: 2rem;
+  @media (max-width: 900px) {
+    flex-direction: column;
+    text-align: center;
+  }
+  &__text {
+    flex: 1.2;
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+    p {
+      color: #555;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+    button {
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 1.5rem;
+      padding: 0.8rem 2.2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      &:hover { background: #2e7d32; }
+    }
+  }
+  &__img {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      max-width: 320px;
+      width: 100%;
+      border-radius: 2rem;
+      background: linear-gradient(135deg, #e6f9e6 60%, #fff 100%);
+      box-shadow: 0 4px 32px #e0e0e0;
+    }
+  }
+} 

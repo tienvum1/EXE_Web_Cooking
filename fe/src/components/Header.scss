@@ -1,0 +1,105 @@
+.header {
+  background: #fff;
+  border-radius: 0 0 2rem 2rem;
+  box-shadow: 0 4px 24px rgba(46, 125, 50, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 2.5rem 1.2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  &__logo {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #2e7d32;
+    letter-spacing: 1.5px;
+    font-family: 'Playfair Display', serif;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    &:hover {
+      color: #e67e22;
+      transform: scale(1.06);
+    }
+  }
+
+  &__nav {
+    display: flex;
+    gap: 2.5rem;
+    a {
+      color: #222;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.18rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 1.5rem;
+      position: relative;
+      transition: background 0.2s, color 0.2s;
+      &:hover {
+        background: #e6f9e6;
+        color: #2e7d32;
+      }
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        width: 0%;
+        height: 2px;
+        background: #2e7d32;
+        transition: width 0.3s;
+      }
+      &:hover::after {
+        width: 100%;
+      }
+    }
+  }
+
+  &__social {
+    display: flex;
+    gap: 0.7rem;
+    a {
+      color: #2e7d32;
+      font-size: 1.25rem;
+      background: #f4f4f4;
+      border-radius: 50%;
+      width: 2.3rem;
+      height: 2.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      &:hover {
+        background: #2e7d32;
+        color: #fff;
+      }
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 1.2rem 1rem 1rem 1rem;
+    }
+    &__nav {
+      width: 100%;
+      gap: 1.2rem;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    &__social {
+      align-self: flex-start;
+      gap: 0.5rem;
+    }
+  }
+}
