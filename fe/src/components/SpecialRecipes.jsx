@@ -1,6 +1,6 @@
 import React from 'react';
 import specialRecipes from '../data/specialRecipesData';
-import RecipeCard from './RecipeCard';
+import RecipeCard from './recipeCard/RecipeCard';
 import './SpecialRecipes.scss';
 
 const SpecialRecipes = () => (

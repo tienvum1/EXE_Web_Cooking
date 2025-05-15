@@ -14,6 +14,7 @@ $radius: 1rem;
       font-size: 2rem;
       color: $primary;
       margin: 0;
+      text-align: center;
     }
     .categories__viewall {
       padding: 0.5rem 1.5rem;
@@ -31,8 +32,10 @@ $radius: 1rem;
   }
   &__list {
     display: flex;
-    justify-content: center;
+    justify-content: center;  // căn giữa ngang
+    align-items: center;      // căn giữa dọc nếu cần
     gap: 2rem;
     flex-wrap: wrap;
+  
   }
 } 

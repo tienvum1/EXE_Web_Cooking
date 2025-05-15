@@ -1,0 +1,64 @@
+.instagram {
+    background: linear-gradient(to top, #3DD056, #d3edd1);
+    padding: 4rem 2rem;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+    &__title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 0.5rem;
+  
+      span {
+        color: #000;
+      }
+    }
+  
+    &__subtitle {
+      font-size: 16px;
+      color: #555;
+      max-width: 620px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
+  
+    &__gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      justify-items: center;
+    }
+  
+    &__image {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 4px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+  
+    &__button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #000;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 0.9rem 2.2rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+  
+      svg {
+        fill: #fff;
+      }
+  
+      &:hover {
+        background-color: #222;
+      }
+    }
+  }
+  
