@@ -1,0 +1,69 @@
+@import './RecipeHeader';
+@import './ImageSection';
+@import './IngredientsList';
+@import './DirectionsList';
+
+.detail-layout {
+  max-width: 1200px;
+  margin: $spacing-unit * 2 auto 0 auto;
+  padding: 0 $spacing-unit * 2 $spacing-unit * 3 $spacing-unit * 2;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Arial', sans-serif;
+  background: $background-light;
+
+  .top-section {
+    display: flex;
+    align-items: stretch;
+    gap: $spacing-unit * 2.5;
+    margin-bottom: $spacing-unit * 2;
+    justify-content: flex-start;
+
+    .left-col {
+      flex: 2;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-unit;
+    }
+
+    .right-col {
+      flex: 1;
+      min-width: 260px;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    @include responsive("md") {
+      flex-direction: column;
+      gap: $spacing-unit * 1.5;
+
+      .right-col,
+      .left-col {
+        max-width: 100%;
+        min-width: 0;
+        align-items: stretch;
+      }
+    }
+  }
+
+  .description {
+    font-size: 1.08rem;
+    color: $secondary-text;
+    margin: $spacing-unit * 1.5 0 $spacing-unit * 2.5 0;
+    line-height: 1.7;
+    max-width: '100%';
+    font-weight: 400;
+  }
+
+  @include responsive("sm") {
+    padding: 0 $spacing-unit $spacing-unit * 2 $spacing-unit;
+
+    .description {
+      font-size: 1rem;
+      margin: $spacing-unit 0 $spacing-unit * 2 0;
+    }
+  }
+}

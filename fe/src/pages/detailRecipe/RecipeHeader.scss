@@ -1,0 +1,180 @@
+@import './_shared'; // đường dẫn tùy vào cấu trúc thư mục của bạn
+
+.recipe-header {
+  padding: $spacing-unit * 1.5;
+  margin-bottom: $spacing-unit * 2.5;
+
+  .recipe-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: $primary-text;
+    margin-bottom: $spacing-unit * 1.2;
+    line-height: 1.2;
+    text-transform: capitalize;
+    letter-spacing: -0.5px;
+  }
+
+  .recipe-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-unit * 1.5;
+    padding: $spacing-unit / 2;
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: $spacing-unit;
+
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid $primary-green;
+        transition: $transition;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      .user-details {
+        .name {
+          font-weight: 600;
+          color: $primary-text;
+          font-size: 16px;
+        }
+
+        .date {
+          font-size: 13px;
+          color: $secondary-text;
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .time-info {
+      display: flex;
+      gap: $spacing-unit * 1.2;
+      font-size: 14px;
+      color: $secondary-text;
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba($primary-green, 0.1);
+        border-radius: $border-radius / 2;
+        transition: $transition;
+
+        &:hover {
+          background: rgba($primary-green, 0.2);
+        }
+
+        svg {
+          color: $primary-green;
+          font-size: 16px;
+        }
+
+        span {
+          font-weight: 500;
+          color: $primary-text;
+          transition: $transition;
+
+          &:hover {
+            color: darken($primary-text, 10%);
+          }
+        }
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: $spacing-unit / 1.5;
+
+      .btn {
+        background: $primary-green;
+        color: $white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: $border-radius / 1.5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: $transition;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+          background-color: darken($primary-green, 5%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        svg {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  @include responsive("sm") {
+    padding: $spacing-unit;
+    margin-bottom: $spacing-unit * 2;
+
+    .recipe-title {
+      font-size: 24px;
+      margin-bottom: $spacing-unit;
+    }
+
+    .recipe-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-unit;
+
+      .user-info {
+        width: 100%;
+      }
+
+      .time-info {
+        width: 100%;
+        flex-wrap: wrap;
+
+        .item {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
+
+      .actions {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: $spacing-unit;
+
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  @include responsive("md") {
+    .recipe-meta {
+      .time-info {
+        .item {
+          padding: 4px 10px;
+        }
+      }
+    }
+  }
+}

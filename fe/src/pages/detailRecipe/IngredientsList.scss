@@ -1,0 +1,62 @@
+// IngredientsList.scss
+@import './_shared.scss';
+
+.ingredients-list {
+  background: #fff;
+  border-radius: 18px;
+  padding: 32px 28px 24px 28px;
+  margin-bottom: 40px;
+  font-family: 'Inter', 'Arial', sans-serif;
+  .section-title {
+    font-size: 1.5rem;
+    color: #111;
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+  .subsection-title {
+    font-size: 1.13rem;
+    color: #222;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .ingredient-items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+    .ingredient-item {
+      border-bottom: 1px solid #ececec;
+      padding: 12px 0 12px 0;
+      display: flex;
+      align-items: center;
+      &:last-child {
+        border-bottom: none;
+      }
+      .ingredient-label {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        .ingredient-radio {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border: 2px solid #bdbdbd;
+          border-radius: 50%;
+          margin-right: 18px;
+          background: #fff;
+          position: relative;
+        }
+        .ingredient-text {
+          font-size: 1.08rem;
+          color: #222;
+        }
+      }
+    }
+  }
+}
+@media (max-width: 640px) {
+  .ingredients-list {
+    padding: 16px 8px 12px 8px;
+    border-radius: 10px;
+  }
+}

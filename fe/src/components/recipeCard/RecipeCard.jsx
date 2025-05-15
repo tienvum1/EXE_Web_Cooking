@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './RecipeCard.scss';
 
 const RecipeCard = ({ image, title, time, type, author }) => {
   const [liked, setLiked] = useState(false);
+  const navigate = useNavigate();
+
   const toggleLike = () => setLiked(!liked);
 
+  const handleCardClick = () => {
+    // Navigate to /detail-recipe and pass the recipe data as state
+    navigate('/detail-recipe', {
+      state: { image, title, time, type, author },
+    });
+  };
+
   return (
-    <div className="recipe-card">
+    <div className="recipe-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
       <div className="recipe-card__image-box">
         <img src={image} alt={title} className="recipe-card__image" />
         <button
           className={`recipe-card__like ${liked ? 'liked' : ''}`}
-          onClick={toggleLike}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent the card click from firing when clicking the like button
+            toggleLike();
+          }}
           aria-label={liked ? 'Unlike' : 'Like'}
         >
           <i className="fas fa-heart" />
@@ -22,8 +35,12 @@ const RecipeCard = ({ image, title, time, type, author }) => {
         <h3 className="recipe-card__title">{title}</h3>
 
         <div className="recipe-card__info">
-          <span><i className="far fa-clock" /> {time}</span>
-          <span><i className="fas fa-utensils" /> {type}</span>
+          <span>
+            <i className="far fa-clock" /> {time}
+          </span>
+          <span>
+            <i className="fas fa-utensils" /> {type}
+          </span>
         </div>
 
         {author && (
