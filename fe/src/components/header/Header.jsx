@@ -5,14 +5,14 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 const Header = () => (
   <header className="header">
     <div className="header__container">
-      <div className="header__logo"> FitMeal</div>
+      <div className="header__logo">FitMeal</div>
 
       <nav className="header__nav">
         <a href="/">Home</a>
         <a href="/recipes">Recipes</a>
         <a href="/blog">Blog</a>
         <a href="/contact">Contact</a>
-        <a href="/about">About us</a>
+        <a href="/about">About Us</a>
       </nav>
 
       <div className="header__social">

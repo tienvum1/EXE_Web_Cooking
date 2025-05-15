@@ -6,6 +6,7 @@
     justify-content: center;  // Căn giữa các phần tử
     align-items: center;
     gap: 1rem;  // Khoảng cách giữa các phần tử trong header
+    padding : 50px;
   }
 
   &__desc {
@@ -21,7 +22,7 @@
   &__list {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 2.5rem;
     justify-content: flex-start;
   }
 

@@ -1,23 +1,29 @@
 import React from 'react';
-import Header from './components/Header';
-import Hero from './components/Hero';
-import SearchBar from './components/SearchBar';
-import Categories from './components/Categories';
-import RecipesGrid from './components/RecipesGrid';
+import Header from '../components/header/Header';
+import Hero from '../components/banner/Banner';
+import SearchBar from '../components/search/SearchBar';
+import Categories from '../components/category/Categories';
+import RecipesGrid from '../components/recipeGird/RecipesGrid';
 
-import SpecialRecipes from './components/SpecialRecipes';
-import WellnessChefSection from './components/WellnessChefSection';
+import SpecialRecipes from '../components/SpecialRecipes';
+import WellnessChef from '../components/wellnessChef/WellnessChef';
+import InstagramFeed from '../components/InstagramFeed/InstagramFeed';
+import Subscribe from '../components/Subscribe/Subscribe';
+import Footer from '../components/footer/Footer';
+
 
 const HomePage = () => (
-  <div style={{background: '#fafafa'}}>
+  <div >
     <Header />
-    <main style={{maxWidth: '95%', margin: '0 auto', padding: '0 10px'}}>
+    <main style={{maxWidth: '95%', margin: '0 auto', padding: '0px 10px '}}>
       <Hero />
       <SearchBar />
       <Categories />
       <RecipesGrid />
       <SpecialRecipes />
-      <WellnessChefSection />
+      <WellnessChef />
+      <InstagramFeed />
+      <Subscribe />
     </main>
     <Footer />
   </div>
