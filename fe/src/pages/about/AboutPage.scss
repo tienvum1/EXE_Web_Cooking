@@ -1,0 +1,69 @@
+.about-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 18px 64px 18px;
+    font-family: 'Inter', Arial, sans-serif;
+    color: #222;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px #2e7d3211;
+  }
+  
+  .about-title {
+    text-align: center;
+    font-size: 2.3rem;
+    font-weight: 700;
+    color: #2e7d32;
+    margin-bottom: 10px;
+  }
+  
+  .about-desc {
+    text-align: center;
+    color: #555;
+    font-size: 1.18rem;
+    margin-bottom: 32px;
+  }
+  
+  .about-section {
+    margin-bottom: 38px;
+    h2 {
+      color: #e67e22;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    p, ul {
+      font-size: 1.08rem;
+      color: #333;
+    }
+    ul {
+      padding-left: 22px;
+      li { margin-bottom: 7px; }
+    }
+  }
+  
+  .about-team-flex {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    margin-top: 18px;
+    @media (max-width: 700px) {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+  
+  .about-team-img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px #2e7d3222;
+    background: #fafafa;
+  }
+  
+  @media (max-width: 700px) {
+    .about-container { padding: 16px 2vw 32px 2vw; border-radius: 0; box-shadow: none; }
+    .about-title { font-size: 1.3rem; }
+    .about-desc { font-size: 1rem; }
+  }

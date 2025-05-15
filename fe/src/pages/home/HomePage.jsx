@@ -10,7 +10,7 @@ import WellnessChef from '../../components/wellnessChef/WellnessChef';
 import InstagramFeed from '../../components/instagramFeed/InstagramFeed';
 import Subscribe from '../../components/subscribe/Subscribe';
 import Footer from '../../components/footer/Footer';
-
+import Sidebar from '../../components/sidebar/Sidebar';
 
 const HomePage = () => (
   <div >
@@ -25,6 +25,7 @@ const HomePage = () => (
       <InstagramFeed />
       <Subscribe />
     </main>
+    <Sidebar />
     <Footer />
   </div>
 );

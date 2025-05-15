@@ -1,0 +1,215 @@
+$primary-color: #2e7d32;
+$text-color: #222;
+$text-muted: #888;
+$bg-light: #fafafa;
+$font-main: 'Inter', Arial, sans-serif;
+
+.blog-detail-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 18px 64px;
+  font-family: $font-main;
+  color: $text-color;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(46,125,50,0.06);
+}
+
+.blog-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  &--centered {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+}
+.blog-detail-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 12px #2e7d3222;
+  &--large {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 8px;
+  }
+}
+.blog-detail-meta {
+  margin-top: 8px;
+}
+.blog-detail-author {
+  font-weight: 700;
+  font-size: 1.18rem;
+  &--main {
+    color: $primary-color;
+    font-size: 1.22rem;
+    margin-bottom: 2px;
+  }
+}
+.blog-detail-date {
+  color: $text-muted;
+  font-size: 1rem;
+  &--main {
+    font-size: 1.05rem;
+  }
+}
+
+.blog-detail-desc {
+  text-align: center;
+  font-size: 1.18rem;
+  color: #444;
+  margin-bottom: 28px;
+  &--highlight {
+    font-weight: 500;
+    color: #222;
+    background: $bg-light;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px #2e7d3211;
+  }
+}
+
+.blog-detail-mainimg {
+  width: 100%;
+  display: block;
+  border-radius: 22px;
+  margin: 0 auto 32px auto;
+  object-fit: cover;
+  box-shadow: 0 4px 24px #2e7d3211;
+  &--large {
+    max-height: 420px;
+  }
+  &--medium {
+    max-height: 320px;
+    margin: 18px 0 24px 0;
+  }
+}
+
+.blog-detail-flex-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+.blog-detail-section {
+  margin-top: 32px;
+  &--grow {
+    flex: 1;
+  }
+  h2 {
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 10px;
+  }
+  p, ul {
+    font-size: 1.07rem;
+    color: #333;
+  }
+  ul {
+    padding-left: 22px;
+    li { margin-bottom: 7px; }
+  }
+}
+
+.blog-detail-share {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 120px;
+  margin-top: 8px;
+  &--side {
+    margin-top: 0;
+    margin-bottom: 0;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+  span {
+    font-weight: 600;
+    color: $text-color;
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    a {
+      color: #444;
+      font-size: 1.25rem;
+      transition: color 0.2s, transform 0.18s;
+      &:hover {
+        color: $primary-color;
+        transform: scale(1.13);
+      }
+    }
+  }
+}
+
+.blog-detail-quote {
+  background: $bg-light;
+  border-left: 5px solid $primary-color;
+  font-size: 1.22rem;
+  font-style: italic;
+  margin: 38px 0;
+  padding: 22px 28px;
+  color: #444;
+  &--highlight {
+    background: linear-gradient(90deg, #f4fff4 0%, #fafafa 100%);
+    border-left: 6px solid $primary-color;
+    font-size: 1.28rem;
+    color: #222;
+    box-shadow: 0 2px 12px #2e7d3211;
+  }
+}
+
+.blog-detail-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 18px;
+  letter-spacing: 0.01em;
+  line-height: 1.18;
+  @media (max-width: 700px) {
+    font-size: 1.35rem;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .blog-detail-container {
+    padding: 16px 2vw 32px 2vw;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .blog-detail-header--centered {
+    margin-bottom: 18px;
+  }
+  .blog-detail-mainimg--large {
+    max-height: 220px;
+  }
+  .blog-detail-mainimg--medium {
+    max-height: 140px;
+  }
+  .blog-detail-flex-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .blog-detail-share {
+    align-items: flex-start;
+    min-width: 0;
+  }
+}

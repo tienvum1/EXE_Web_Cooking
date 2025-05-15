@@ -9,6 +9,7 @@ import DirectionsList from './DirectionsList';
 import Subscribe from '../../components/subscribe/Subscribe';
 import video from '../../assets/images/video.mp4';
 import RecommendedRecipes from './RecommendedRecipes';
+import Sidebar from '../../components/sidebar/Sidebar';
 import './DetailRecipe.scss';
 
 
@@ -62,6 +63,7 @@ const DetailRecipe = () => {
 
   return (
     <> <Header />
+     <Sidebar />
     <div className="detail-layout">
      
       <RecipeHeader

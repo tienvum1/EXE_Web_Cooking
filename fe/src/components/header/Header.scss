@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
 :root {
   --primary-color: #2e7d32;
   --highlight-color: #e67e22;
@@ -25,10 +27,11 @@
   }
 
   &__logo {
-    font-size: 2rem;
-    font-weight: bold;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Pacifico', cursive;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--primary-color);
+    margin: 0;
     cursor: pointer;
     transition: all 0.3s ease;
 
