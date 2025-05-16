@@ -1,0 +1,106 @@
+.recipe-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 16px 64px 16px;
+    font-family: 'Inter', Arial, sans-serif;
+  }
+  
+  .recipe-page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #2e7d32;
+  }
+  
+  .recipe-page-desc {
+    text-align: center;
+    color: #666;
+    font-size: 1.15rem;
+    margin-bottom: 32px;
+  }
+  
+  .recipe-page-search {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+    input {
+      width: 400px;
+      padding: 14px 22px;
+      border-radius: 24px;
+      border: 1.5px solid #e5e5e5;
+      font-size: 1.08rem;
+      outline: none;
+      background: #fafafa;
+      transition: border 0.2s;
+      &:focus {
+        border: 1.5px solid #2e7d32;
+      }
+    }
+  }
+  
+  .recipe-page-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+  }
+  
+  .recipe-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px #2e7d3211;
+    overflow: hidden;
+    transition: box-shadow 0.18s, transform 0.18s;
+    cursor: pointer;
+    &:hover {
+      box-shadow: 0 8px 32px #2e7d3222;
+      transform: translateY(-4px) scale(1.03);
+    }
+  }
+  
+  .recipe-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
+  }
+  
+  .recipe-card-info {
+    padding: 18px 16px 14px 16px;
+  }
+  
+  .recipe-card-title {
+    font-size: 1.13rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #222;
+  }
+  
+  .recipe-card-meta {
+    display: flex;
+    gap: 18px;
+    font-size: 0.98rem;
+    color: #4a5a41;
+    margin-bottom: 10px;
+    span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      i { color: #3a4c33; }
+    }
+  }
+  
+  .recipe-card-author {
+    font-size: 1rem;
+    color: #2e7d32;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    i { color: #2e7d32; }
+  }
+  
+  @media (max-width: 700px) {
+    .recipe-page-search input { width: 98vw; font-size: 1rem; }
+    .recipe-card-img { height: 120px; }
+  }

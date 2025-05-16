@@ -1,0 +1,79 @@
+.recipe-author-info {
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    padding-left: 5rem; // hoặc giá trị bạn muốn, ví dụ 24px 
+    padding-right: 5rem; // hoặc giá trị bạn muốn, ví dụ 24px
+  }
+  
+  .recipe-author-title {
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .recipe-author-main {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1.1rem;
+  }
+  
+  .recipe-author-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  
+  .recipe-author-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .recipe-author-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+  }
+  
+  .recipe-author-username {
+    color: #888;
+    font-size: 1rem;
+  }
+  
+  .recipe-author-time {
+    color: #666;
+    font-size: 0.98rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .recipe-author-location {
+    margin-left: 1.2rem;
+    color: #888;
+    font-size: 0.98rem;
+  }
+  
+  .recipe-author-friend-btn {
+    margin-top: 0.5rem;
+    background: #444;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .recipe-author-friend-btn:hover {
+    background: #e67e22;
+  }
+  
+  .recipe-author-desc {
+    color: #444;
+    font-size: 1.08rem;
+    margin-top: 0.5rem;
+  }

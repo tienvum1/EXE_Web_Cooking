@@ -5,11 +5,15 @@ const DirectionsList = ({ directions }) => (
     <h2 className="section-title">Directions</h2>
     {directions.map((step, index) => (
       <div key={index} className="direction-step">
-        <label className="direction-label">
-          <input type="radio" className="direction-radio" disabled />
-          <span className="step-title">{index + 1}. {step.title}</span>
-        </label>
+        <span className="step-title">{index + 1}. {step.title}</span>
         <p className="step-description">{step.description}</p>
+        {step.images && step.images.length > 0 && (
+          <div className="step-images">
+            {step.images.map((img, i) => (
+              <img key={i} src={img} alt={`step-${index + 1}-${i + 1}`} className="step-image" />
+            ))}
+          </div>
+        )}
       </div>
     ))}
   </div>

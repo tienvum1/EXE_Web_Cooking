@@ -1,70 +1,138 @@
 .footer {
-  padding: 20px 40px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #000;
+  background: #f9f9f9;
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 40px 16px 24px;
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.03);
+
+  &__container {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
   &__top {
     display: flex;
     justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 20px;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 28px;
   }
 
-  &__brand {
-    display: flex;
-    flex-direction: column;
+  &__intro {
+    flex: 1;
+    min-width: 280px;
 
-    & .footer__logo {
-      font-family: 'Pacifico', cursive;
-      font-size: 1.8rem;
-      margin: 0 0 5px;
+    h3 {
+      font-size: 1.6rem;
       font-weight: 700;
+      margin-bottom: 8px;
+
+      .highlight {
+        color: #2e7d32;
+      }
     }
 
-    & .footer__slogan {
-      font-size: 0.9rem;
-      color: #666;
-      margin: 0;
+    p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+
+      strong {
+        color: #2e7d32;
+        font-weight: 600;
+      }
     }
   }
 
-  &__nav {
+  &__social {
     display: flex;
-    gap: 25px;
+    gap: 12px;
 
     a {
+      background: #2e7d32;
+      color: #fff;
+      padding: 10px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #1b5e20;
+      }
+    }
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    a {
+      color: #555;
       text-decoration: none;
-      color: #000;
-      font-weight: 500;
-      font-size: 1rem;
-      transition: color 0.3s;
+      font-size: 0.95rem;
+      transition: color 0.2s;
 
       &:hover {
         color: #2e7d32;
+        text-decoration: underline;
       }
     }
   }
 
   &__bottom {
-    border-top: 1px solid #ddd;
-    padding-top: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #888;
   }
 
-  &__social {
-    display: flex;
-    gap: 20px;
+  @media (max-width: 768px) {
+    &__top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__social {
+      margin-top: 12px;
+    }
+
+    &__links {
+      font-size: 0.9rem;
+      gap: 12px;
+    }
+  }
+  &__premium-message {
+    font-size: 1rem;
+    color: #2e7d32;
+    text-align: center;
+    margin-bottom: 20px;
+    background: #e8f5e9;
+    padding: 10px 16px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 800px;
 
     a {
-      font-size: 1.2rem;
-      color: #000;
-      transition: color 0.3s;
+      color: #1b5e20;
+      text-decoration: none;
 
       &:hover {
-        color: #2e7d32;
+        text-decoration: underline;
       }
+    }
+
+    strong {
+      font-weight: 700;
     }
   }
 }

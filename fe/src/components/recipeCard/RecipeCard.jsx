@@ -39,7 +39,7 @@ const RecipeCard = ({ image, title, time, type, author }) => {
             <i className="far fa-clock" /> {time}
           </span>
           <span>
-            <i className="fas fa-utensils" /> {type}
+            <i className="fas fa-utensils" /> {type} 
           </span>
         </div>
 

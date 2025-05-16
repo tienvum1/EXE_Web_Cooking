@@ -7,7 +7,6 @@ const Categories = () => (
   <section className="categories">
     <div className="categories__header">
       <h2>Categories</h2>
-      <button className="categories__viewall">View All Categories</button>
     </div>
     <div className="categories__list">
       {categories.map(cat => (
