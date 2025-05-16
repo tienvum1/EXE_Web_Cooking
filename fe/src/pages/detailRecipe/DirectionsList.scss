@@ -47,10 +47,31 @@
       line-height: 1.7;
     }
   }
+  .step-images {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    .step-image {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 6px;
+      border: 1px solid #eee;
+    }
+  }
 }
 @media (max-width: 640px) {
   .directions-list {
     padding: 16px 8px 12px 8px;
     border-radius: 10px;
+    .step-images {
+      .step-image {
+        width: 86px;
+        height: 86px;
+      }
+    }
   }
 }

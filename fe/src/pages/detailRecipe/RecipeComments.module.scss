@@ -1,0 +1,87 @@
+.commentWrapper {
+  padding: 5rem;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #90a4ae;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.input {
+  flex: 1;
+  border: 1.5px solid #ddd;
+  border-radius: 24px;
+  padding: 10px 18px;
+  font-size: 17px;
+  outline: none;
+}
+
+.sendButton {
+  margin-left: -40px;
+  background: none;
+  border: none;
+  color: #f4a259;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.commentList {
+  margin-top: 12px;
+}
+
+.commentItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.avatarSmall {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #90a4ae;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.commentHeader {
+  font-weight: 600;
+}
+
+.commentTime {
+  color: #aaa;
+  font-weight: 400;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.commentContent {
+  font-size: 15px;
+}

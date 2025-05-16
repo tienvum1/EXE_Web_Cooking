@@ -34,7 +34,7 @@ const Sidebar = () => {
           </div>
           <div className="sidebar__item">
             <FaBell className="sidebar__icon" />
-            <span>Tương Tác</span>
+            <span>Thông báo</span>
           </div>
           <div className="sidebar__item sidebar__section">
             <FaBook className="sidebar__icon" />

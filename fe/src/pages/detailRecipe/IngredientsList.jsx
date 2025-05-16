@@ -3,10 +3,7 @@ import React from 'react';
 const IngredientsList = ({ mainDish, sauce }) => {
   const renderItem = (item, index) => (
     <li key={index} className="ingredient-item">
-      <label className="ingredient-label">
-        <input type="radio" className="ingredient-radio" disabled />
-        <span className="ingredient-text">{item}</span>
-      </label>
+      <span className="ingredient-text">{item}</span>
     </li>
   );
 

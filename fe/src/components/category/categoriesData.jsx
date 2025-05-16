@@ -1,10 +1,14 @@
 const categories = [
-  { name: 'Breakfast', icon: '🍙' },
-  { name: 'Vegan', icon: '🥬' },
-  { name: 'Meat', icon: '🥩' },
+  { name: 'Breakfast', icon: '🍳' },
+  { name: 'Lunch', icon: '🥪' },
+  { name: 'Dinner', icon: '🍽️' },
   { name: 'Dessert', icon: '🍰' },
-  { name: 'Lunch', icon: '🍞' },
-  { name: 'Sea food', icon: '🦐' },
+  { name: 'Salad', icon: '🥗' },
+  { name: 'Vegetarian', icon: '🥦' },
+  { name: 'Meat', icon: '🥩' },
+  { name: 'Seafood', icon: '🦐' },
+
+
 ];
 
 export default categories; 
