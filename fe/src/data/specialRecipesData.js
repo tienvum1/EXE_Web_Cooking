@@ -20,5 +20,13 @@ const specialRecipes = [
       time: '30 Minutes',
       type: 'Meat'
     }
+    ,
+    {
+      id: 3,
+      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
+      title: 'Northwest Grilled Chicken Platter',
+      time: '30 Minutes',
+      type: 'Meat'
+    }
   ];
   export default specialRecipes;

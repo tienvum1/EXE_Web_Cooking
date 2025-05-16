@@ -28,7 +28,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header__container">
-        <div className="header__logo">FitMeal</div>
+        <div className="header__logo" style={{cursor: 'pointer'}} onClick={() => navigate('/')}>FitMeal</div>
 
         <nav className="header__nav">
           <a href="/">Home</a>

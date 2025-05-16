@@ -6,7 +6,6 @@ import NutritionInfo from './NutritionInfo';
 import ImageSection from './ImageSection';
 import IngredientsList from './IngredientsList';
 import DirectionsList from './DirectionsList';
-import Subscribe from '../../components/subscribe/Subscribe';
 import video from '../../assets/images/video.mp4';
 import RecommendedRecipes from './RecommendedRecipes';
 import Sidebar from '../../components/sidebar/Sidebar';
@@ -115,8 +114,6 @@ const DetailRecipe = () => {
     <RecipeComments />
     <RecipeAuthorInfo />
     <RecommendedRecipes />
-
-    <Subscribe />
   
     <Footer />
     </>

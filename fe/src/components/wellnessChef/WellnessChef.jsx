@@ -1,8 +1,10 @@
 import React from 'react';
 import './WellnessChef.scss';
 import chefImage from '../../assets/images/wellnessChef.png';
+import { useNavigate } from 'react-router-dom';
 
 const WellnessChef = () => {
+  const navigate = useNavigate();
   return (
     <section className="wellness-chef">
       <div className="wellness-chef__text">
@@ -15,7 +17,7 @@ const WellnessChef = () => {
           Fuel your body with wholesome ingredients, embrace a balanced lifestyle,
           and make every meal a step toward better health!
         </p>
-        <button className="wellness-chef__btn">Learn More</button>
+        <button className="wellness-chef__btn" onClick={() => navigate('/blog')}>Learn More</button>
       </div>
 
       <div className="wellness-chef__image-wrapper">
