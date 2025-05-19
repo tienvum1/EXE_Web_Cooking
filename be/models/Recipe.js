@@ -22,11 +22,12 @@ const RecipeSchema = new mongoose.Schema({
   steps: [StepSchema], // Các bước làm
   mainImage: { type: String }, // Ảnh chính của món ăn (URL hoặc đường dẫn)
   nutrition: NutritionSchema, // Thông tin dinh dưỡng
-  author: {
-    username: { type: String },
-    userId: { type: String },
-    avatar: { type: String }
+  status: {
+    type: String,
+    enum: ['draft', 'pending', 'approved', 'rejected'],
+    default: 'draft'
   },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Người đăng
   createdAt: { type: Date, default: Date.now }
 });
 
