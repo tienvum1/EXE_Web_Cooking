@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from '../../components/header/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Footer from '../../components/footer/Footer';
+import axios from 'axios';
 import './CreateRecipe.scss';
 
 const CreateRecipe = () => {
@@ -15,6 +16,8 @@ const CreateRecipe = () => {
   const [mainImageUrl, setMainImageUrl] = useState('');
   // Nutrition Info
   const [nutrition, setNutrition] = useState({ calories: '', fat: '', protein: '', carbs: '' });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   // Ảnh món ăn
   const handleMainImageChange = (e) => {
@@ -57,6 +60,42 @@ const CreateRecipe = () => {
   };
   const addStep = () => setSteps([...steps, { text: '', images: [] }]);
   const removeStep = (idx) => setSteps(steps.filter((_, i) => i !== idx));
+
+  // Gửi API tạo recipe
+  const handleSubmit = async (status) => {
+    setLoading(true);
+    setMessage('');
+    try {
+      await axios.post(
+        'http://localhost:4567/api/recipes/create',
+        {
+          title,
+          desc,
+          servings,
+          cookTime,
+          ingredients,
+          steps: steps.map(s => ({
+            text: s.text,
+            images: (s.images || []).map(img => img.url)
+          })),
+          mainImage: mainImageUrl,
+          nutrition,
+          status
+        },
+        { withCredentials: true }
+      );
+      setMessage(status === 'pending'
+        ? 'Gửi duyệt thành công! Công thức sẽ được kiểm duyệt.'
+        : 'Đã lưu nháp công thức!');
+    } catch (err) {
+      setMessage(
+        err.response?.data?.message ||
+        'Lưu công thức thất bại. Vui lòng thử lại.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="create-recipe-page">
@@ -189,8 +228,13 @@ const CreateRecipe = () => {
       </div>
       <div className="create-recipe-actions">
         <button className="btn-delete"><i className="fas fa-trash-alt"></i> Xóa</button>
-        <button className="btn-save">Lưu và Đóng</button>
-        <button className="btn-publish">Lên sóng</button>
+        <button className="btn-save" onClick={() => handleSubmit('draft')} disabled={loading}>
+          {loading ? 'Đang lưu...' : 'Lưu và Đóng'}
+        </button>
+        <button className="btn-publish" onClick={() => handleSubmit('pending')} disabled={loading}>
+          {loading ? 'Đang gửi duyệt...' : 'Lên sóng'}
+        </button>
+        {message && <div className="create-recipe-message">{message}</div>}
       </div>
       <Footer />
     </div>

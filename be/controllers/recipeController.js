@@ -4,19 +4,39 @@ exports.getAll = async (req, res) => {
   res.json(recipes);
 };
 exports.create = async (req, res) => {
-  const recipe = await Recipe.create(req.body);
-  res.json(recipe);
+  try {
+    const { title, desc, servings, cookTime, ingredients, steps, mainImage, nutrition, status } = req.body;
+    // Kiểm tra trường bắt buộc
+    if (!title || !ingredients || !steps) {
+      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc (title, ingredients, steps)' });
+    }
+    // Tạo recipe mới, lấy author từ req.user.id
+    const recipe = await Recipe.create({
+      title,
+      desc,
+      servings,
+      cookTime,
+      ingredients,
+      steps,
+      mainImage,
+      nutrition,
+      status: status || 'draft',
+      author: req.user.id
+    });
+    res.status(201).json(recipe);
+  } catch (err) {
+    console.error('Lỗi tạo recipe:', err);
+    res.status(500).json({ message: 'Lỗi tạo recipe', error: err.message });
+  }
 };
-exports.getById = async (req, res) => {
-  const recipe = await Recipe.findById(req.params.id);
-  if (!recipe) return res.status(404).json({ message: 'Not found' });
-  res.json(recipe);
-};
-exports.update = async (req, res) => {
-  const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(recipe);
-};
-exports.delete = async (req, res) => {
-  await Recipe.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Deleted' });
+
+// Lấy tất cả recipe
+exports.getAll = async (req, res) => {
+  try {
+    // Lấy tất cả recipe, có thể populate author nếu muốn
+    const recipes = await Recipe.find().populate('author', 'username');
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy danh sách recipe', error: err.message });
+  }
 };

@@ -1,77 +1,74 @@
 import React, { useState } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './AuthPage.scss';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = e => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-    // Fake async
-    setTimeout(() => {
-      setLoading(false);
-      if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
-        setError('Invalid email address.');
-      } else if (password.length < 6) {
-        setError('Password must be at least 6 characters.');
-      } else {
-        // TODO: Gọi API đăng nhập
-        alert('Login success!');
-      }
-    }, 1200);
-  };
 
-  const handleSocial = provider => {
-    alert('Login with ' + provider);
+    if (!username || !password) {
+      setError('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post(
+        'http://localhost:4567/api/auth/login',
+        { username, password },
+        { withCredentials: true }
+      );
+      // Không cần lưu token, cookie sẽ tự động được gửi kèm các request sau
+      navigate('/');
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        'Đăng nhập thất bại. Vui lòng thử lại.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <Header />
       <div className="auth-container">
-        <h2 className="auth-title">Sign In to FitMeal</h2>
+        <h2 className="auth-title">Đăng nhập FitMeal</h2>
         <form className="auth-form" onSubmit={handleLogin}>
           <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            type="text"
+            placeholder="Tên đăng nhập"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
             required
             disabled={loading}
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Mật khẩu"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
             disabled={loading}
           />
           <button className="auth-btn" type="submit" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
         </form>
-        <div className="auth-forgot">
-          <a href="/forgot-password">Forgot password?</a>
-        </div>
         {error && <div className="auth-error">{error}</div>}
-        <div className="auth-or">or</div>
-        <div className="auth-social">
-          <button className="auth-social-btn fb" onClick={() => handleSocial('Facebook')} disabled={loading}>
-            <i className="fab fa-facebook-f"></i> Continue with Facebook
-          </button>
-          <button className="auth-social-btn gg" onClick={() => handleSocial('Google')} disabled={loading}>
-            <i className="fab fa-google"></i> Continue with Google
-          </button>
-        </div>
         <div className="auth-bottom">
-          Don't have an account? <a href="/signup">Sign Up</a>
+          Chưa có tài khoản? <a href="/signup">Đăng ký</a>
         </div>
       </div>
       <Footer />

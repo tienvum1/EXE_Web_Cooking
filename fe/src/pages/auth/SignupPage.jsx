@@ -1,32 +1,58 @@
 import React, { useState } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './AuthPage.scss';
 
 const SignupPage = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignup = e => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
+
+    if (username.trim().length < 6) {
+      setError('Tên đăng nhập phải có ít nhất 6 ký tự.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await axios.post('http://localhost:4567/api/auth/register', {
+        username,
+        password
+      });
+      setSuccess(true);
+      setUsername('');
+      setPassword('');
+      setConfirmPassword('');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1200);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        'Đăng ký thất bại. Vui lòng thử lại.'
+      );
+    } finally {
       setLoading(false);
-      if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
-        setError('Invalid email address.');
-      } else if (password.length < 6) {
-        setError('Password must be at least 6 characters.');
-      } else if (name.trim().length < 2) {
-        setError('Please enter your full name.');
-      } else {
-        setSuccess(true);
-      }
-    }, 1200);
+    }
   };
 
   const handleSocial = provider => {
@@ -37,40 +63,40 @@ const SignupPage = () => {
     <>
       <Header />
       <div className="auth-container">
-        <h2 className="auth-title">Create Your FitMeal Account</h2>
+        <h2 className="auth-title">Tạo tài khoản FitMeal</h2>
         {!success ? (
           <form className="auth-form" onSubmit={handleSignup}>
             <input
               type="text"
-              placeholder="Full name"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-              disabled={loading}
-            />
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              placeholder="Tên đăng nhập"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               required
               disabled={loading}
             />
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Mật khẩu"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
               disabled={loading}
             />
+            <input
+              type="password"
+              placeholder="Nhập lại mật khẩu"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
             <button className="auth-btn" type="submit" disabled={loading}>
-              {loading ? 'Signing up...' : 'Sign Up'}
+              {loading ? 'Đang đăng ký...' : 'Đăng ký'}
             </button>
           </form>
         ) : (
           <div className="auth-success">
-            Registration successful! Please check your email to verify your account.
+            Đăng ký thành công! Đang chuyển sang trang đăng nhập...
           </div>
         )}
         {error && <div className="auth-error">{error}</div>}
@@ -86,7 +112,7 @@ const SignupPage = () => {
               </button>
             </div>
             <div className="auth-bottom">
-              Already have an account? <a href="/login">Sign In</a>
+              Đã có tài khoản? <a href="/login">Đăng nhập</a>
             </div>
           </>
         )}
