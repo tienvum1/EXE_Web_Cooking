@@ -14,6 +14,10 @@ import MenuSuggestion from "./pages/menuSuggestion/MenuSuggestion";
 import MenuSuggestionResult from "./pages/menuSuggestion/MenuSuggestionResult";
 import ProfilePage from "./pages/profilePage/ProfilePage";
 import SettingPage from "./pages/settingPage/SettingPage";
+import BMIPage from './pages/tools/BMIPage';
+import WeightPage from './pages/tools/WeightPage';
+import BmrTdeePage from './pages/tools/BmrTdeePage';
+
 import "./App.css";
 
 function App() {
@@ -34,6 +38,9 @@ function App() {
       <Route path="/menu-suggestion/result" element={<MenuSuggestionResult />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/settings" element={<SettingPage />} />
+      <Route path="/tools/bmi" element={<BMIPage />} />
+<Route path="/tools/weight" element={<WeightPage />} />
+<Route path="/tools/bmr-tdee" element={<BmrTdeePage />} />
     </Routes>
   );
 }

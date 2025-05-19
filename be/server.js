@@ -1,27 +1,13 @@
-// app.js
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./db');
+const mongoose = require('mongoose');
+const app = require('./app');
+const config = require('./config');
 
-const app = express();
-const PORT = process.env.PORT || 3002;
-
-// Middleware
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: false
-  }));
-  
-app.use(express.json());
-
-connectDB();
-// Route test
-app.get('/', (req, res) => {
-  res.send('Healthy Cooking API is running!');
-});
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+mongoose.connect(config.MONGO_URI)
+  .then(() => {
+    app.listen(config.PORT, () => {
+      console.log(`Server running on port ${config.PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
   });

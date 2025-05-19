@@ -32,10 +32,24 @@ const Header = () => {
 
         <nav className="header__nav">
           <a href="/">Home</a>
+          
           <a href="/recipes">Recipes</a>
+          
           <a href="/blog">Blog</a>
           <a href="/menu-suggestion">Menu Suggestion</a>
-       
+          <div className="header__dropdown">
+            <span
+              className="header__dropdown-toggle"
+              tabIndex={0}
+            >
+              Công cụ tính các chỉ số
+            </span>
+            <div className="header__dropdown-menu">
+              <a href="/tools/bmi">Công cụ tính BMI</a>
+              <a href="/tools/weight">Công cụ tính cân nặng chuẩn</a>
+              <a href="/tools/bmr-tdee">Công cụ tính BMR và TDEE</a>
+            </div>
+          </div>
           <a href="/about">About Us</a>
         </nav>
         <div className="header__actions">
