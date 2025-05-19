@@ -34,9 +34,9 @@ const Header = () => {
           <a href="/">Home</a>
           <a href="/recipes">Recipes</a>
           <a href="/blog">Blog</a>
-          <a href="/feedback">Feedback</a>
-          <a href="/about">About Us</a>
           <a href="/menu-suggestion">Menu Suggestion</a>
+       
+          <a href="/about">About Us</a>
         </nav>
         <div className="header__actions">
           <div className="header__avatar" onClick={() => setMenuOpen(!menuOpen)} style={{cursor: 'pointer'}}>
@@ -51,9 +51,36 @@ const Header = () => {
                   <div className="header__user-username">@cook_113267840</div>
                 </div>
               </div>
-              <div className="header__user-menu-item"><i className="fas fa-user"></i> Bếp cá nhân</div>
-              <div className="header__user-menu-item"><i className="fas fa-cog"></i> Cài đặt</div>
-              <div className="header__user-menu-item"><i className="fas fa-paper-plane"></i> Gửi Góp Ý</div>
+              <div
+                className="header__user-menu-item"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/profile');
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <i className="fas fa-user"></i> Bếp cá nhân
+              </div>
+              <div
+                className="header__user-menu-item"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/settings');
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <i className="fas fa-cog"></i> Cài đặt
+              </div>
+              <div
+                className="header__user-menu-item"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/feedback');
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <i className="fas fa-paper-plane"></i> Gửi Góp Ý
+              </div>
               <div className="header__user-menu-divider"></div>
               <div className="header__user-menu-item header__user-menu-logout"><i className="fas fa-sign-out-alt"></i> Thoát</div>
             </div>

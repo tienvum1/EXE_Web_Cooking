@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './FeedbackForm.scss';
-import Header from '../header/Header';
-import Footer from '../footer/Footer';
-import Sidebar from '../sidebar/Sidebar';
+import './FeedbackPage.scss';
+import Header from '../../components/header/Header';
+import Footer from '../../components/footer/Footer';
+import Sidebar from '../../components/sidebar/Sidebar';
 
 const FeedbackForm = () => {
   const [value, setValue] = useState('');

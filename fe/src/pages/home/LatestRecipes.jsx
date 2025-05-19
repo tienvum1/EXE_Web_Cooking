@@ -30,12 +30,44 @@ const latestRecipes = [
     type: 'Salad',
     author: 'Chef Mark',
   },
+  ,
+  {
+    image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80',
+    title: 'Healthy Mixed Salad',
+    time: '15 Minutes',
+    type: 'Salad',
+    author: 'Chef Mark',
+  },
+  ,
+  {
+    image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80',
+    title: 'Healthy Mixed Salad',
+    time: '15 Minutes',
+    type: 'Salad',
+    author: 'Chef Mark',
+  },
+  ,
+  {
+    image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80',
+    title: 'Healthy Mixed Salad',
+    time: '15 Minutes',
+    type: 'Salad',
+    author: 'Chef Mark',
+  },
+  ,
+  {
+    image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80',
+    title: 'Healthy Mixed Salad',
+    time: '15 Minutes',
+    type: 'Salad',
+    author: 'Chef Mark',
+  },
 ];
 
 const LatestRecipes = () => (
-  <section style={{margin: '2.5rem 0'}}>
+  <section style={{margin: '2rem 0'}}>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem'}}>
-      <h2 style={{fontSize: '2rem', fontWeight: 700, color: '#2d3a2f', margin: 0, textAlign: 'center'}}>
+      <h2 style={{fontSize: '2rem', fontWeight: 700, color: '#3DD056', margin: 0, textAlign: 'center'}}>
         Latest Healthy Recipes
       </h2>
       <div style={{fontSize: '1.05rem', color: '#4a5a41', marginTop: '0.3rem', textAlign: 'center', maxWidth: 600}}>

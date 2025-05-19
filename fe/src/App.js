@@ -3,7 +3,7 @@ import HomePage from "./pages/home/HomePage";
 import DetailRecipe from "./pages/detailRecipe/DetailRecipe";
 import Blog from "./pages/blog/Blog";
 import BlogDetail from "./pages/blogDetail/BlogDetail";
-import FeedbackForm from "./components/feedback/FeedbackForm";
+import FeedbackForm from "./pages/feedback/FeedbackPage";
 import RecipePage from "./pages/recipe/RecipePage";
 import AboutPage from "./pages/about/AboutPage";
 import LoginPage from "./pages/auth/LoginPage";
@@ -12,6 +12,8 @@ import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import CreateRecipe from "./pages/recipe/CreateRecipe";
 import MenuSuggestion from "./pages/menuSuggestion/MenuSuggestion";
 import MenuSuggestionResult from "./pages/menuSuggestion/MenuSuggestionResult";
+import ProfilePage from "./pages/profilePage/ProfilePage";
+import SettingPage from "./pages/settingPage/SettingPage";
 import "./App.css";
 
 function App() {
@@ -30,6 +32,8 @@ function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/menu-suggestion" element={<MenuSuggestion />} />
       <Route path="/menu-suggestion/result" element={<MenuSuggestionResult />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/settings" element={<SettingPage />} />
     </Routes>
   );
 }
