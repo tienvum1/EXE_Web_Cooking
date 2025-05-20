@@ -2,11 +2,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import './Header.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+
+  // Lấy thông tin user khi header mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get('http://localhost:4567/api/users/me', { withCredentials: true });
+        setUser(res.data);
+      } catch {
+        setUser(null);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Đóng menu khi click ra ngoài
   useEffect(() => {
@@ -54,15 +69,21 @@ const Header = () => {
         </nav>
         <div className="header__actions">
           <div className="header__avatar" onClick={() => setMenuOpen(!menuOpen)} style={{cursor: 'pointer'}}>
-            T
+            {user?.avatar
+              ? <img src={user.avatar} alt="avatar" />
+              : (user?.username ? user.username[0].toUpperCase() : 'U')}
           </div>
           {menuOpen && (
             <div className="header__user-menu" ref={menuRef}>
               <div className="header__user-info">
-                <div className="header__avatar">T</div>
+                <div className="header__avatar">
+                  {user?.avatar
+                    ? <img src={user.avatar} alt="avatar" />
+                    : (user?.username ? user.username[0].toUpperCase() : 'U')}
+                </div>
                 <div>
-                  <div className="header__user-name">Tiến Vũ</div>
-                  <div className="header__user-username">@cook_113267840</div>
+                  <div className="header__user-name">{user?.fullName || user?.username || 'Khách'}</div>
+                  <div className="header__user-username">{user ? `@${user.username}` : ''}</div>
                 </div>
               </div>
               <div

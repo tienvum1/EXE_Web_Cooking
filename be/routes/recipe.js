@@ -4,6 +4,6 @@ const recipeController = require('../controllers/recipeController');
 const auth = require('../middlewares/auth');
 
 router.post('/create', auth, recipeController.create); // Bắt buộc phải đăng nhập mới tạo được
-router.get('/lastestRecipes', recipeController.getAll);
+router.get('/', recipeController.getAll);
 
 module.exports = router;
