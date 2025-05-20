@@ -1,30 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import Sidebar from '../../components/sidebar/Sidebar';
 import RecipeCard from '../../components/recipeCard/RecipeCard';
+import { getUserWithRecipes, getCurrentUser } from '../../api/user';
 import './ProfilePage.scss';
 
-const user = {
-  name: 'Tiến Vũ',
-  username: 'cook_113267840',
-  avatar: '',
-  friends: 0,
-  followers: 0,
-  recipes: [
-    {
-      id: 1,
-      title: 'Hi',
-      description: 'test',
-      image: '',
-      time: '30 phút',
-      type: 'Món chính',
-    },
-    // Thêm nhiều món để test grid
-  ],
-};
-
 const ProfilePage = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // Lấy user hiện tại từ cookie
+        const currentUser = await getCurrentUser();
+        if (!currentUser || !currentUser._id) {
+          setError('Không tìm thấy user.');
+          setLoading(false);
+          return;
+        }
+        const data = await getUserWithRecipes(currentUser._id);
+        setUser(data);
+      } catch (err) {
+        setError('Không thể tải thông tin người dùng.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="loading">Đang tải...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!user) return null;
+
   return (
     <div>
       <Header />
@@ -35,17 +48,17 @@ const ProfilePage = () => {
             {user.avatar ? (
               <img src={user.avatar} alt="avatar" />
             ) : (
-              user.name[0]
+              user.fullName ? user.fullName[0] : user.username[0]
             )}
           </div>
-          <div className="name">{user.name}</div>
+          <div className="name">{user.fullName || user.username}</div>
           <div className="username">@{user.username}</div>
           <div className="profile-stats">
             <span>
-              <b>{user.friends}</b> Bạn Bếp
+              <b>{user.friends || 0}</b> Bạn Bếp
             </span>
             <span>
-              <b>{user.followers}</b> Người quan tâm
+              <b>{user.followers || 0}</b> Người quan tâm
             </span>
           </div>
           <button className="edit-btn">Sửa thông tin cá nhân</button>
@@ -55,17 +68,17 @@ const ProfilePage = () => {
           <div className="recipes-header">
             <i className="fas fa-utensils"></i>
             <span>Các món</span>
-            <span className="count">({user.recipes.length})</span>
+            <span className="count">({user.recipes?.length || 0})</span>
           </div>
           <div className="recipes-list">
-            {user.recipes.map((recipe) => (
+            {user.recipes && user.recipes.map((recipe) => (
               <RecipeCard
-                key={recipe.id}
-                image={recipe.image}
+                key={recipe._id}
+                image={recipe.mainImage}
                 title={recipe.title}
-                time={recipe.time}
+                time={recipe.cookTime}
                 type={recipe.type}
-                author={user.name}
+                author={user.fullName || user.username}
               />
             ))}
           </div>

@@ -21,6 +21,7 @@ const RecipePage = () => {
         const res = await axios.get('http://localhost:4567/api/recipes');
         // Map về format cho RecipeGrid
         const mapped = res.data.map(r => ({
+          id: r._id,
           image: r.mainImage || '',
           title: r.title,
           time: r.cookTime || '',
