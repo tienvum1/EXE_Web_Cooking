@@ -5,7 +5,7 @@ const DirectionsList = ({ directions }) => (
     <h2 className="section-title">Directions</h2>
     {directions.map((step, index) => (
       <div key={index} className="direction-step">
-        <span className="step-title">{index + 1}. {step.title}</span>
+        <span className="step-title">{index + 1}. {step.text}</span>
         <p className="step-description">{step.description}</p>
         {step.images && step.images.length > 0 && (
           <div className="step-images">

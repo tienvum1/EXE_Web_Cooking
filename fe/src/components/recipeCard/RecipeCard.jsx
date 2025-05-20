@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RecipeCard.scss';
 
-const RecipeCard = ({ image, title, time, type, author }) => {
+const RecipeCard = ({ id, image, title, time, type, author }) => {
   const [liked, setLiked] = useState(false);
   const navigate = useNavigate();
 
   const toggleLike = () => setLiked(!liked);
 
   const handleCardClick = () => {
-    // Navigate to /detail-recipe and pass the recipe data as state
-    navigate('/detail-recipe', {
-      state: { image, title, time, type, author },
-    });
+    // Navigate to /detail-recipe/:id
+    navigate(`/detail-recipe/${id}`);
   };
 
   return (

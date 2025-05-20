@@ -10,10 +10,9 @@ const IngredientsList = ({ mainDish, sauce }) => {
   return (
     <div className="ingredients-list">
       <h2 className="section-title">Ingredients</h2>
-      <h3 className="subsection-title">For main dish</h3>
+
       <ul className="ingredient-items">{mainDish.map(renderItem)}</ul>
-      <h3 className="subsection-title">For the sauce</h3>
-      <ul className="ingredient-items">{sauce.map(renderItem)}</ul>
+    
     </div>
   );
 };

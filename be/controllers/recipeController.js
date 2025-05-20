@@ -1,7 +1,12 @@
 const Recipe = require('../models/Recipe');
 exports.getAll = async (req, res) => {
-  const recipes = await Recipe.find();
-  res.json(recipes);
+  try {
+    // Chỉ lấy recipe đã duyệt
+    const recipes = await Recipe.find({ status: 'approved' }).populate('author', 'username');
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy danh sách recipe', error: err.message });
+  }
 };
 exports.create = async (req, res) => {
   try {
@@ -29,14 +34,34 @@ exports.create = async (req, res) => {
     res.status(500).json({ message: 'Lỗi tạo recipe', error: err.message });
   }
 };
-
-// Lấy tất cả recipe
+// Lấy tất cả recipe đã duyệt
 exports.getAll = async (req, res) => {
   try {
-    // Lấy tất cả recipe, có thể populate author nếu muốn
-    const recipes = await Recipe.find().populate('author', 'username');
+    // Chỉ lấy recipe đã duyệt
+    const recipes = await Recipe.find({ status: 'approved' }).populate('author', 'username');
     res.json(recipes);
   } catch (err) {
     res.status(500).json({ message: 'Lỗi lấy danh sách recipe', error: err.message });
+  }
+};
+
+exports.getRecipeById = async (req, res) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id).populate('author', 'username createdAt',);
+    if (!recipe) {
+      return res.status(404).json({ message: 'Recipe not found' });
+    }
+    res.json(recipe);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy recipe', error: err.message });
+  }
+};
+
+exports.getAuthorRecipeById = async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ author: req.params.id }).populate('author', 'username createdAt');
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy recipe', error: err.message });
   }
 };

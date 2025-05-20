@@ -28,7 +28,8 @@ const RecipeSchema = new mongoose.Schema({
     default: 'draft'
   },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Người đăng
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Recipe', RecipeSchema); 

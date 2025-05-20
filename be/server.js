@@ -8,14 +8,15 @@ const cookieParser = require('cookie-parser');
 
 // Import routes
 const authRoutes = require('./routes/auth');
-// const userRoutes = require('./routes/user');
+ const userRoutes = require('./routes/user');
  const recipeRoutes = require('./routes/recipe');
+ const blogRoutes = require('./routes/blog');
 // ... (các route khác nếu cần)
 
 const app = express();
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:3003', // FE domain
+  origin: 'http://localhost:3003', 
   credentials: true
 }));
 app.use(express.json());
@@ -23,8 +24,9 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/users', userRoutes);
+ app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/blogs', blogRoutes);
 // ... (các route khác nếu cần)
 
 app.get('/', (req, res) => res.send('API is running!'));
