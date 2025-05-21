@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import Sidebar from '../../components/sidebar/Sidebar';
@@ -7,6 +8,7 @@ import { getUserWithRecipes, getCurrentUser } from '../../api/user';
 import './ProfilePage.scss';
 
 const ProfilePage = () => {
+  const { id } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,14 +18,17 @@ const ProfilePage = () => {
       setLoading(true);
       setError('');
       try {
-        // Lấy user hiện tại từ cookie
-        const currentUser = await getCurrentUser();
-        if (!currentUser || !currentUser._id) {
+        let userId = id;
+        if (!userId) {
+          const currentUser = await getCurrentUser();
+          userId = currentUser?._id;
+        }
+        if (!userId) {
           setError('Không tìm thấy user.');
           setLoading(false);
           return;
         }
-        const data = await getUserWithRecipes(currentUser._id);
+        const data = await getUserWithRecipes(userId);
         setUser(data);
       } catch (err) {
         setError('Không thể tải thông tin người dùng.');
@@ -32,7 +37,7 @@ const ProfilePage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   if (loading) return <div className="loading">Đang tải...</div>;
   if (error) return <div className="error">{error}</div>;

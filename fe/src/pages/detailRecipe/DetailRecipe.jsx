@@ -90,6 +90,7 @@ const DetailRecipe = () => {
       time={recipeData.createdAt}
       location={authorInfo?.location || ''}
       description={authorInfo?.bio || authorInfo?.introduce || ''}
+      authorId={authorInfo?._id}
     />
     <RecommendedRecipes />
   

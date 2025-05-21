@@ -36,7 +36,7 @@ function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/menu-suggestion" element={<MenuSuggestion />} />
       <Route path="/menu-suggestion/result" element={<MenuSuggestionResult />} />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile/:id" element={<ProfilePage />} />
       <Route path="/settings" element={<SettingPage />} />
       <Route path="/tools/bmi" element={<BMIPage />} />
 <Route path="/tools/weight" element={<WeightPage />} />
