@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './RecipeAuthorInfo.scss';
 
 const RecipeAuthorInfo = ({
@@ -7,12 +8,21 @@ const RecipeAuthorInfo = ({
   username,
   time,
   location,
-  description
+  description,
+  authorId
 }) => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    if (authorId) {
+      navigate(`/profile/${authorId}`);
+    }
+  };
   return (
     <div className="recipe-author-info">
-      <h2 className="recipe-author-title">Viết bởi</h2>
-      <div className="recipe-author-main">
+      <h2 className="recipe-author-title" onClick={handleClick} style={{cursor: authorId ? 'pointer' : 'default', color: authorId ? '#2e7d32' : undefined}}>
+        Viết bởi
+      </h2>
+      <div className="recipe-author-main" onClick={handleClick} style={{cursor: authorId ? 'pointer' : 'default'}}>
         <img
           className="recipe-author-avatar"
           src={avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'}
