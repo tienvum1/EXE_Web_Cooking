@@ -40,6 +40,15 @@ const Header = () => {
     };
   }, [menuOpen]);
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:4567/api/auth/logout', {}, { withCredentials: true });
+      window.location.href = '/';
+    } catch (err) {
+      alert('Đăng xuất thất bại!');
+    }
+  };
+
   return (
     <header className="header">
       <div className="header__container">
@@ -90,7 +99,7 @@ const Header = () => {
                 className="header__user-menu-item"
                 onClick={() => {
                   setMenuOpen(false);
-                  navigate('/profile');
+                  navigate(`/profile/${user._id}`);
                 }}
                 style={{ cursor: 'pointer' }}
               >
@@ -117,7 +126,7 @@ const Header = () => {
                 <i className="fas fa-paper-plane"></i> Gửi Góp Ý
               </div>
               <div className="header__user-menu-divider"></div>
-              <div className="header__user-menu-item header__user-menu-logout"><i className="fas fa-sign-out-alt"></i> Thoát</div>
+              <div className="header__user-menu-item header__user-menu-logout" onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Thoát</div>
             </div>
           )}
           <button className="header__new-recipe-btn" onClick={() => navigate('/recipes/create')}>
