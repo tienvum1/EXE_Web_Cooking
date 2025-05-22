@@ -5,6 +5,8 @@ const auth = require('../middlewares/auth');
 
 router.post('/create', auth, recipeController.create); // Bắt buộc phải đăng nhập mới tạo được
 router.get('/', recipeController.getAll);
+router.get('/newest', recipeController.getNewest);
+router.get('/most-liked', recipeController.getMostLiked);
 router.get('/:id', recipeController.getRecipeById);
 router.get('/author/:id', recipeController.getAuthorRecipeById);
 
