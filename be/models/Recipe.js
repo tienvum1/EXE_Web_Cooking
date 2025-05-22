@@ -21,6 +21,7 @@ const RecipeSchema = new mongoose.Schema({
   ingredients: [{ type: String, required: true }], // Danh sách nguyên liệu
   steps: [StepSchema], // Các bước làm
   mainImage: { type: String }, // Ảnh chính của món ăn (URL hoặc đường dẫn)
+  categories: [{ type: String, required: true }], // Danh mục món ăn (mảng)
   nutrition: NutritionSchema, // Thông tin dinh dưỡng
   status: {
     type: String,
@@ -28,6 +29,7 @@ const RecipeSchema = new mongoose.Schema({
     default: 'draft'
   },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Người đăng
+  likes: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

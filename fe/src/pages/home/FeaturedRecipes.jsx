@@ -1,49 +1,106 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import RecipeGrid from '../../components/recipeCard/RecipeGrid';
+import { fetchMostLikedRecipes } from '../../api/recipe';
+import { useNavigate } from 'react-router-dom';
 
-const featuredRecipes = [
-  {
-    image: 'https://images.unsplash.com/photo-1506089676908-3592f7389d4d?auto=format&fit=crop&w=400&q=80',
-    title: 'Greek-Style Shrimp Salad',
-    time: '30 Minutes',
-    type: 'Sea Food',
-    author: 'Chef Anna',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
-    title: 'Fruity Pancake with Orange & Blueberry',
-    time: '30 Minutes',
-    type: 'Sweet',
-    author: 'Chef Tom',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80',
-    title: 'The Best Easy One Pot Chicken and Rice',
-    time: '30 Minutes',
-    type: 'Meat',
-    author: 'Chef Steve',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80',
-    title: 'Stir-Fried Vegan Rice Noodles',
-    time: '30 Minutes',
-    type: 'Noodles',
-    author: 'Chef Lisa',
-  },
-];
+const mapRecipe = (r) => ({
+  id: r._id,
+  image: r.mainImage || '',
+  title: r.title,
+  time: r.cookTime ? `${r.cookTime} Minutes` : '',
+  type: r.type || '',
+  author: r.author?.username || '',
+});
 
-const FeaturedRecipes = () => (
-  <section style={{margin: '2rem 0'}}>
-    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem'}}>
-      <h2 style={{fontSize: '2rem', fontWeight: 700, color: '#3DD056', margin: 0, textAlign: 'center'}}>
-        Featured Delicious Recipes
-      </h2>
-      <div style={{fontSize: '1.05rem', color: '#4a5a41', marginTop: '0.3rem', textAlign: 'center', maxWidth: 600}}>
+const FeaturedRecipes = () => {
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchMostLikedRecipes()
+      .then((data) => setRecipes(data.map(mapRecipe)))
+      .catch(() => setError('Failed to load featured recipes'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <section style={{ margin: '2rem 0' }}>
+      {/* Title */}
+      <h2 style={styles.title}>Featured Delicious Recipes</h2>
+
+      {/* Description */}
+      <p style={styles.description}>
         Enjoy our most popular and highly rated dishes, selected just for you.
-      </div>
-    </div>
-    <RecipeGrid recipes={featuredRecipes} />
-  </section>
-);
+      </p>
 
-export default FeaturedRecipes; 
+      {/* View All Button */}
+      <div style={styles.buttonWrapper}>
+        <button
+          style={styles.button}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 16px rgba(46, 184, 114, 0.3)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 12px rgba(61, 208, 86, 0.2)';
+          }}
+          onClick={() => navigate('/recipes')}
+        >
+          View All
+        </button>
+      </div>
+
+      {/* Recipe Grid */}
+      {loading ? (
+        <div style={styles.centerText}>Loading...</div>
+      ) : error ? (
+        <div style={{ ...styles.centerText, color: 'red' }}>{error}</div>
+      ) : (
+        <RecipeGrid recipes={recipes} />
+      )}
+    </section>
+  );
+};
+
+const styles = {
+  title: {
+    fontSize: '2rem',
+    fontWeight: 700,
+    color: '#3DD056',
+    textAlign: 'center',
+    marginBottom: '0.5rem',
+  },
+  description: {
+    fontSize: '1.05rem',
+    color: '#4a5a41',
+    textAlign: 'center',
+    maxWidth: 600,
+    margin: '0 auto 1.5rem',
+  },
+  buttonWrapper: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginBottom: '1rem',
+  },
+  button: {
+    padding: '0.5rem 1.5rem',
+    background: 'linear-gradient(90deg, #3DD056, #2EB872)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '999px',
+    fontWeight: 600,
+    fontSize: '1rem',
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(61, 208, 86, 0.2)',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.3s ease',
+  },
+  centerText: {
+    textAlign: 'center',
+  },
+};
+
+export default FeaturedRecipes;

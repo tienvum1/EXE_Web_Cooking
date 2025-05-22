@@ -14,8 +14,8 @@ const blogRoutes = require('./routes/blog');
 
 const app = express();
 app.use(cookieParser());
-app.use(cors({
-  origin: 'http://localhost:3003', 
+app.use(cors({  // middleware đầu tiên  req chạy qua
+  origin: 'http://localhost:3000', 
   credentials: true
 }));
 app.use(express.json());

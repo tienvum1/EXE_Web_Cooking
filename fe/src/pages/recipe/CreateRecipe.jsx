@@ -4,6 +4,7 @@ import Sidebar from '../../components/sidebar/Sidebar';
 import Footer from '../../components/footer/Footer';
 import axios from 'axios';
 import './CreateRecipe.scss';
+import categoriesData from '../../components/category/categoriesData';
 
 const CreateRecipe = () => {
   const [title, setTitle] = useState('');
@@ -16,6 +17,7 @@ const CreateRecipe = () => {
   const [mainImageUrl, setMainImageUrl] = useState('');
   // Nutrition Info
   const [nutrition, setNutrition] = useState({ calories: '', fat: '', protein: '', carbs: '' });
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -28,6 +30,15 @@ const CreateRecipe = () => {
     } else {
       setMainImageUrl('');
     }
+  };
+
+  // Chọn category (multi)
+  const handleCategoryChange = (catName) => {
+    setCategories(prev =>
+      prev.includes(catName)
+        ? prev.filter(c => c !== catName)
+        : [...prev, catName]
+    );
   };
 
   // Nguyên liệu
@@ -80,7 +91,8 @@ const CreateRecipe = () => {
           })),
           mainImage: mainImageUrl,
           nutrition,
-          status
+          status,
+          categories,
         },
         { withCredentials: true }
       );
@@ -157,6 +169,24 @@ const CreateRecipe = () => {
                   <label>Carbs</label>
                   <input type="number" min="0" placeholder="g" value={nutrition.carbs} onChange={e => setNutrition(n => ({ ...n, carbs: e.target.value }))} />
                 </div>
+              </div>
+            </div>
+            {/* Chọn category */}
+            <div className="create-recipe-categories">
+              <div style={{ fontWeight: 600, margin: '1rem 0 0.5rem' }}>Chọn danh mục món ăn (có thể chọn nhiều):</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                {categoriesData.map(cat => (
+                  <label key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', background: categories.includes(cat.name) ? '#e6f7ea' : '#f7f7f7', borderRadius: 16, padding: '4px 12px', border: categories.includes(cat.name) ? '1.5px solid #3DD056' : '1.5px solid #e0e0e0', fontWeight: 500 }}>
+                    <input
+                      type="checkbox"
+                      checked={categories.includes(cat.name)}
+                      onChange={() => handleCategoryChange(cat.name)}
+                      style={{ accentColor: '#3DD056' }}
+                    />
+                    <span style={{ fontSize: 18 }}>{cat.icon}</span>
+                    <span>{cat.name}</span>
+                  </label>
+                ))}
               </div>
             </div>
           </div>
