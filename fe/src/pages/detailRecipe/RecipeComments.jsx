@@ -1,53 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './RecipeComments.module.scss';
 
-const RecipeComments = () => {
+const RecipeComments = ({ recipeId }) => {
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
-  const [replyingTo, setReplyingTo] = useState(null); // id của comment đang trả lời
-  const [replyContent, setReplyContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [userId, setUserId] = useState(null);
 
-  // Tạo id đơn giản cho comment
-  const generateId = () => Math.random().toString(36).substr(2, 9);
-
-  const handleSend = () => {
-    if (comment.trim() === '') return;
-    setComments([
-      ...comments,
-      {
-        id: generateId(),
-        user: 'Bạn',
-        avatar: '',
-        content: comment,
-        time: 'Vừa xong',
-        replies: []
+  // Lấy user hiện tại (nếu có)
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await axios.get('http://localhost:4567/api/users/me', { withCredentials: true });
+        setUserId(res.data._id);
+      } catch {
+        setUserId(null);
       }
-    ]);
-    setComment('');
+    };
+    fetchMe();
+  }, []);
+
+  // Lấy danh sách bình luận
+  useEffect(() => {
+    const fetchComments = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await axios.get(`http://localhost:4567/api/comments/${recipeId}`);
+        setComments(res.data);
+      } catch {
+        setError('Không thể tải bình luận');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (recipeId) fetchComments();
+  }, [recipeId]);
+
+  // Thêm bình luận
+  const handleSend = async () => {
+    if (comment.trim() === '') return;
+    try {
+      const res = await axios.post('http://localhost:4567/api/comments/add', { recipeId, content: comment }, { withCredentials: true });
+      setComments(prev => [res.data, ...prev]);
+      setComment('');
+    } catch {
+      alert('Vui lòng đăng nhập để bình luận!');
+    }
   };
 
-  const handleReplySend = (parentId) => {
-    if (replyContent.trim() === '') return;
-    setComments(comments => comments.map(c => {
-      if (c.id === parentId) {
-        return {
-          ...c,
-          replies: [
-            ...c.replies,
-            {
-              id: generateId(),
-              user: 'Bạn',
-              avatar: '',
-              content: replyContent,
-              time: 'Vừa xong'
-            }
-          ]
-        };
-      }
-      return c;
-    }));
-    setReplyingTo(null);
-    setReplyContent('');
+  // Xóa bình luận
+  const handleDelete = async (commentId) => {
+    if (!window.confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+    try {
+      await axios.delete(`http://localhost:4567/api/comments/${commentId}`, { withCredentials: true });
+      setComments(prev => prev.filter(c => c._id !== commentId));
+    } catch {
+      alert('Không thể xóa bình luận!');
+    }
   };
 
   return (
@@ -66,60 +78,32 @@ const RecipeComments = () => {
           <i className="fas fa-paper-plane"></i>
         </button>
       </div>
+      {loading && <div>Đang tải bình luận...</div>}
+      {error && <div style={{ color: 'red' }}>{error}</div>}
       <div className={styles.commentList}>
-        {comments.map((c, idx) => (
-          <div key={c.id} className={styles.commentItem}>
-            <div className={styles.avatarSmall}>{c.user[0]}</div>
+        {comments.map((c) => (
+          <div key={c._id} className={styles.commentItem}>
+            <div className={styles.avatarSmall}>
+              {c.user?.avatar ? (
+                <img src={c.user.avatar} alt={c.user.username} style={{ width: 32, height: 32, borderRadius: '50%' }} />
+              ) : (
+                c.user?.username ? c.user.username[0].toUpperCase() : 'U'
+              )}
+            </div>
             <div style={{flex: 1}}>
               <div className={styles.commentHeader}>
-                {c.user}
-                <span className={styles.commentTime}>{c.time}</span>
+                {c.user?.username || 'Ẩn danh'}
+                <span className={styles.commentTime}>{new Date(c.createdAt).toLocaleString('vi-VN')}</span>
+                {userId && c.user?._id === userId && (
+                  <button
+                    style={{ color: '#f44336', background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, marginLeft: 8 }}
+                    onClick={() => handleDelete(c._id)}
+                  >
+                    Xóa
+                  </button>
+                )}
               </div>
               <div className={styles.commentContent}>{c.content}</div>
-              <button
-                style={{ color: '#f4a259', background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, marginTop: 2 }}
-                onClick={() => setReplyingTo(c.id)}
-              >
-                Trả lời
-              </button>
-              {/* Hiển thị input trả lời */}
-              {replyingTo === c.id && (
-                <div style={{ display: 'flex', alignItems: 'center', marginTop: 8 }}>
-                  <div className={styles.avatarSmall}>T</div>
-                  <input
-                    value={replyContent}
-                    onChange={e => setReplyContent(e.target.value)}
-                    placeholder="Trả lời bình luận..."
-                    className={styles.input}
-                    style={{ fontSize: 15, height: 32 }}
-                    onKeyDown={e => { if (e.key === 'Enter') handleReplySend(c.id); }}
-                  />
-                  <button
-                    onClick={() => handleReplySend(c.id)}
-                    className={styles.sendButton}
-                    aria-label="Gửi trả lời"
-                  >
-                    <i className="fas fa-paper-plane"></i>
-                  </button>
-                </div>
-              )}
-              {/* Hiển thị replies */}
-              {c.replies && c.replies.length > 0 && (
-                <div style={{ marginLeft: 36, marginTop: 6 }}>
-                  {c.replies.map((r, ridx) => (
-                    <div key={r.id} className={styles.commentItem}>
-                      <div className={styles.avatarSmall}>{r.user[0]}</div>
-                      <div>
-                        <div className={styles.commentHeader}>
-                          {r.user}
-                          <span className={styles.commentTime}>{r.time}</span>
-                        </div>
-                        <div className={styles.commentContent}>{r.content}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         ))}

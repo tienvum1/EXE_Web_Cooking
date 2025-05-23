@@ -9,7 +9,7 @@ import categoriesData from '../../components/category/categoriesData';
 const CreateRecipe = () => {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
-  const [servings, setServings] = useState('2 người');
+  const [servings, setServings] = useState('');
   const [cookTime, setCookTime] = useState('');
   const [ingredients, setIngredients] = useState(['']);
   const [steps, setSteps] = useState([{ text: '', images: [] }]);
@@ -197,7 +197,7 @@ const CreateRecipe = () => {
             <h3>Nguyên Liệu</h3>
             <div className="create-recipe-servings">
               <span>Khẩu phần</span>
-              <input value={servings} onChange={e => setServings(e.target.value)} />
+              <input value={servings} onChange={e => setServings(e.target.value)}  placeholder="VD: 2 phần" />
             </div>
             <div className="create-recipe-ingredient-list">
               {ingredients.map((ing, idx) => (
@@ -221,7 +221,7 @@ const CreateRecipe = () => {
             <h3>Các bước</h3>
             <div className="create-recipe-cooktime">
               <span>Thời gian nấu</span>
-              <input value={cookTime} onChange={e => setCookTime(e.target.value)} placeholder="VD: 1 tiếng 30 phút" />
+              <input value={cookTime} onChange={e => setCookTime(e.target.value)} placeholder="VD: 30 phút" />
             </div>
             <div className="create-recipe-step-list">
               {steps.map((step, idx) => (

@@ -88,3 +88,38 @@ exports.getMostLiked = async (req, res) => {
     res.status(500).json({ message: 'Lỗi lấy recipe nhiều like nhất', error: err.message });
   }
 };
+
+// Tìm recipe theo nguyên liệu (ingredient)
+exports.findByIngredient = async (req, res) => {
+  try {
+    const keyword = req.query.ingredient;
+    if (!keyword || keyword.trim() === '') {
+      return res.status(400).json({ message: 'Thiếu tham số ingredient' });
+    }
+    // Tìm các recipe có ít nhất 1 nguyên liệu chứa từ khoá (không phân biệt hoa thường)
+    const recipes = await Recipe.find({
+      status: 'approved',
+      ingredients: { $elemMatch: { $regex: keyword, $options: 'i' } }
+    }).populate('author', 'username');
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tìm recipe theo nguyên liệu', error: err.message });
+  }
+};
+
+// Tìm kiếm recipe theo title
+exports.search = async (req, res) => {
+  try {
+    const q = req.query.q;
+    if (!q || q.trim() === '') {
+      return res.status(400).json({ message: 'Thiếu từ khóa tìm kiếm' });
+    }
+    const recipes = await Recipe.find({
+      status: 'approved',
+      title: { $regex: q, $options: 'i' }
+    }).populate('author', 'username');
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tìm kiếm', error: err.message });
+  }
+};
