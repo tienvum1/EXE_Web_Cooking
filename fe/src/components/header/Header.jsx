@@ -77,61 +77,98 @@ const Header = () => {
           <a href="/about">About Us</a>
         </nav>
         <div className="header__actions">
-          <div className="header__avatar" onClick={() => setMenuOpen(!menuOpen)} style={{cursor: 'pointer'}}>
-            {user?.avatar
-              ? <img src={user.avatar} alt="avatar" />
-              : (user?.username ? user.username[0].toUpperCase() : 'U')}
-          </div>
-          {menuOpen && (
-            <div className="header__user-menu" ref={menuRef}>
-              <div className="header__user-info">
-                <div className="header__avatar">
-                  {user?.avatar
-                    ? <img src={user.avatar} alt="avatar" />
-                    : (user?.username ? user.username[0].toUpperCase() : 'U')}
+          {user ? (
+            <>
+              <div className="header__avatar" onClick={() => setMenuOpen(!menuOpen)} style={{cursor: 'pointer'}}>
+                {user?.avatar
+                  ? <img src={user.avatar} alt="avatar" />
+                  : (user?.username ? user.username[0].toUpperCase() : 'U')}
+              </div>
+              {menuOpen && (
+                <div className="header__user-menu" ref={menuRef}>
+                  <div className="header__user-info">
+                    <div className="header__avatar">
+                      {user?.avatar
+                        ? <img src={user.avatar} alt="avatar" />
+                        : (user?.username ? user.username[0].toUpperCase() : 'U')}
+                    </div>
+                    <div>
+                      <div className="header__user-name">{user?.fullName || user?.username || 'Khách'}</div>
+                      <div className="header__user-username">{user ? `@${user.username}` : ''}</div>
+                    </div>
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate(`/profile/${user._id}`);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-user"></i> Bếp cá nhân
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/settings');
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-cog"></i> Cài đặt
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/feedback');
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-paper-plane"></i> Gửi Góp Ý
+                  </div>
+                  <div className="header__user-menu-divider"></div>
+                  <div className="header__user-menu-item header__user-menu-logout" onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Thoát</div>
                 </div>
-                <div>
-                  <div className="header__user-name">{user?.fullName || user?.username || 'Khách'}</div>
-                  <div className="header__user-username">{user ? `@${user.username}` : ''}</div>
-                </div>
-              </div>
-              <div
-                className="header__user-menu-item"
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate(`/profile/${user._id}`);
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <i className="fas fa-user"></i> Bếp cá nhân
-              </div>
-              <div
-                className="header__user-menu-item"
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate('/settings');
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <i className="fas fa-cog"></i> Cài đặt
-              </div>
-              <div
-                className="header__user-menu-item"
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate('/feedback');
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <i className="fas fa-paper-plane"></i> Gửi Góp Ý
-              </div>
-              <div className="header__user-menu-divider"></div>
-              <div className="header__user-menu-item header__user-menu-logout" onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Thoát</div>
-            </div>
+              )}
+              <button className="header__new-recipe-btn" onClick={() => navigate('/recipes/create')}>
+                <i className="fas fa-pen"></i> Viết món mới
+              </button>
+            </>
+          ) : (
+            <button
+              className="header__login-btn"
+              onClick={() => navigate('/login')}
+              style={{
+                border: 'none',
+                borderRadius: '22px',
+                background: '#e6f7ea',
+                color: '#218838',
+                fontWeight: 600,
+                fontSize: '1rem',
+                padding: '10px 28px',
+                marginLeft: 12,
+                boxShadow: '0 2px 8px #2e7d3211',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                transition: 'background 0.18s, color 0.18s, box-shadow 0.18s',
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = '#3DD056';
+                e.currentTarget.style.color = '#fff';
+                e.currentTarget.style.boxShadow = '0 4px 16px #2e7d3222';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = '#e6f7ea';
+                e.currentTarget.style.color = '#218838';
+                e.currentTarget.style.boxShadow = '0 2px 8px #2e7d3211';
+              }}
+            >
+              <i className="fas fa-sign-in-alt"></i> Login
+            </button>
           )}
-          <button className="header__new-recipe-btn" onClick={() => navigate('/recipes/create')}>
-            <i className="fas fa-pen"></i> Viết món mới
-          </button>
         </div>
       </div>
     </header>

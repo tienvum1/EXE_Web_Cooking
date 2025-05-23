@@ -60,6 +60,7 @@ const DetailRecipe = () => {
         prepTime={recipeData.prepTime || ''}
         cookTime={recipeData.cookTime || ''}
         servings={recipeData.servings}
+        recipeId={recipeData._id}
       />
       <div className="top-section">
         <div className="left-col">
@@ -82,7 +83,7 @@ const DetailRecipe = () => {
       <DirectionsList directions={recipeData.steps} />
      
     </div>
-    <RecipeComments />
+    <RecipeComments recipeId={recipeData._id} />
     <RecipeAuthorInfo
       avatar={authorInfo?.avatar}
       name={authorInfo?.fullName || authorInfo?.username}

@@ -1,165 +1,194 @@
+// ====== Base Styles ======
+$primary-color: #2e7d32;
+$primary-shadow: #2e7d3211;
+$hover-shadow: #2e7d3222;
+$font-family: 'Inter', Arial, sans-serif;
+
 .recipe-page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 16px 64px 16px;
-    font-family: 'Inter', Arial, sans-serif;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 40px 16px 64px;
+  font-family: $font-family;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    padding: 32px 12px;
   }
-  
-  .recipe-page-title {
+}
+
+// ====== Title and Description ======
+.recipe-page-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .title {
     font-size: 2.2rem;
     font-weight: 700;
-    text-align: center;
+    color: $primary-color;
     margin-bottom: 8px;
-    color: #2e7d32;
   }
-  
-  .recipe-page-desc {
-    text-align: center;
-    color: #666;
+
+  .desc {
     font-size: 1.15rem;
-    margin-bottom: 32px;
+    color: #666;
   }
-  
-  .recipe-page-search {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 32px;
-    input {
-      width: 400px;
-      padding: 14px 22px;
-      border-radius: 24px;
-      border: 1.5px solid #e5e5e5;
-      font-size: 1.08rem;
-      outline: none;
-      background: #fafafa;
-      transition: border 0.2s;
-      &:focus {
-        border: 1.5px solid #2e7d32;
-      }
+}
+
+// ====== Search Bar ======
+.recipe-page-search {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+
+  input {
+    width: 400px;
+    padding: 14px 22px;
+    border-radius: 24px;
+    border: 1.5px solid #e5e5e5;
+    font-size: 1.08rem;
+    background: #fafafa;
+    outline: none;
+    transition: border 0.2s;
+
+    &:focus {
+      border-color: $primary-color;
+    }
+
+    @media (max-width: 700px) {
+      width: 100%;
+      font-size: 1rem;
     }
   }
-  
-  .recipe-page-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 32px;
+}
+
+// ====== Grid Layout ======
+.recipe-page-grid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+}
+
+// ====== Recipe Card ======
+.recipe-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px $primary-shadow;
+  overflow: hidden;
+  transition: 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 8px 32px $hover-shadow;
+    transform: translateY(-4px) scale(1.03);
   }
-  
-  .recipe-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 18px #2e7d3211;
-    overflow: hidden;
-    transition: box-shadow 0.18s, transform 0.18s;
-    cursor: pointer;
-    &:hover {
-      box-shadow: 0 8px 32px #2e7d3222;
-      transform: translateY(-4px) scale(1.03);
-    }
-  }
-  
-  .recipe-card-img {
+
+  &-img {
     width: 100%;
     height: 180px;
     object-fit: cover;
     border-radius: 18px 18px 0 0;
+
+    @media (max-width: 700px) {
+      height: 120px;
+    }
   }
-  
-  .recipe-card-info {
-    padding: 18px 16px 14px 16px;
+
+  &-info {
+    padding: 18px 16px 14px;
   }
-  
-  .recipe-card-title {
+
+  &-title {
     font-size: 1.13rem;
     font-weight: 700;
-    margin-bottom: 8px;
     color: #222;
+    margin-bottom: 8px;
   }
-  
-  .recipe-card-meta {
+
+  &-meta {
     display: flex;
     gap: 18px;
     font-size: 0.98rem;
     color: #4a5a41;
     margin-bottom: 10px;
+
     span {
       display: flex;
       align-items: center;
       gap: 6px;
-      i { color: #3a4c33; }
+
+      i {
+        color: #3a4c33;
+      }
     }
   }
-  
-  .recipe-card-author {
-    font-size: 1rem;
-    color: #2e7d32;
-    font-weight: 600;
+
+  &-author {
     display: flex;
     align-items: center;
     gap: 6px;
-    i { color: #2e7d32; }
-  }
-  
-  @media (max-width: 700px) {
-    .recipe-page-search input { width: 98vw; font-size: 1rem; }
-    .recipe-card-img { height: 120px; }
-  }
+    font-size: 1rem;
+    font-weight: 600;
+    color: $primary-color;
 
-.sidebar-filter {
-  min-width: 240px;
-  max-width: 280px;
-  background: #f8f6f2;
-  border-radius: 0.7rem;
-  padding: 1.5rem 1.2rem 1.5rem 1.2rem;
-  margin-right: 0.5rem;
-  box-shadow: 0 2px 12px #2e7d3211;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  h3 {
-    font-size: 1.18rem;
-    font-weight: 700;
-    color: #2e7d32;
-    margin-bottom: 0.7rem;
-    text-align: left;
-  }
-  .sidebar-filter-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 1.1rem;
-    label {
-      font-size: 1rem;
-      color: #444;
-      font-weight: 500;
-      margin-bottom: 0.2rem;
-    }
-    input[type="number"] {
-      background: #fff;
-      border: 1.5px solid #e0e0e0;
-      border-radius: 0.4rem;
-      padding: 0.5rem 0.8rem;
-      color: #2e7d32;
-      font-size: 1rem;
-      width: 100%;
-      transition: border 0.18s;
-      &:focus {
-        border: 1.5px solid #3DD056;
-      }
+    i {
+      color: $primary-color;
     }
   }
 }
 
-@media (max-width: 900px) {
-  .sidebar-filter {
-    min-width: 100%;
-    max-width: 100%;
-    margin-bottom: 1.5rem;
-    box-shadow: none;
-    padding: 1rem 0.5rem;
+// ====== Sidebar Filter ======
+.sidebar-filter {
+  min-width: 240px;
+  max-width: 280px;
+  background: #f8f6f2;
+  border-radius: 12px;
+  padding: 1.5rem 1.2rem;
+  box-shadow: 0 2px 12px $primary-shadow;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  h3 {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 0.7rem;
   }
-  .recipe-page-container {
+
+  .sidebar-filter-section {
+    display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
+
+    label {
+      font-size: 1rem;
+      color: #444;
+      font-weight: 500;
+    }
+
+    input[type="number"] {
+      background: #fff;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem;
+      font-size: 1rem;
+      color: $primary-color;
+      transition: border 0.2s;
+
+      &:focus {
+        border-color: #3dd056;
+      }
+    }
+  }
+
+  @media (max-width: 900px) {
+    max-width: 100%;
+    padding: 1rem 0.5rem;
+    margin-right: 0;
+    box-shadow: none;
   }
 }

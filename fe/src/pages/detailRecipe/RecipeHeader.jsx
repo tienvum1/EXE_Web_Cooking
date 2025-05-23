@@ -1,10 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaRegClock, FaDrumstickBite, FaRegSave, FaShareAlt, FaRegBookmark, FaBookmark } from 'react-icons/fa';
+import axios from 'axios';
 import './RecipeHeader.scss';
 
-const RecipeHeader = ({ title, user, prepTime, cookTime }) => {
+const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId }) => {
   const [saved, setSaved] = useState(false);
-  const handleSave = () => setSaved(!saved);
+  const [loading, setLoading] = useState(false);
+
+  // Kiểm tra đã lưu chưa khi mount
+  useEffect(() => {
+    const checkSaved = async () => {
+      try {
+        const res = await axios.get('http://localhost:4567/api/saved-recipes/list', { withCredentials: true });
+        setSaved(res.data.some(item => item.recipe._id === recipeId));
+      } catch {}
+    };
+    if (recipeId) checkSaved();
+  }, [recipeId]);
+
+  const handleSave = async () => {
+    if (!recipeId) return;
+    setLoading(true);
+    try {
+      if (!saved) {
+        await axios.post('http://localhost:4567/api/saved-recipes/save', { recipeId }, { withCredentials: true });
+        setSaved(true);
+      } else {
+        await axios.post('http://localhost:4567/api/saved-recipes/unsave', { recipeId }, { withCredentials: true });
+        setSaved(false);
+      }
+    } catch (err) {
+      alert('Vui lòng đăng nhập để sử dụng chức năng này!');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="recipe-header">
@@ -32,6 +62,7 @@ const RecipeHeader = ({ title, user, prepTime, cookTime }) => {
             className={saved ? 'btn saved-btn' : 'btn save-btn'}
             onClick={handleSave}
             aria-label={saved ? 'Bỏ lưu món' : 'Lưu món'}
+            disabled={loading}
           >
             {saved ? <FaBookmark /> : <FaRegBookmark />}
             <span>{saved ? 'Đã lưu' : 'Lưu món'}</span>
