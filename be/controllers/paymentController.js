@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
@@ -7,12 +7,7 @@ const Notification = require('../models/Notification');
 const notificationController = require('./notificationController');
 
 console.log('Stripe key:', process.env.STRIPE_SECRET_KEY);
-=======
-const Stripe = require('stripe');
-const stripe = Stripe('sk_test_...'); // Thay bằng secret key của bạn
-const Wallet = require('../models/Wallet');
-const Transaction = require('../models/Transaction');
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
 
 exports.createStripePaymentIntent = async (req, res) => {
   try {
@@ -22,22 +17,16 @@ exports.createStripePaymentIntent = async (req, res) => {
 
     // Stripe yêu cầu số tiền là cent (1 USD = 100 cent)
     const paymentIntent = await stripe.paymentIntents.create({
-<<<<<<< HEAD
-      amount: Math.round(amount), // USD: cent
-      currency: 'usd', // đổi sang 'usd' để test
-=======
       amount: Math.round(amount), // VNĐ, nếu dùng USD thì *100
       currency: 'vnd', // hoặc 'usd'
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
       metadata: { userId }
     });
 
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
-<<<<<<< HEAD
+
     console.error('Stripe error:', err);
-=======
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
     res.status(500).json({ message: 'Lỗi tạo thanh toán Stripe', error: err.message });
   }
 };
@@ -63,7 +52,7 @@ exports.confirmStripeTopup = async (req, res) => {
     // Lưu transaction
     await Transaction.create({ from: null, to: userId, amount, type: 'topup', method: 'stripe', status: 'success' });
 
-<<<<<<< HEAD
+
     // Gửi thông báo nạp tiền
     await notificationController.createNotification(
       userId,
@@ -72,13 +61,11 @@ exports.confirmStripeTopup = async (req, res) => {
       { amount }
     );
 
-=======
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
     res.json({ message: 'Nạp tiền thành công', balance: wallet.balance });
   } catch (err) {
     res.status(500).json({ message: 'Lỗi xác nhận nạp tiền', error: err.message });
   }
-<<<<<<< HEAD
+
 };
 
 // API lấy số dư ví hiện tại của user
@@ -158,6 +145,5 @@ exports.donateToAuthor = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Lỗi donate', error: err.message });
   }
-=======
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
 };

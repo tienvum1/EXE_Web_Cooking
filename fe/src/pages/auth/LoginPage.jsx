@@ -26,11 +26,10 @@ const LoginPage = () => {
     setLoading(true);
     try {
       await axios.post(
-<<<<<<< HEAD
+
         `${API_URL}/api/auth/login`,
-=======
-        'https://localhost:4567/api/auth/login',
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
+
         { username, password },
         { withCredentials: true }
       );
