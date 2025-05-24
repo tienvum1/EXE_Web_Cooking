@@ -3,18 +3,20 @@ import './Header.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import TopupModal from '../../pages/wallet/StripeTopupModal.jsx';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const [showTopup, setShowTopup] = useState(false);
 
   // Lấy thông tin user khi header mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('http://localhost:4567/api/users/me', { withCredentials: true });
+        const res = await axios.get('https://localhost:4567/api/users/me', { withCredentials: true });
         setUser(res.data);
       } catch {
         setUser(null);
@@ -51,21 +53,17 @@ const Header = () => {
 
   return (
     <header className="header">
+      <TopupModal open={showTopup} onClose={() => setShowTopup(false)} />
       <div className="header__container">
         <div className="header__logo" style={{cursor: 'pointer'}} onClick={() => navigate('/')}>FitMeal</div>
 
         <nav className="header__nav">
           <a href="/">Home</a>
-          
           <a href="/recipes">Recipes</a>
-          
           <a href="/blog">Blog</a>
           <a href="/menu-suggestion">Menu Suggestion</a>
           <div className="header__dropdown">
-            <span
-              className="header__dropdown-toggle"
-              tabIndex={0}
-            >
+            <span className="header__dropdown-toggle" tabIndex={0}>
               Công cụ tính các chỉ số
             </span>
             <div className="header__dropdown-menu">
@@ -133,6 +131,13 @@ const Header = () => {
               )}
               <button className="header__new-recipe-btn" onClick={() => navigate('/recipes/create')}>
                 <i className="fas fa-pen"></i> Viết món mới
+              </button>
+              <button
+                className="header__topup-btn"
+                style={{ marginLeft: 10, background: '#ffe082', color: '#222', border: 'none', borderRadius: 18, padding: '8px 20px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.18s' }}
+                onClick={() => setShowTopup(true)}
+              >
+                <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
               </button>
             </>
           ) : (
