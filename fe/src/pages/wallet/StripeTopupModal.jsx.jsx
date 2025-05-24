@@ -10,8 +10,8 @@ import {
 import { loadStripe } from '@stripe/stripe-js';
 import './StripeTopupModal.scss';
 import axios from 'axios';
-
-const stripePromise = loadStripe('pk_test_51RSHFA05kBhsFuj1pqrSVgLU9PnifKwONtK1TSyxlpwsuJaT3rWnJYrm2PXe4NCiTSVxY47EsGvtnBKU4BdJh7kX00RWn4P2mM')
+console.log(process.env.REACT_APP_API_URL);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 const StripeTopupForm = ({ onClose }) => {
   const [amount, setAmount] = useState('');
   const [cardName, setCardName] = useState('');

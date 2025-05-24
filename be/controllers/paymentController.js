@@ -1,11 +1,11 @@
-const stripe = require('stripe')('***REMOVED***51RSHFA05kBhsFuj1EMkytliiac3LVzc7Vd3Aqkev3iBzsQpV7PpXRR9S1Hw5vT7dCuYs1w8TFHBSPDUEVa2ROq5V00PJBF9oKX');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
 const Recipe = require('../models/Recipe');
 const Notification = require('../models/Notification');
 const notificationController = require('./notificationController');
 
-console.log('Stripe key:', '***REMOVED***51RSHFA05kBhsFuj1EMkytliiac3LVzc7Vd3Aqkev3iBzsQpV7PpXRR9S1Hw5vT7dCuYs1w8TFHBSPDUEVa2ROq5V00PJBF9oKX');
+console.log('Stripe key:', process.env.STRIPE_SECRET_KEY);
 
 exports.createStripePaymentIntent = async (req, res) => {
   try {
