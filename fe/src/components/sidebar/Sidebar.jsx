@@ -2,9 +2,30 @@ import React, { useState } from 'react';
 import './Sidebar.scss';
 import { FaSearch, FaUser, FaBell, FaGlobe, FaCheck, FaRegBookmark, FaChartBar, FaCrown, FaBook, FaLock, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import logo from '../../assets/images/logo.png';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export const getWalletBalance = async () => {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_URL}/api/payment/balance`,
+    { withCredentials: true }
+  );
+  return res.data.balance;
+};
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const balance = await getWalletBalance();
+      setBalance(balance);
+    };
+    fetchBalance();
+  }, []);
 
   return (
     <>
@@ -16,21 +37,17 @@ const Sidebar = () => {
           <img src={logo} alt="FitMeal" className="sidebar__logo" />
         </div>
         <div className="sidebar__menu">
-          <div className="sidebar__item active">
-            <FaSearch className="sidebar__icon" />
-            <span>Tìm kiếm</span>
-          </div>
           <div className="sidebar__item">
             <FaCrown className="sidebar__icon" />
             <span>Premium</span>
           </div>
           <div className="sidebar__item">
             <FaChartBar className="sidebar__icon" />
-            <span>Thống Kê Bếp</span>
+            <span>Số dư: {balance}đ</span>
           </div>
           <div className="sidebar__item">
             <FaRegBookmark className="sidebar__icon" />
-            <span>Thử Thách</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/wallet/history')}>Lịch sử giao dịch</span>
           </div>
           <div className="sidebar__item">
             <FaBell className="sidebar__icon" />

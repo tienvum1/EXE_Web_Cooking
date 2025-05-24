@@ -18,6 +18,11 @@ import BMIPage from './pages/tools/BMIPage';
 import WeightPage from './pages/tools/WeightPage';
 import BmrTdeePage from './pages/tools/BmrTdeePage';
 import TopupModal from "./pages/wallet/StripeTopupModal.jsx";
+<<<<<<< HEAD
+import TransactionHistory from './pages/transasctionPage/TransactionHistory.jsx';
+import NotificationPage from './pages/notification/NotificationPage';
+=======
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
 
 import "./App.css";
 
@@ -40,9 +45,17 @@ function App() {
       <Route path="/profile/:id" element={<ProfilePage />} />
       <Route path="/settings" element={<SettingPage />} />
       <Route path="/tools/bmi" element={<BMIPage />} />
+<<<<<<< HEAD
+      <Route path="/tools/weight" element={<WeightPage />} />
+      <Route path="/tools/bmr-tdee" element={<BmrTdeePage />} />
+      <Route path="/wallet/topup" element={<TopupModal />} />
+      <Route path="/wallet/history" element={<TransactionHistory />} />
+      <Route path="/notifications" element={<NotificationPage />} />
+=======
 <Route path="/tools/weight" element={<WeightPage />} />
 <Route path="/tools/bmr-tdee" element={<BmrTdeePage />} />
 <Route path="/wallet/topup" element={<TopupModal />} />  
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
     </Routes>
   );
 }
