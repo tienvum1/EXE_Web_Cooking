@@ -12,6 +12,7 @@ const recipeRoutes = require('./routes/recipe');
 const blogRoutes = require('./routes/blog');
 const savedRecipeRoutes = require('./routes/savedRecipe');
 const commentRoutes = require('./routes/comment');
+const paymentRoutes = require('./routes/payment');
 // ... (các route khác nếu cần)
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/recipes', recipeRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/saved-recipes', savedRecipeRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/payment', paymentRoutes);
 // ... (các route khác nếu cần)
 
 app.get('/', (req, res) => res.send('API is running!'));

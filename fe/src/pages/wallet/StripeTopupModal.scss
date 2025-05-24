@@ -1,0 +1,137 @@
+// fe/src/pages/wallet/TopupModal.scss
+
+.topup-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.topup-modal {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0002;
+  padding: 36px 32px 28px 32px;
+  min-width: 350px;
+  max-width: 95vw;
+  position: relative;
+  animation: modalPop 0.22s cubic-bezier(.4,2,.6,1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.topup-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.18s;
+  &:hover { color: #e74c3c; }
+}
+
+.topup-modal-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.topup-modal-form h2 {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #218838;
+  letter-spacing: 0.5px;
+}
+
+.topup-modal-input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1.08rem;
+  outline: none;
+  transition: border 0.18s;
+  &:focus {
+    border-color: #3DD056;
+    background: #f6fff8;
+  }
+}
+
+.topup-modal-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 14px 12px;
+  border: 1.5px solid #e0e0e0;
+  margin-bottom: 2px;
+  .StripeElement {
+    background: transparent;
+    font-size: 1.08rem;
+    color: #222;
+  }
+}
+
+.topup-modal-next-btn {
+  background: linear-gradient(90deg, #3DD056 60%, #218838 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  box-shadow: 0 2px 8px #3dd05622;
+  transition: background 0.18s, box-shadow 0.18s;
+  &:hover, &:focus {
+    background: linear-gradient(90deg, #218838 60%, #3DD056 100%);
+    box-shadow: 0 4px 16px #3dd05633;
+  }
+  &:disabled {
+    background: #b2dfdb;
+    color: #fff;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.topup-modal-message {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e74c3c;
+  &.success {
+    color: #218838;
+  }
+}
+
+@media (max-width: 500px) {
+  .topup-modal {
+    min-width: 90vw;
+    padding: 18px 6vw 18px 6vw;
+  }
+  .topup-modal-form h2 {
+    font-size: 1.08rem;
+  }
+}
