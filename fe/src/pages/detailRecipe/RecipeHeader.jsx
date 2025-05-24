@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaRegClock, FaDrumstickBite, FaRegSave, FaShareAlt, FaRegBookmark, FaBookmark, FaDonate } from 'react-icons/fa';
 import axios from 'axios';
 import './RecipeHeader.scss';
+import DonateModal from './DonateModal';
 
 const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId }) => {
   const [saved, setSaved] = useState(false);
@@ -76,52 +77,11 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId }) => {
         </div>
       </div>
 
-      {showDonate && (
-        <div className="donate-modal-overlay" onClick={() => setShowDonate(false)}>
-          <div className="donate-modal" onClick={e => e.stopPropagation()}>
-            <h3>Donate cho tác giả</h3>
-            <input
-              type="number"
-              min={1000}
-              placeholder="Số tiền (VNĐ)"
-              value={donateAmount}
-              onChange={e => setDonateAmount(e.target.value)}
-              className="donate-input"
-            />
-            <textarea
-              placeholder="Lời nhắn (không bắt buộc)"
-              value={donateMsg}
-              onChange={e => setDonateMsg(e.target.value)}
-              className="donate-input"
-              rows={3}
-            />
-            <button
-              className="donate-submit-btn"
-              disabled={donateLoading || !donateAmount}
-              onClick={async () => {
-                setDonateLoading(true);
-                setDonateResult('');
-                try {
-                  await axios.post(
-                    `${process.env.REACT_APP_API_URL}/api/payment/donate`,
-                    { recipeId, amount: Number(donateAmount), message: donateMsg },
-                    { withCredentials: true }
-                  );
-                  setDonateResult('Donate thành công!');
-                  setTimeout(() => { setShowDonate(false); setDonateAmount(''); setDonateMsg(''); setDonateResult(''); }, 1500);
-                } catch (err) {
-                  setDonateResult(err.response?.data?.message || 'Donate thất bại!');
-                } finally {
-                  setDonateLoading(false);
-                }
-              }}
-            >{donateLoading ? 'Đang gửi...' : 'Gửi donate'}</button>
-            {donateResult && <div className={donateResult.includes('thành công') ? 'donate-success' : 'donate-error'}>{donateResult}</div>}
-            <button className="donate-cancel-btn" onClick={() => setShowDonate(false)}>Hủy</button>
-          </div>
-          <div className="donate-modal-backdrop" />
-        </div>
-      )}
+      <DonateModal
+        open={showDonate}
+        onClose={() => setShowDonate(false)}
+        recipeId={recipeId}
+      />
     </div>
   );
 };

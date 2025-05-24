@@ -77,11 +77,14 @@ const DetailRecipe = () => {
         </div>
       </div>
       <p className="description">{recipeData.desc}</p>
-      <IngredientsList
-        mainDish={recipeData.ingredients}
-        sauce={[]}
-      />
-      <DirectionsList directions={recipeData.steps} />
+      <div className="ingredients-directions-row">
+        <div className="ingredients-col">
+          <IngredientsList mainDish={recipeData.ingredients} sauce={[]} />
+        </div>
+        <div className="directions-col">
+          <DirectionsList directions={recipeData.steps} />
+        </div>
+      </div>
      
     </div>
     <RecipeComments recipeId={recipeData._id} />
