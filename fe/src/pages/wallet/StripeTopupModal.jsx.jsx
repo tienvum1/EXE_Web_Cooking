@@ -10,8 +10,14 @@ import {
 import { loadStripe } from '@stripe/stripe-js';
 import './StripeTopupModal.scss';
 import axios from 'axios';
+<<<<<<< HEAD
 console.log(process.env.REACT_APP_API_URL);
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+=======
+
+const stripePromise = loadStripe('pk_test_...'); // Thay bằng publishable key thực tế
+
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
 const StripeTopupForm = ({ onClose }) => {
   const [amount, setAmount] = useState('');
   const [cardName, setCardName] = useState('');
@@ -27,7 +33,11 @@ const StripeTopupForm = ({ onClose }) => {
     setMessage('');
     try {
       // 1. Gọi BE tạo PaymentIntent
+<<<<<<< HEAD
       const res = await axios.post('https://localhost:4567/api/payment/stripe-create', { amount: Number(amount) }, { withCredentials: true });
+=======
+      const res = await axios.post('http://localhost:4567/api/payment/stripe-create', { amount: Number(amount) }, { withCredentials: true });
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
       const clientSecret = res.data.clientSecret;
 
       // 2. Thanh toán với Stripe
@@ -43,16 +53,26 @@ const StripeTopupForm = ({ onClose }) => {
 
       if (error) {
         setMessage(error.message);
+<<<<<<< HEAD
         console.error('Stripe confirmCardPayment error:', error);
       } else if (paymentIntent.status === 'succeeded') {
         // 3. Gọi BE xác nhận nạp tiền
         await axios.post('https://localhost:4567/api/payment/stripe-confirm', { paymentIntentId: paymentIntent.id }, { withCredentials: true });
+=======
+      } else if (paymentIntent.status === 'succeeded') {
+        // 3. Gọi BE xác nhận nạp tiền
+        await axios.post('http://localhost:4567/api/payment/stripe-confirm', { paymentIntentId: paymentIntent.id }, { withCredentials: true });
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
         setMessage('Nạp tiền thành công!');
         setTimeout(() => { setMessage(''); setAmount(''); onClose(); }, 1800);
       }
     } catch (err) {
+<<<<<<< HEAD
       setMessage(err.response?.data?.error || err.response?.data?.message || err.message || 'Nạp tiền thất bại');
       console.error('Stripe FE error:', err);
+=======
+      setMessage(err.response?.data?.message || 'Nạp tiền thất bại');
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
     } finally {
       setLoading(false);
     }

@@ -3,12 +3,20 @@
 .topup-modal-overlay {
   position: fixed;
   inset: 0;
+<<<<<<< HEAD
   background: rgba(0,0,0,0.38);
+=======
+  background: rgba(0,0,0,0.35);
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
   animation: fadeIn 0.22s;
+=======
+  animation: fadeIn 0.2s;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
 }
 
 @keyframes fadeIn {
@@ -18,11 +26,19 @@
 
 .topup-modal {
   background: #fff;
+<<<<<<< HEAD
   border-radius: 22px;
   box-shadow: 0 8px 32px #0003, 0 1.5px 8px #3dd05622;
   padding: 38px 32px 28px 32px;
   min-width: 870px;
   max-width: 96vw;
+=======
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0002;
+  padding: 36px 32px 28px 32px;
+  min-width: 350px;
+  max-width: 95vw;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   position: relative;
   animation: modalPop 0.22s cubic-bezier(.4,2,.6,1);
   display: flex;
@@ -41,8 +57,13 @@
   right: 18px;
   background: none;
   border: none;
+<<<<<<< HEAD
   font-size: 2.1rem;
   color: #bbb;
+=======
+  font-size: 2rem;
+  color: #aaa;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   cursor: pointer;
   transition: color 0.18s;
   &:hover { color: #e74c3c; }
@@ -58,6 +79,7 @@
 
 .topup-modal-form h2 {
   text-align: center;
+<<<<<<< HEAD
   font-size: 1.38rem;
   font-weight: 800;
   margin-bottom: 8px;
@@ -89,22 +111,51 @@
     border-color: #3DD056;
     background: #f6fff8;
     box-shadow: 0 2px 8px #3dd05622;
+=======
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #218838;
+  letter-spacing: 0.5px;
+}
+
+.topup-modal-input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1.08rem;
+  outline: none;
+  transition: border 0.18s;
+  &:focus {
+    border-color: #3DD056;
+    background: #f6fff8;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   }
 }
 
 .topup-modal-card {
   background: #f8f9fa;
+<<<<<<< HEAD
   border-radius: 9px;
   padding: 14px 12px 8px 12px;
+=======
+  border-radius: 8px;
+  padding: 14px 12px;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   border: 1.5px solid #e0e0e0;
   margin-bottom: 2px;
   .StripeElement {
     background: transparent;
+<<<<<<< HEAD
     font-size: 1.09rem;
+=======
+    font-size: 1.08rem;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
     color: #222;
   }
 }
 
+<<<<<<< HEAD
 .topup-modal-card label {
   font-size: 1rem;
   color: #218838;
@@ -119,10 +170,13 @@
   margin-bottom: 2px;
 }
 
+=======
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
 .topup-modal-next-btn {
   background: linear-gradient(90deg, #3DD056 60%, #218838 100%);
   color: #fff;
   border: none;
+<<<<<<< HEAD
   border-radius: 9px;
   padding: 13px 0;
   font-size: 1.09rem;
@@ -135,32 +189,61 @@
     background: linear-gradient(90deg, #218838 60%, #3DD056 100%);
     box-shadow: 0 4px 16px #3dd05633;
     transform: translateY(-2px) scale(1.03);
+=======
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  box-shadow: 0 2px 8px #3dd05622;
+  transition: background 0.18s, box-shadow 0.18s;
+  &:hover, &:focus {
+    background: linear-gradient(90deg, #218838 60%, #3DD056 100%);
+    box-shadow: 0 4px 16px #3dd05633;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   }
   &:disabled {
     background: #b2dfdb;
     color: #fff;
     cursor: not-allowed;
     box-shadow: none;
+<<<<<<< HEAD
     opacity: 0.7;
+=======
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   }
 }
 
 .topup-modal-message {
   text-align: center;
   margin-top: 8px;
+<<<<<<< HEAD
   font-size: 1.08rem;
   font-weight: 600;
   color: #e74c3c;
   padding: 8px 0 0 0;
+=======
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e74c3c;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   &.success {
     color: #218838;
   }
 }
 
+<<<<<<< HEAD
 @media (max-width: 600px) {
   .topup-modal {
     min-width: 96vw;
     padding: 18px 4vw 18px 4vw;
+=======
+@media (max-width: 500px) {
+  .topup-modal {
+    min-width: 90vw;
+    padding: 18px 6vw 18px 6vw;
+>>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
   }
   .topup-modal-form h2 {
     font-size: 1.08rem;
