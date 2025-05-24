@@ -4,10 +4,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopupModal from '../../pages/wallet/StripeTopupModal.jsx';
-<<<<<<< HEAD
+
 import { io } from 'socket.io-client';
-=======
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,11 +14,9 @@ const Header = () => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [showTopup, setShowTopup] = useState(false);
-<<<<<<< HEAD
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
-=======
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
 
   // Lấy thông tin user khi header mount
   useEffect(() => {
@@ -163,13 +160,12 @@ const Header = () => {
               >
                 <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
               </button>
-<<<<<<< HEAD
+
               <div className="header__notification" onClick={() => navigate('/notifications')} style={{ position: 'relative', cursor: 'pointer' }}>
                 <i className="fa fa-bell"></i>
                 {unread > 0 && <span className="noti-badge">{unread}</span>}
               </div>
-=======
->>>>>>> 951e2b41db4e422a23f49156e1cfb7e0a0129458
+
             </>
           ) : (
             <button
