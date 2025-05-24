@@ -55,7 +55,7 @@ const RecipePage = () => {
       setLoading(true);
       setError('');
       try {
-        let url = 'http://localhost:4567/api/recipes';
+        let url = 'https://localhost:4567/api/recipes';
         if (category) url += `?category=${encodeURIComponent(category)}`;
         const res = await axios.get(url);
         const mapped = res.data.map(r => ({
@@ -84,7 +84,7 @@ const RecipePage = () => {
   useEffect(() => {
     const fetchSaved = async () => {
       try {
-        const res = await axios.get('http://localhost:4567/api/saved-recipes/list', { withCredentials: true });
+        const res = await axios.get('https://localhost:4567/api/saved-recipes/list', { withCredentials: true });
         setSavedIds(res.data.map(item => item.recipe._id));
       } catch {}
     };

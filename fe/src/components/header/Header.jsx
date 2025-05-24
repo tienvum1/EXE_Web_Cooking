@@ -16,7 +16,7 @@ const Header = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('http://localhost:4567/api/users/me', { withCredentials: true });
+        const res = await axios.get('https://localhost:4567/api/users/me', { withCredentials: true });
         setUser(res.data);
       } catch {
         setUser(null);

@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AuthPage.scss';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:4567';
+
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +26,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       await axios.post(
-        'http://localhost:4567/api/auth/login',
+        'https://localhost:4567/api/auth/login',
         { username, password },
         { withCredentials: true }
       );
