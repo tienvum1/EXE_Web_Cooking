@@ -17,6 +17,7 @@ import SettingPage from "./pages/settingPage/SettingPage";
 import BMIPage from './pages/tools/BMIPage';
 import WeightPage from './pages/tools/WeightPage';
 import BmrTdeePage from './pages/tools/BmrTdeePage';
+import TopupModal from "./pages/wallet/StripeTopupModal.jsx";
 
 import "./App.css";
 
@@ -41,6 +42,7 @@ function App() {
       <Route path="/tools/bmi" element={<BMIPage />} />
 <Route path="/tools/weight" element={<WeightPage />} />
 <Route path="/tools/bmr-tdee" element={<BmrTdeePage />} />
+<Route path="/wallet/topup" element={<TopupModal />} />  
     </Routes>
   );
 }

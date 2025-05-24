@@ -61,6 +61,7 @@ const DetailRecipe = () => {
         cookTime={recipeData.cookTime || ''}
         servings={recipeData.servings}
         recipeId={recipeData._id}
+        authorName={recipeData.author?.username}
       />
       <div className="top-section">
         <div className="left-col">
