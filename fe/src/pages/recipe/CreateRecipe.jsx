@@ -21,6 +21,7 @@ const CreateRecipe = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
+  const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:4567';
   // Ảnh món ăn
   const handleMainImageChange = (e) => {
     const file = e.target.files[0];
@@ -78,7 +79,7 @@ const CreateRecipe = () => {
     setMessage('');
     try {
       await axios.post(
-        'http://localhost:4567/api/recipes/create',
+        `${API_URL}/api/recipes/create`,
         {
           title,
           desc,

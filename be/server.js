@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const https = require('https');
 const fs = require('fs');
+const { Server } = require('socket.io');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -15,6 +16,8 @@ const blogRoutes = require('./routes/blog');
 const savedRecipeRoutes = require('./routes/savedRecipe');
 const commentRoutes = require('./routes/comment');
 const paymentRoutes = require('./routes/payment');
+const transactionRoutes = require('./routes/transaction');
+const notificationRoutes = require('./routes/notification');
 // ... (các route khác nếu cần)
 
 const app = express();
@@ -34,6 +37,8 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/saved-recipes', savedRecipeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/notifications', notificationRoutes);
 // ... (các route khác nếu cần)
 
 app.get('/', (req, res) => res.send('API is running!'));
@@ -47,12 +52,25 @@ const sslOptions = {
   cert: fs.readFileSync('./localhost.pem')
 };
 
+const httpsServer = https.createServer(sslOptions, app);
+const io = new Server(httpsServer, { cors: { origin: ['https://localhost:3000', 'http://localhost:3000'], credentials: true } });
+app.set('io', io);
+global.io = io;
+
 mongoose.connect(MONGO_URI)
   .then(() => {
-    https.createServer(sslOptions, app).listen(PORT, () => {
-      console.log(`HTTPS Server running on port ${PORT}`);
+    httpsServer.listen(PORT, () => {
+      console.log(`Server running at https://localhost:${PORT}`);
     });
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
   });
+
+// Socket.io connection
+io.on('connection', (socket) => {
+  // Nhận userId khi client connect
+  socket.on('register', (userId) => {
+    socket.join(userId);
+  });
+});

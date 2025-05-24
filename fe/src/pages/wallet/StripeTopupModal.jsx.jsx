@@ -11,8 +11,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import './StripeTopupModal.scss';
 import axios from 'axios';
 
-const stripePromise = loadStripe('pk_test_...'); // Thay bằng publishable key thực tế
-
+const stripePromise = loadStripe('pk_test_51RSHFA05kBhsFuj1pqrSVgLU9PnifKwONtK1TSyxlpwsuJaT3rWnJYrm2PXe4NCiTSVxY47EsGvtnBKU4BdJh7kX00RWn4P2mM')
 const StripeTopupForm = ({ onClose }) => {
   const [amount, setAmount] = useState('');
   const [cardName, setCardName] = useState('');
@@ -28,7 +27,7 @@ const StripeTopupForm = ({ onClose }) => {
     setMessage('');
     try {
       // 1. Gọi BE tạo PaymentIntent
-      const res = await axios.post('http://localhost:4567/api/payment/stripe-create', { amount: Number(amount) }, { withCredentials: true });
+      const res = await axios.post('https://localhost:4567/api/payment/stripe-create', { amount: Number(amount) }, { withCredentials: true });
       const clientSecret = res.data.clientSecret;
 
       // 2. Thanh toán với Stripe
@@ -44,14 +43,16 @@ const StripeTopupForm = ({ onClose }) => {
 
       if (error) {
         setMessage(error.message);
+        console.error('Stripe confirmCardPayment error:', error);
       } else if (paymentIntent.status === 'succeeded') {
         // 3. Gọi BE xác nhận nạp tiền
-        await axios.post('http://localhost:4567/api/payment/stripe-confirm', { paymentIntentId: paymentIntent.id }, { withCredentials: true });
+        await axios.post('https://localhost:4567/api/payment/stripe-confirm', { paymentIntentId: paymentIntent.id }, { withCredentials: true });
         setMessage('Nạp tiền thành công!');
         setTimeout(() => { setMessage(''); setAmount(''); onClose(); }, 1800);
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Nạp tiền thất bại');
+      setMessage(err.response?.data?.error || err.response?.data?.message || err.message || 'Nạp tiền thất bại');
+      console.error('Stripe FE error:', err);
     } finally {
       setLoading(false);
     }

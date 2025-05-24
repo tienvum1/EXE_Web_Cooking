@@ -116,10 +116,10 @@ const RecipePage = () => {
   const handleToggleSave = async (recipeId, isSaved) => {
     try {
       if (!isSaved) {
-        await axios.post('http://localhost:4567/api/saved-recipes/save', { recipeId }, { withCredentials: true });
+        await axios.post('https://localhost:4567/api/saved-recipes/save', { recipeId }, { withCredentials: true });
         setSavedIds(prev => [...prev, recipeId]);
       } else {
-        await axios.post('http://localhost:4567/api/saved-recipes/unsave', { recipeId }, { withCredentials: true });
+        await axios.post('https://localhost:4567/api/saved-recipes/unsave', { recipeId }, { withCredentials: true });
         setSavedIds(prev => prev.filter(id => id !== recipeId));
       }
     } catch (err) {

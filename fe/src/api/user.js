@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4567';
+const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:4567';
 
 export const getCurrentUser = async () => {
   const res = await axios.get(`${API_URL}/api/users/me`, { withCredentials: true });

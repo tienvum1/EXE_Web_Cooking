@@ -26,7 +26,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       await axios.post(
-        'https://localhost:4567/api/auth/login',
+        `${API_URL}/api/auth/login`,
         { username, password },
         { withCredentials: true }
       );

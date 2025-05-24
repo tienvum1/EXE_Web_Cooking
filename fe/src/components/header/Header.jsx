@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopupModal from '../../pages/wallet/StripeTopupModal.jsx';
+import { io } from 'socket.io-client';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,6 +12,8 @@ const Header = () => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [showTopup, setShowTopup] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unread, setUnread] = useState(0);
 
   // Lấy thông tin user khi header mount
   useEffect(() => {
@@ -42,9 +45,24 @@ const Header = () => {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    // Lấy userId từ localStorage/session hoặc context
+    const userId = user?._id;
+    if (!userId) return;
+    const socket = io('https://localhost:4567', { withCredentials: true });
+    socket.on('connect', () => {
+      socket.emit('register', userId);
+    });
+    socket.on('notification', (noti) => {
+      setNotifications(prev => [noti, ...prev]);
+      setUnread(u => u + 1);
+    });
+    return () => socket.disconnect();
+  }, [user?._id]);
+
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:4567/api/auth/logout', {}, { withCredentials: true });
+      await axios.post('https://localhost:4567/api/auth/logout', {}, { withCredentials: true });
       window.location.href = '/';
     } catch (err) {
       alert('Đăng xuất thất bại!');
@@ -139,6 +157,10 @@ const Header = () => {
               >
                 <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
               </button>
+              <div className="header__notification" onClick={() => navigate('/notifications')} style={{ position: 'relative', cursor: 'pointer' }}>
+                <i className="fa fa-bell"></i>
+                {unread > 0 && <span className="noti-badge">{unread}</span>}
+              </div>
             </>
           ) : (
             <button

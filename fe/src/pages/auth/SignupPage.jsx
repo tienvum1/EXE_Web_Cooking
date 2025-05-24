@@ -13,6 +13,7 @@ const SignupPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:4567';
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -34,7 +35,7 @@ const SignupPage = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:4567/api/auth/register', {
+      const res = await axios.post(`${API_URL}/api/auth/register`, {
         username,
         password
       });
