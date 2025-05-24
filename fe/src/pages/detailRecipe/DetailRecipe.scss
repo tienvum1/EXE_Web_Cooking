@@ -67,3 +67,28 @@
     }
   }
 }
+
+.ingredients-directions-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+
+  .ingredients-col {
+    flex: 1.1;
+    min-width: 220px;
+    max-width: 340px;
+  }
+  .directions-col {
+    flex: 2;
+    min-width: 0;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 18px;
+    .ingredients-col, .directions-col {
+      max-width: 100%;
+      min-width: 0;
+    }
+  }
+}

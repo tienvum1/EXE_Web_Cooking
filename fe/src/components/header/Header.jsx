@@ -161,10 +161,6 @@ const Header = () => {
                 <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
               </button>
 
-              <div className="header__notification" onClick={() => navigate('/notifications')} style={{ position: 'relative', cursor: 'pointer' }}>
-                <i className="fa fa-bell"></i>
-                {unread > 0 && <span className="noti-badge">{unread}</span>}
-              </div>
 
             </>
           ) : (

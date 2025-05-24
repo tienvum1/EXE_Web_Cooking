@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
 import './NotificationPage.scss';
+import Header from '../../components/header/Header';
+import Sidebar from '../../components/sidebar/Sidebar';
+import Footer from '../../components/footer/Footer';
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -24,6 +28,9 @@ const NotificationPage = () => {
   };
 
   return (
+    <>  
+    <Header />
+    <Sidebar />
     <div className="notification-page-container">
       <h2>Thông báo</h2>
       {loading ? <div>Đang tải...</div> : (
@@ -37,6 +44,8 @@ const NotificationPage = () => {
         </ul>
       )}
     </div>
+    <Footer />
+    </>
   );
 };
 
