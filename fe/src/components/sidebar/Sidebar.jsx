@@ -51,7 +51,7 @@ const Sidebar = () => {
           </div>
           <div className="sidebar__item">
             <FaBell className="sidebar__icon" />
-            <span>Thông báo</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/notifications')}>Thông báo</span>
           </div>
           <div className="sidebar__item sidebar__section">
             <FaBook className="sidebar__icon" />

@@ -13,7 +13,7 @@ const RecipeComments = ({ recipeId }) => {
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await axios.get('http://localhost:4567/api/users/me', { withCredentials: true });
+        const res = await axios.get('https://localhost:4567/api/users/me', { withCredentials: true });
         setUserId(res.data._id);
       } catch {
         setUserId(null);
@@ -28,7 +28,7 @@ const RecipeComments = ({ recipeId }) => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get(`http://localhost:4567/api/comments/${recipeId}`);
+        const res = await axios.get(`https://localhost:4567/api/comments/${recipeId}`);
         setComments(res.data);
       } catch {
         setError('Không thể tải bình luận');
