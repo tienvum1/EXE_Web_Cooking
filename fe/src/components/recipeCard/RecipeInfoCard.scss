@@ -1,0 +1,127 @@
+.recipe-info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f7fff9;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #43b06d22;
+  padding: 18px 16px 22px 16px;
+  width: 100%;
+  max-width: 340px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  margin: 0 auto;
+
+  &:hover {
+    box-shadow: 0 8px 32px #43b06d44;
+    transform: translateY(-4px) scale(1.03);
+  }
+
+  &__img-box {
+    width: 100%;
+    height: 170px;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px #43b06d11;
+    background: #eafaf1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    transition: transform 0.3s;
+  }
+  &:hover &__img {
+    transform: scale(1.04);
+  }
+
+  &__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  &__title {
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: #218838;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    text-align: left;
+  }
+  &__meta {
+    display: flex;
+    gap: 18px;
+    font-size: 0.98rem;
+    color: #43b06d;
+    margin-bottom: 10px;
+    span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      svg {
+        color: #218838;
+        font-size: 1.1rem;
+      }
+    }
+  }
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.97rem;
+    font-weight: 600;
+    color: #218838;
+    margin-bottom: 14px;
+    &-icon {
+      font-size: 1.1rem;
+      color: #43b06d;
+    }
+  }
+  &__btn {
+    background: linear-gradient(90deg, #43b06d 60%, #218838 100%);
+    color: #fff;
+    font-weight: 700;
+    padding: 8px 22px;
+    border-radius: 20px;
+    border: none;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #43b06d33;
+    transition: background 0.2s, transform 0.2s;
+    margin-top: 2px;
+    align-self: flex-end;
+  }
+  &__btn:hover {
+    background: linear-gradient(90deg, #218838 60%, #43b06d 100%);
+    transform: translateY(-2px) scale(1.04);
+  }
+}
+
+@media (max-width: 600px) {
+  .recipe-info-card {
+    max-width: 98vw;
+    padding: 10px 4vw 16px 4vw;
+    &__img-box {
+      height: 120px;
+    }
+    &__title {
+      font-size: 1rem;
+    }
+    &__meta {
+      font-size: 0.9rem;
+      gap: 10px;
+    }
+    &__author {
+      font-size: 0.9rem;
+    }
+    &__btn {
+      font-size: 0.95rem;
+      padding: 7px 14px;
+    }
+  }
+} 
