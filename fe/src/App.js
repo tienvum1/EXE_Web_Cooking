@@ -22,6 +22,9 @@ import TopupModal from "./pages/wallet/StripeTopupModal.jsx";
 import TransactionHistory from './pages/transasctionPage/TransactionHistory.jsx';
 import NotificationPage from './pages/notification/NotificationPage';
 
+import SavedRecipesPage from './pages/recipeSaved/SavedRecipesPage';
+
+
 
 import "./App.css";
 
@@ -50,9 +53,13 @@ function App() {
       <Route path="/wallet/history" element={<TransactionHistory />} />
       <Route path="/notifications" element={<NotificationPage />} />
 
-<Route path="/tools/weight" element={<WeightPage />} />
-<Route path="/tools/bmr-tdee" element={<BmrTdeePage />} />
-<Route path="/wallet/topup" element={<TopupModal />} />  
+    
+      <Route path="/tools/weight" element={<WeightPage />} />
+      <Route path="/tools/bmr-tdee" element={<BmrTdeePage />} />
+      <Route path="/wallet/topup" element={<TopupModal />} />  
+
+      <Route path="/recipes-saved" element={<SavedRecipesPage />} />
+
     </Routes>
   );
 }

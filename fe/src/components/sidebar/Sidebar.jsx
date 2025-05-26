@@ -66,27 +66,17 @@ const Sidebar = () => {
             <span>Tất Cả</span>
             <span className="sidebar__count">0 món</span>
           </div>
-          <div className="sidebar__subitem">
+          <div className="sidebar__subitem" onClick={()=> navigate('/recipes-saved')}>
             <FaRegBookmark className="sidebar__icon" />
             <span>Đã Lưu</span>
             <span className="sidebar__count">0 món</span>
           </div>
-          <div className="sidebar__subitem">
-            <FaCheck className="sidebar__icon" />
-            <span>Đã Nấu</span>
-            <span className="sidebar__count">0 món</span>
-          </div>
-          <div className="sidebar__subitem">
-            <FaUser className="sidebar__icon" />
-            <span>Món Của Tôi</span>
-            <span className="sidebar__count">0 món</span>
-          </div>
-          <div className="sidebar__subitem">
+          <div className="sidebar__subitem" onClick={()=> navigate('/recipes-published')}>
             <FaGlobe className="sidebar__icon" />
             <span>Đã lên sóng</span>
             <span className="sidebar__count">0 món</span>
           </div>
-          <div className="sidebar__subitem">
+          <div className="sidebar__subitem" onClick={()=> navigate('/recipes-draft')}>
             <FaLock className="sidebar__icon" />
             <span>Món Nháp</span>
             <span className="sidebar__count">0 món</span>
