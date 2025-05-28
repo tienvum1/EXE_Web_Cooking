@@ -103,10 +103,50 @@
 
 .saved-recipes-list {
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   margin-top: 10px;
+}
+
+.saved-search-sort-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px; /* Adjust as needed */
+  margin-bottom: 20px;
+}
+
+.saved-search-input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.saved-search-input input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.saved-sort-option {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.saved-content-area {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Space between recipe list and feedback form */
+  width: 100%;
+
+  .saved-recipes-list {
+    flex-grow: 1; /* Allow recipe list to take up available space */
+    max-width: 800px; /* Adjust as needed, should be consistent with the previous max-width */
+  }
 }
 
 @media (max-width: 700px) {

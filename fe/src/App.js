@@ -22,7 +22,10 @@ import TopupModal from "./pages/wallet/StripeTopupModal.jsx";
 import TransactionHistory from './pages/transasctionPage/TransactionHistory.jsx';
 import NotificationPage from './pages/notification/NotificationPage';
 
-import SavedRecipesPage from './pages/recipeSaved/SavedRecipesPage';
+import SavedRecipesPage from './pages/recipePages/SavedRecipesPage.jsx';
+import AllRecipesPage from './pages/recipePages/AllRecipesPage.jsx';
+import DraftRecipesPage from './pages/recipePages/DraftRecipesPage.jsx';
+import PublishedRecipesPage from './pages/recipePages/PublishedRecipesPage.jsx';
 
 
 
@@ -59,7 +62,9 @@ function App() {
       <Route path="/wallet/topup" element={<TopupModal />} />  
 
       <Route path="/recipes-saved" element={<SavedRecipesPage />} />
-
+      <Route path="/all-recipes" element={<AllRecipesPage />} />
+      <Route path="/draft-recipes" element={<DraftRecipesPage />} />
+      <Route path="/published-recipes" element={<PublishedRecipesPage />} />
     </Routes>
   );
 }

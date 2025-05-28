@@ -123,3 +123,37 @@ exports.search = async (req, res) => {
     res.status(500).json({ message: 'Lỗi tìm kiếm', error: err.message });
   }
 };
+
+// lấy tất cả recipe của user
+exports.getAllUserRecipes = async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ author: req.user.id });
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy tất cả recipe của user', error: err.message });
+  }
+};
+exports.getPublishedUserRecipes = async (req, res) => {
+  try {
+    // Find published recipes where the author matches the logged-in user's ID
+    const recipes = await Recipe.find({ author: req.user._id, status: 'published' }); // Assuming status field
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc Get draft recipes for the logged-in user
+// @route GET /api/users/me/draft-recipes
+// @access Private
+exports.getDraftUserRecipes = async (req, res) => {
+  try {
+    // Find draft recipes where the author matches the logged-in user's ID
+    const recipes = await Recipe.find({ author: req.user._id, status: 'draft' }); // Assuming status field
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

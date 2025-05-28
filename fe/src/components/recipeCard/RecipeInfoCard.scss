@@ -1,127 +1,128 @@
 .recipe-info-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #f7fff9;
-  border-radius: 18px;
-  box-shadow: 0 4px 18px #43b06d22;
-  padding: 18px 16px 22px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background-color: #fff;
   width: 100%;
-  max-width: 340px;
-  transition: box-shadow 0.2s, transform 0.2s;
-  margin: 0 auto;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:hover {
-    box-shadow: 0 8px 32px #43b06d44;
-    transform: translateY(-4px) scale(1.03);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
 
   &__img-box {
-    width: 100%;
-    height: 170px;
-    border-radius: 14px;
+    flex-basis: 35%;
+    flex-shrink: 0;
     overflow: hidden;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 10px #43b06d11;
-    background: #eafaf1;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  &__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 14px;
-    transition: transform 0.3s;
-  }
-  &:hover &__img {
-    transform: scale(1.04);
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   &__content {
-    width: 100%;
+    flex-basis: 65%;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
   }
+
   &__title {
-    font-size: 1.18rem;
-    font-weight: 800;
-    color: #218838;
-    margin-bottom: 10px;
-    line-height: 1.2;
-    text-align: left;
+    font-size: 1.3em;
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #333;
   }
+
   &__meta {
-    display: flex;
-    gap: 18px;
-    font-size: 0.98rem;
-    color: #43b06d;
-    margin-bottom: 10px;
+    font-size: 0.95em;
+    color: #666;
+    margin-bottom: 12px;
+
     span {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      margin-right: 15px;
+
       svg {
-        color: #218838;
-        font-size: 1.1rem;
+        margin-right: 5px;
+        color: #4CAF50;
       }
     }
   }
+
+  &__description {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   &__author {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-size: 0.97rem;
-    font-weight: 600;
-    color: #218838;
-    margin-bottom: 14px;
+
     &-icon {
-      font-size: 1.1rem;
-      color: #43b06d;
+      margin-right: 5px;
+      color: #666;
     }
   }
-  &__btn {
-    background: linear-gradient(90deg, #43b06d 60%, #218838 100%);
-    color: #fff;
-    font-weight: 700;
-    padding: 8px 22px;
-    border-radius: 20px;
-    border: none;
-    font-size: 1.05rem;
-    cursor: pointer;
-    box-shadow: 0 2px 8px #43b06d33;
-    transition: background 0.2s, transform 0.2s;
-    margin-top: 2px;
-    align-self: flex-end;
+
+  &__saved-date {
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 0;
   }
-  &__btn:hover {
-    background: linear-gradient(90deg, #218838 60%, #43b06d 100%);
-    transform: translateY(-2px) scale(1.04);
+
+  &__bookmark-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.4em;
+    color: #4CAF50;
+  }
+
+  &__btn {
+    display: none;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    flex-direction: column;
+
+    &__img-box {
+      flex-basis: auto;
+      width: 100%;
+      height: 180px;
+    }
+
+    &__content {
+      flex-basis: auto;
+      padding: 15px;
+    }
+
+    &__bookmark-icon {
+      top: 10px;
+      right: 10px;
+      font-size: 1.2em;
+    }
   }
 }
-
-@media (max-width: 600px) {
-  .recipe-info-card {
-    max-width: 98vw;
-    padding: 10px 4vw 16px 4vw;
-    &__img-box {
-      height: 120px;
-    }
-    &__title {
-      font-size: 1rem;
-    }
-    &__meta {
-      font-size: 0.9rem;
-      gap: 10px;
-    }
-    &__author {
-      font-size: 0.9rem;
-    }
-    &__btn {
-      font-size: 0.95rem;
-      padding: 7px 14px;
-    }
-  }
-} 
