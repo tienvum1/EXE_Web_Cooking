@@ -18,12 +18,13 @@ const commentRoutes = require('./routes/comment');
 const paymentRoutes = require('./routes/payment');
 const transactionRoutes = require('./routes/transaction');
 const notificationRoutes = require('./routes/notification');
+
 // ... (các route khác nếu cần)
 
 const app = express();
 app.use(cookieParser());
 app.use(cors({
-  origin: [ 'https://localhost:3000'],
+  origin: [ 'https://localhost:3001'],
   credentials: true
 }));
 app.use(express.json());
@@ -39,6 +40,8 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/notifications', notificationRoutes);
+
+
 // ... (các route khác nếu cần)
 
 app.get('/', (req, res) => res.send('API is running!'));
