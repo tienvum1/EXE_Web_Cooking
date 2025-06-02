@@ -1,11 +1,16 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-06-20' // Specify a stable API version
+});
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
 const Recipe = require('../models/Recipe');
 const Notification = require('../models/Notification');
 const notificationController = require('./notificationController');
 
+const endpointSecret = process.env.WEBHOOK_SECRET; // Your Stripe webhook signing secret
+
 console.log('Stripe key:', process.env.STRIPE_SECRET_KEY);
+console.log('Webhook Secret:', process.env.WEBHOOK_SECRET ? '******' : undefined);
 
 
 exports.createStripePaymentIntent = async (req, res) => {
@@ -32,6 +37,7 @@ exports.createStripePaymentIntent = async (req, res) => {
 
 // Xác nhận nạp tiền sau khi thanh toán thành công (webhook hoặc FE gọi)
 exports.confirmStripeTopup = async (req, res) => {
+  console.log("DEBUG: /api/payment/stripe-confirm endpoint was hit!");
   try {
     const { paymentIntentId } = req.body;
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -385,5 +391,133 @@ exports.updateWithdrawalStatus = async (req, res) => {
   } catch (err) {
     console.error('Error updating withdrawal status:', err);
     res.status(500).json({ message: 'Lỗi khi cập nhật trạng thái yêu cầu rút tiền.', error: err.message });
+  }
+};
+
+// Handle Stripe webhooks
+exports.handleStripeWebhook = async (req, res) => {
+  console.log('[Stripe Webhook] Webhook handler received a request.');
+  console.log('[Stripe Webhook] Endpoint Secret (partial): ', endpointSecret ? endpointSecret.substring(0, 8) + '...' : 'Not set');
+  const sig = req.headers['stripe-signature'];
+
+  // Access raw body directly from req.body due to express.raw() middleware
+  const rawBody = req.body;
+  console.log('[Stripe Webhook] Accessed raw body from req.body.');
+
+  try {
+    let event;
+
+    try {
+      // Verify webhook signature using the raw body from req.body
+      console.log('[Stripe Webhook] Attempting to construct event from raw body and signature.');
+      // console.log('[Stripe Webhook] Raw Body (partial): ', rawBody.toString().substring(0, 100) + '...'); // Log partial raw body (corrected)
+      console.log('[Stripe Webhook] Signature: ', sig); // Log the signature
+      event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret, {
+        apiVersion: '2024-06-20'
+      });
+      console.log(`[Stripe Webhook] Event constructed successfully. Type: ${event.type}`);
+    } catch (err) {
+      // On error, return the error message
+      console.error(`[Stripe Webhook] Webhook signature verification failed: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        const paymentIntent = event.data.object;
+        console.log('PaymentIntent was successful!', paymentIntent);
+        // Implement logic here to fulfill the purchase/update database
+        // You can access paymentIntent.metadata to get associated data like userId, etc.
+        // Example: Update wallet, create transaction
+        await handlePaymentIntentSucceeded(paymentIntent);
+        break;
+      case 'payment_method.attached':
+        const paymentMethod = event.data.object;
+        console.log('PaymentMethod was attached to a Customer!', paymentMethod);
+        // Handle this event
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    // Return a 200 to acknowledge receipt of the event
+    res.status(200).json({ received: true });
+  } catch (err) {
+    console.error('[Stripe Webhook] Unhandled error in webhook handler:', err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// Helper function to handle payment_intent.succeeded event
+// This is similar to your existing confirmStripeTopup logic but triggered by webhook
+const handlePaymentIntentSucceeded = async (paymentIntent) => {
+  try {
+    console.log(`[Stripe Webhook] handlePaymentIntentSucceeded started for PaymentIntent ID: ${paymentIntent.id}`);
+    const userId = paymentIntent.metadata.userId;
+    const amount = paymentIntent.amount; // Amount is in smallest currency unit (e.g., cents for USD, dong for VND)
+    const paymentIntentId = paymentIntent.id;
+
+    console.log(`[Stripe Webhook] Processing PaymentIntent ID: ${paymentIntentId}, User ID: ${userId}, Amount: ${amount}`);
+
+    // Find or create wallet
+    console.log(`[Stripe Webhook] Looking for wallet for user ID: ${userId}`);
+    let wallet = await Wallet.findOne({ user: userId });
+    if (!wallet) {
+      console.log(`[Stripe Webhook] Wallet not found for user ID: ${userId}. Creating new wallet.`);
+      wallet = await Wallet.create({ user: userId });
+      console.log(`[Stripe Webhook] New wallet created for user ID: ${userId}.`);
+    } else {
+      console.log(`[Stripe Webhook] Existing wallet found for user ID: ${userId}. Current balance: ${wallet.balance}`);
+    }
+
+    // Check if this transaction has already been processed to prevent duplicates
+    console.log(`[Stripe Webhook] Checking for existing transaction with PaymentIntent ID: ${paymentIntentId}`);
+    const existingTransaction = await Transaction.findOne({ method: 'stripe', status: 'success', 'metadata.paymentIntentId': paymentIntentId });
+    if (existingTransaction) {
+      console.log(`[Stripe Webhook] Transaction for PaymentIntent ID ${paymentIntentId} already processed. Aborting.`);
+      return; // Already processed, do nothing
+    }
+    console.log(`[Stripe Webhook] No existing transaction found for PaymentIntent ID: ${paymentIntentId}. Proceeding.`);
+
+    // Update wallet balance
+    console.log(`[Stripe Webhook] Updating wallet balance. Current balance: ${wallet.balance}, Amount to add: ${amount}`);
+    wallet.balance += amount; // Amount from Stripe is usually in the smallest unit
+    wallet.updatedAt = new Date();
+    await wallet.save();
+    console.log(`[Stripe Webhook] Wallet balance updated successfully. New balance: ${wallet.balance}`);
+
+
+    // Create transaction record
+    console.log(`[Stripe Webhook] Creating transaction record for PaymentIntent ID: ${paymentIntentId}`);
+    await Transaction.create({
+      from: null,
+      to: userId,
+      amount: amount, // Store amount in smallest unit or convert if necessary
+      type: 'topup', // Assuming this is for topup, adjust if other types of payments use this webhook
+      method: 'stripe',
+      status: 'success',
+      metadata: { paymentIntentId: paymentIntentId }, // Store Stripe Payment Intent ID
+    });
+    console.log(`[Stripe Webhook] Transaction record created successfully for PaymentIntent ID: ${paymentIntentId}`);
+
+
+     // Gửi thông báo nạp tiền
+    console.log(`[Stripe Webhook] Sending topup notification to user ID: ${userId}`);
+    await notificationController.createNotification(
+      userId,
+      'topup',
+      `Bạn đã nạp ${amount.toLocaleString('vi-VN')}đ vào tài khoản thành công!`, // Adjust currency display if needed
+      { amount }
+    );
+    console.log(`[Stripe Webhook] Topup notification sent to user ID: ${userId}`);
+
+
+    console.log(`[Stripe Webhook] Wallet updated and Transaction created for PaymentIntent ID ${paymentIntentId}`);
+
+  } catch (err) {
+    console.error(`[Stripe Webhook] Error handling payment_intent.succeeded for PaymentIntent ID ${paymentIntent?.id}:`, err);
+    // Consider logging this error or using a monitoring system
   }
 };

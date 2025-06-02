@@ -50,11 +50,14 @@ const StripeTopupForm = ({ onClose }) => {
 
         console.error('Stripe confirmCardPayment error:', error);
       } else if (paymentIntent.status === 'succeeded') {
-        // 3. Gọi BE xác nhận nạp tiền
-        await axios.post('https://localhost:4567/api/payment/stripe-confirm', { paymentIntentId: paymentIntent.id }, { withCredentials: true });
+        // 3. **Remove** Call BE xác nhận nạp tiền - this is now handled by webhook
+        // await axios.post('https://localhost:4567/api/payment/stripe-confirm', { paymentIntentId: paymentIntent.id }, { withCredentials: true });
 
-        setMessage('Nạp tiền thành công!');
-        setTimeout(() => { setMessage(''); setAmount(''); onClose(); }, 1800);
+        setMessage('Thanh toán thành công! Đang xử lý nạp tiền...'); // Inform user it's being processed
+        // Optional: Close modal immediately or after a short delay
+        // setTimeout(() => { setMessage(''); setAmount(''); onClose(); }, 1800);
+        // Close the modal immediately and let backend webhook handle final update/notification
+         setTimeout(() => { setMessage(''); setAmount(''); onClose(); }, 2000);
       }
     } catch (err) {
 
