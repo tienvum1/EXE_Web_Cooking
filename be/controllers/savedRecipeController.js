@@ -4,7 +4,7 @@ const Recipe = require('../models/Recipe');
 // Lưu một recipe
 exports.saveRecipe = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const { recipeId } = req.body;
     if (!recipeId) return res.status(400).json({ message: 'Thiếu recipeId' });
     // Kiểm tra đã lưu chưa
@@ -20,7 +20,7 @@ exports.saveRecipe = async (req, res) => {
 // Bỏ lưu một recipe
 exports.unsaveRecipe = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const { recipeId } = req.body;
     if (!recipeId) return res.status(400).json({ message: 'Thiếu recipeId' });
     const deleted = await SavedRecipe.findOneAndDelete({ user: userId, recipe: recipeId });
@@ -34,7 +34,7 @@ exports.unsaveRecipe = async (req, res) => {
 // Lấy danh sách recipe đã lưu của user
 exports.getSavedRecipes = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const saved = await SavedRecipe.find({ user: userId }).populate({ path: 'recipe', populate: { path: 'author', select: 'username' } }).sort({ createdAt: -1 });
     res.json(saved);
   } catch (err) {

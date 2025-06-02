@@ -77,30 +77,95 @@ const CreateRecipe = () => {
   const handleSubmit = async (status) => {
     setLoading(true);
     setMessage('');
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('desc', desc);
+    formData.append('servings', servings);
+    formData.append('cookTime', cookTime);
+    formData.append('nutrition[calories]', nutrition.calories);
+    formData.append('nutrition[fat]', nutrition.fat);
+    formData.append('nutrition[protein]', nutrition.protein);
+    formData.append('nutrition[carbs]', nutrition.carbs);
+    formData.append('status', status);
+
+    // Thêm các nguyên liệu vào FormData
+    ingredients.forEach((ingredient, index) => {
+        formData.append(`ingredients[${index}]`, ingredient);
+    });
+
+    // Thêm các bước làm vào FormData (chỉ text, ảnh bước làm hiện chưa xử lý upload backend)
+    steps.forEach((step, index) => {
+        formData.append(`steps[${index}][text]`, step.text);
+        // Thêm file ảnh cho từng bước làm
+        if (step.images && Array.isArray(step.images)) {
+            step.images.forEach((image, imageIndex) => {
+                // image ở đây là object { file: File, url: URL.createObjectURL(file) }
+                // Chúng ta cần lấy File object thực tế
+                if (image.file) {
+                    formData.append(`stepImages[${index}][${imageIndex}]`, image.file);
+                }
+            });
+        }
+    });
+
+    // Thêm file ảnh chính nếu có
+    if (mainImage) {
+        formData.append('mainImage', mainImage);
+    }
+
+    // Thêm danh mục vào FormData
+    categories.forEach((category, index) => {
+        formData.append(`categories[${index}]`, category);
+    });
+
     try {
+      // await axios.post(
+      //   `${API_URL}/api/recipes/create`,
+      //   {
+      //     title,
+      //     desc,
+      //     servings,
+      //     cookTime,
+      //     ingredients: ingredients,
+      //     steps: steps.map(s => ({ text: s.text, images: (s.images || []).map(img => img.url) })), // Ảnh bước làm vẫn là URL tạm
+      //     mainImage: mainImageUrl, // Trước đây gửi URL, giờ gửi file
+      //     nutrition,
+      //     status,
+      //     categories,
+      //   },
+      //   { withCredentials: true }
+      // );
+      
+      // Gửi FormData thay vì JSON
       await axios.post(
         `${API_URL}/api/recipes/create`,
-        {
-          title,
-          desc,
-          servings,
-          cookTime,
-          ingredients,
-          steps: steps.map(s => ({
-            text: s.text,
-            images: (s.images || []).map(img => img.url)
-          })),
-          mainImage: mainImageUrl,
-          nutrition,
-          status,
-          categories,
-        },
-        { withCredentials: true }
+        formData, // Gửi FormData
+        { withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data' // Axios sẽ tự set, nhưng để rõ ràng
+          }
+        }
       );
+
       setMessage(status === 'pending'
         ? 'Gửi duyệt thành công! Công thức sẽ được kiểm duyệt.'
         : 'Đã lưu nháp công thức!');
+        
+      // Optional: Reset form sau khi submit thành công
+      // setTitle('');
+      // setDesc('');
+      // setServings('');
+      // setCookTime('');
+      // setIngredients(['']);
+      // setSteps([{ text: '', images: [] }]);
+      // setMainImage(null);
+      // setMainImageUrl('');
+      // setNutrition({ calories: '', fat: '', protein: '', carbs: '' });
+      // setCategories([]);
+
     } catch (err) {
+      console.error('Lỗi khi gửi form recipe:', err.response?.data || err.message);
       setMessage(
         err.response?.data?.message ||
         'Lưu công thức thất bại. Vui lòng thử lại.'
@@ -137,13 +202,7 @@ const CreateRecipe = () => {
               value={title}
               onChange={e => setTitle(e.target.value)}
             />
-            <div className="create-recipe-user">
-              <div className="create-recipe-avatar">T</div>
-              <div>
-                <div className="create-recipe-username">Tiến Vũ</div>
-                <div className="create-recipe-userid">@cook_113267840</div>
-              </div>
-            </div>
+         
             <textarea
               className="create-recipe-desc"
               placeholder="Hãy chia sẻ với mọi người về món này của bạn nhé ..."

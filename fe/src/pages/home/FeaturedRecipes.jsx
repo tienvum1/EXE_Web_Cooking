@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const mapRecipe = (r) => ({
   id: r._id,
-  image: r.mainImage || '',
+  mainImage: r.mainImage || '',
   title: r.title,
   time: r.cookTime ? `${r.cookTime} Minutes` : '',
   type: r.type || '',

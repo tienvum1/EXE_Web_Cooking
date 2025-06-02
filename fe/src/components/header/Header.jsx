@@ -2,36 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import './Header.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import TopupModal from '../../pages/wallet/StripeTopupModal.jsx';
-
-import { io } from 'socket.io-client';
-
+import { getMe, logout } from '../../api/auth';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [showTopup, setShowTopup] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [unread, setUnread] = useState(0);
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-
-  // Lấy thông tin user khi header mount
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get('https://localhost:4567/api/users/me', { withCredentials: true });
-        setUser(res.data);
-      } catch {
-        setUser(null);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  // Đóng menu khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -48,33 +30,110 @@ const Header = () => {
     };
   }, [menuOpen]);
 
-  useEffect(() => {
-    // Lấy userId từ localStorage/session hoặc context
-    const userId = user?._id;
-    if (!userId) return;
-    const socket = io('https://localhost:4567', { withCredentials: true });
-    socket.on('connect', () => {
-      socket.emit('register', userId);
-    });
-    socket.on('notification', (noti) => {
-      setNotifications(prev => [noti, ...prev]);
-      setUnread(u => u + 1);
-    });
-    return () => socket.disconnect();
-  }, [user?._id]);
-
-  const handleLogout = async () => {
+  // Function to refresh user data - expose this for external calls
+  const refreshUserData = async () => {
     try {
-      await axios.post('https://localhost:4567/api/auth/logout', {}, { withCredentials: true });
-      window.location.href = '/';
-    } catch (err) {
-      alert('Đăng xuất thất bại!');
+      const userData = await getMe();
+      console.log('Header: Refreshing user data:', userData);
+      if (userData) {
+        setUser(userData);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
     }
   };
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const userData = await getMe();
+        console.log('Header: User data from getMe:', userData);
+        if (userData) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Error checking auth status in Header:', error);
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  // Listen for login success events
+  useEffect(() => {
+    const handleLoginSuccess = () => {
+      console.log('Login success event detected, refreshing user data...');
+      refreshUserData();
+    };
+
+    // Listen for custom login success event
+    window.addEventListener('loginSuccess', handleLoginSuccess);
+    
+    // Also listen for storage changes (if token is stored)
+    const handleStorageChange = (e) => {
+      if (e.key === 'token' || e.key === 'user') {
+        console.log('Storage change detected, refreshing user data...');
+        refreshUserData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('loginSuccess', handleLoginSuccess);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    // Close modals IMMEDIATELY before anything else
+    setShowTopup(false);
+    setMenuOpen(false);
+    
+    setLoading(true);
+    try {
+      await logout();
+      
+      // Clear user data after successful logout
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout in Header:', error);
+      // Clear user data even if logout API fails
+      setUser(null);
+      setIsAuthenticated(false);
+      alert('Đăng xuất thất bại!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <header className="header">Đang tải header...</header>;
+  }
+
   return (
     <header className="header">
-      <TopupModal open={showTopup} onClose={() => setShowTopup(false)} />
+      {/* Debug user data before rendering modal */}
+      {user && user._id && showTopup && (
+        <>
+          {console.log('Rendering TopupModal with user:', user)}
+          <TopupModal 
+            open={showTopup} 
+            onClose={() => setShowTopup(false)} 
+            currentUser={user} 
+          />
+        </>
+      )}
+      
       <div className="header__container">
         <div className="header__logo" style={{cursor: 'pointer'}} onClick={() => navigate('/')}>FitMeal</div>
 
@@ -96,15 +155,17 @@ const Header = () => {
           <a href="/about">About Us</a>
         </nav>
         <div className="header__actions">
-          {user ? (
+          {isAuthenticated ? (
             <>
               <div className="header__avatar" onClick={() => setMenuOpen(!menuOpen)} style={{cursor: 'pointer'}}>
                 {user?.avatar
                   ? <img src={user.avatar} alt="avatar" />
                   : (user?.username ? user.username[0].toUpperCase() : 'U')}
               </div>
-              {menuOpen && (
+              {menuOpen && isAuthenticated && (
                 <div className="header__user-menu" ref={menuRef}>
+                  {console.log('Rendering dropdown. Current user state:', user)}
+                  {console.log('ảnh cua user :', user.avatar)}
                   <div className="header__user-info">
                     <div className="header__avatar">
                       {user?.avatar
@@ -112,20 +173,23 @@ const Header = () => {
                         : (user?.username ? user.username[0].toUpperCase() : 'U')}
                     </div>
                     <div>
-                      <div className="header__user-name">{user?.fullName || user?.username || 'Khách'}</div>
+                      <div className="header__user-name">{user?.fullName || user?.username || 'username'}</div>
                       <div className="header__user-username">{user ? `@${user.username}` : ''}</div>
                     </div>
                   </div>
-                  <div
-                    className="header__user-menu-item"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      navigate(`/profile/${user._id}`);
-                    }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <i className="fas fa-user"></i> Bếp cá nhân
-                  </div>
+                  {user?._id && (
+                    <div
+                      className="header__user-menu-item"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        console.log("user id", user._id)
+                        navigate(`/profile/${user._id}`);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <i className="fas fa-user"></i> Bếp cá nhân
+                    </div>
+                  )}
                   <div
                     className="header__user-menu-item"
                     onClick={() => {
@@ -135,6 +199,16 @@ const Header = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <i className="fas fa-cog"></i> Cài đặt
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/settings/change-password');
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-lock"></i> Thay đổi mật khẩu
                   </div>
                   <div
                     className="header__user-menu-item"
@@ -156,12 +230,14 @@ const Header = () => {
               <button
                 className="header__topup-btn"
                 style={{ marginLeft: 10, background: '#ffe082', color: '#222', border: 'none', borderRadius: 18, padding: '8px 20px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.18s' }}
-                onClick={() => setShowTopup(true)}
+                onClick={async () => {
+                  // Refresh user data before opening modal to ensure latest data
+                  await refreshUserData();
+                  setShowTopup(true);
+                }}
               >
                 <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
               </button>
-
-
             </>
           ) : (
             <button

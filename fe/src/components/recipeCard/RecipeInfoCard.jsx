@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const RecipeInfoCard = ({ recipe }) => {
   const navigate = useNavigate();
   if (!recipe) return null;
-  const { _id, image, title, time, type, author, desc, savedAt } = recipe;
+  const { _id, mainImage, title, time, type, author, desc, savedAt } = recipe;
 
   // Lấy tên tác giả phù hợp
   let authorName = '';
@@ -28,7 +28,7 @@ const RecipeInfoCard = ({ recipe }) => {
   return (
     <div className="recipe-info-card" onClick={() => navigate(`/detail-recipe/${_id}`)}>
       <div className="recipe-info-card__img-box">
-        <img src={image} alt={title} className="recipe-info-card__img" />
+        <img src={mainImage} alt={title} className="recipe-info-card__img" />
       </div>
       <div className="recipe-info-card__content">
         <h3 className="recipe-info-card__title">{title}</h3>

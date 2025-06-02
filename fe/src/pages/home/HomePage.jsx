@@ -8,6 +8,7 @@ import Footer from '../../components/footer/Footer';
 import Sidebar from '../../components/sidebar/Sidebar';
 import LatestRecipes from './LatestRecipes';
 import FeaturedRecipes from './FeaturedRecipes';
+import ChatBot from '../../components/sidebar/ChatBot';
 
 
 const HomePage = () => (
@@ -40,6 +41,7 @@ const HomePage = () => (
       <WellnessChef />
       <InstagramFeed />
     </main>
+    <ChatBot />
     <Sidebar />
     <Footer />
   </div>

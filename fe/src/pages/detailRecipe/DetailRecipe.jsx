@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchRecipeById } from '../../api/recipe';
+import { fetchRecipeApproveById } from '../../api/recipe';
 import { fetchUserById } from '../../api/user';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
@@ -30,7 +30,8 @@ const DetailRecipe = () => {
       setLoading(true);
       setError('');
       try {
-        const data = await fetchRecipeById(id);
+        const data = await fetchRecipeApproveById(id);
+        console.log('Fetched recipe data:', data);
         setRecipeData(data);
         if (data.author && data.author._id) {
           const user = await fetchUserById(data.author._id);
@@ -62,10 +63,12 @@ const DetailRecipe = () => {
         servings={recipeData.servings}
         recipeId={recipeData._id}
         authorName={recipeData.author?.username}
+        categories={recipeData.categories}
       />
       <div className="top-section">
         <div className="left-col">
-          <ImageSection src={recipeData.mainImage || ''} alt={recipeData.title} />
+          {console.log('Passing to ImageSection:', { mainImage: recipeData.mainImage, mainImageType: recipeData.mainImageType })}
+          <ImageSection mainImage={recipeData.mainImage} mainImageType={recipeData.mainImageType} alt={recipeData.title} />
         </div>
         <div className="right-col">
           <NutritionInfo
@@ -82,6 +85,7 @@ const DetailRecipe = () => {
           <IngredientsList mainDish={recipeData.ingredients} sauce={[]} />
         </div>
         <div className="directions-col">
+          {console.log('Passing to DirectionsList:', { directions: recipeData.steps })}
           <DirectionsList directions={recipeData.steps} />
         </div>
       </div>

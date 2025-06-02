@@ -23,13 +23,27 @@ const Sidebar = () => {
   const [publishedRecipesCount, setPublishedRecipesCount] = useState(0);
   const [draftRecipesCount, setDraftRecipesCount] = useState(0);
 
+  // Assume `isAuthenticated` is a boolean value indicating user's authentication status
+  // You need to replace `isAuthenticated` with the actual way you track authentication status
+  const isAuthenticated = true; // Placeholder: Replace with your actual auth check
+
   useEffect(() => {
     const fetchBalance = async () => {
-      const balance = await getWalletBalance();
-      setBalance(balance);
+      try {
+        const balance = await getWalletBalance();
+        setBalance(balance);
+      } catch (err) {
+        console.error("Failed to fetch wallet balance:", err);
+        setBalance(0); // Set balance to 0 or handle error appropriately
+      }
     };
-    fetchBalance();
-  }, []);
+
+    // Only fetch if authenticated
+    if (isAuthenticated) {
+      fetchBalance();
+    }
+    // Add dependency that tracks authentication status here, e.g., [isAuthenticated]
+  }, [/* add authentication dependency here */]);
 
   useEffect(() => {
     const fetchSavedCount = async () => {
@@ -41,8 +55,13 @@ const Sidebar = () => {
         setSavedRecipesCount(0);
       }
     };
-    fetchSavedCount();
-  }, []);
+
+    // Only fetch if authenticated
+    if (isAuthenticated) {
+      fetchSavedCount();
+    }
+    // Add dependency that tracks authentication status here
+  }, [/* add authentication dependency here */]);
 
   useEffect(() => {
     const fetchAllRecipesCount = async () => {
@@ -54,34 +73,49 @@ const Sidebar = () => {
         setAllRecipesCount(0);
       }
     };
-    fetchAllRecipesCount();
-  }, []);
+
+    // Only fetch if authenticated
+    if (isAuthenticated) {
+      fetchAllRecipesCount();
+    }
+    // Add dependency that tracks authentication status here
+  }, [/* add authentication dependency here */]);
 
   useEffect(() => {
     const fetchPublishedCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/me/published-recipes`, { withCredentials: true });
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/published-recipes`, { withCredentials: true });
         setPublishedRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch published recipes count:", err);
         setPublishedRecipesCount(0);
       }
     };
-    fetchPublishedCount();
-  }, []);
+
+    // Only fetch if authenticated
+    if (isAuthenticated) {
+      fetchPublishedCount();
+    }
+    // Add dependency that tracks authentication status here
+  }, [/* add authentication dependency here */]);
 
   useEffect(() => {
     const fetchDraftCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/me/draft-recipes`, { withCredentials: true });
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/draft-recipes`, { withCredentials: true });
         setDraftRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch draft recipes count:", err);
         setDraftRecipesCount(0);
       }
     };
-    fetchDraftCount();
-  }, []);
+
+    // Only fetch if authenticated
+    if (isAuthenticated) {
+      fetchDraftCount(0);
+    }
+    // Add dependency that tracks authentication status here
+  }, [/* add authentication dependency here */]);
 
   return (
     <>

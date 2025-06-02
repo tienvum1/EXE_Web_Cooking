@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FaRegClock, FaDrumstickBite, FaRegSave, FaShareAlt, FaRegBookmark, FaBookmark, FaDonate } from 'react-icons/fa';
+import { FaRegClock, FaDrumstickBite, FaRegSave, FaShareAlt, FaRegBookmark, FaBookmark, FaDonate,FaUtensils } from 'react-icons/fa';
 import axios from 'axios';
 import './RecipeHeader.scss';
 import DonateModal from './DonateModal';
 
-const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId }) => {
+const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) => {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showDonate, setShowDonate] = useState(false);
@@ -56,9 +56,9 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId }) => {
         </div>
 
         <div className="time-info">
-          <div className="item"><FaRegClock /> <span>Prep:</span> {prepTime}</div>
+
           <div className="item"><FaRegClock /> <span>Cook:</span> {cookTime}</div>
-          <div className="item"><FaDrumstickBite /> <span>Beef</span></div>
+          <div className="item"><FaUtensils /> <span>{categories}</span></div>
         </div>
 
         <div className="actions">

@@ -34,8 +34,9 @@ const RecommendedRecipes = () => {
       <div className="recommended-recipes__grid">
         {recipes.map((recipe, index) => (
           <RecipeCard
-            key={index}
-            image={recipe.image}
+            key={recipe._id}
+            id={recipe._id}
+            mainImage={recipe.mainImage}
             title={recipe.title}
             time={recipe.time}
             type={recipe.type}

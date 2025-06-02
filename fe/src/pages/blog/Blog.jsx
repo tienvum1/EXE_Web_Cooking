@@ -4,25 +4,8 @@ import Footer from '../../components/footer/Footer';
 import logo from '../../assets/images/logo.png'
 import { useNavigate } from 'react-router-dom';
 import { getAllBlogs } from '../../api/blog';
+import { fetchMostLikedRecipes } from '../../api/recipe';
 import './Blog.scss';
-
-const tastyRecipes = [
-  {
-    image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=200&q=80',
-    title: 'Chicken Meatballs with Cream Cheese',
-    author: 'Andreas Paula',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=200&q=80',
-    title: 'Traditional Bolognaise Ragu',
-    author: 'Andreas Paula',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=200&q=80',
-    title: 'Pork and Chive Chinese Dumplings',
-    author: 'Andreas Paula',
-  },
-];
 
 const Blog = () => {
   const [search, setSearch] = useState('');
@@ -30,6 +13,10 @@ const Blog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const [tastyRecipes, setTastyRecipes] = useState([]);
+  const [tastyLoading, setTastyLoading] = useState(true);
+  const [tastyError, setTastyError] = useState('');
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -45,6 +32,23 @@ const Blog = () => {
       }
     };
     fetchBlogs();
+  }, []);
+
+  useEffect(() => {
+    const getTastyRecipes = async () => {
+      setTastyLoading(true);
+      setTastyError('');
+      try {
+        const data = await fetchMostLikedRecipes();
+        setTastyRecipes(data);
+      } catch (err) {
+        setTastyError('Không thể tải danh sách công thức nổi bật.');
+        console.error('Failed to fetch most liked recipes:', err);
+      } finally {
+        setTastyLoading(false);
+      }
+    };
+    getTastyRecipes();
   }, []);
 
   const filteredPosts = blogs.filter(post =>
@@ -90,15 +94,20 @@ const Blog = () => {
             <div className="tasty-recipes">
               <h2 className="tasty-title">Tasty Recipes</h2>
               <div className="tasty-list">
-                {tastyRecipes.map((r, idx) => (
-                  <div className="tasty-item" key={idx}>
+                {tastyLoading && <div>Đang tải công thức nổi bật...</div>}
+                {tastyError && <div style={{ color: 'red' }}>{tastyError}</div>}
+                {!tastyLoading && !tastyError && tastyRecipes.map((r, idx) => (
+                  <div className="tasty-item" key={r._id || idx} onClick={() => navigate(`/recipe/${r._id}`)} style={{cursor: 'pointer'}}>
                     <img className="tasty-img" src={r.image} alt={r.title} loading="lazy" />
                     <div className="tasty-info">
                       <div className="tasty-recipe-title">{r.title}</div>
-                      <div className="tasty-recipe-author">By {r.author}</div>
+                      <div className="tasty-recipe-author">By {r.authorName || 'Unknown Author'}</div>
                     </div>
                   </div>
                 ))}
+                {!tastyLoading && !tastyError && tastyRecipes.length === 0 && (
+                    <div>Không tìm thấy công thức nổi bật nào.</div>
+                )}
               </div>
             </div>
             <div className="blog-banner">

@@ -2,7 +2,9 @@
 .image-section {
     position: relative;
     width: 100%;
-    height: 350px;
+    max-width: 700px;
+    margin: 0 auto;
+    height: 300px;
     border-radius: $border-radius;
     overflow: hidden;
     @include shadow;
@@ -13,13 +15,22 @@
       @include shadow(0 6px 12px rgba(0, 0, 0, 0.15));
     }
   
-    .image-placeholder {
+    .recipe-main-image {
+      display: block;
       width: 100%;
       height: 100%;
-      background: #e0e0e0;
-      @include flex-center;
-      color: #999;
-      font-size: 16px;
+      object-fit: contain;
+    }
+  
+    .image-placeholder {
+      width: 100%;
+      padding-top: 56.25%;
+      background-color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #666;
+      font-size: 1.2em;
     }
   
     .play-button {

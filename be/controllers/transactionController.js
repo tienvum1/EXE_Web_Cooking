@@ -3,7 +3,7 @@ const Transaction = require('../models/Transaction');
 // Lấy lịch sử giao dịch của user
 exports.getTransactionHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const transactions = await Transaction.find({
       $or: [
         { to: userId },

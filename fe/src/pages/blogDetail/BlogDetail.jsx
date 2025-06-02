@@ -11,8 +11,6 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showUserInfo, setShowUserInfo] = useState(false);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -23,6 +21,7 @@ const BlogDetail = () => {
         setBlog(data);
       } catch (err) {
         setError('Không tìm thấy bài viết.');
+        console.error('Failed to fetch blog:', err);
       } finally {
         setLoading(false);
       }
@@ -31,8 +30,8 @@ const BlogDetail = () => {
   }, [id]);
 
   if (loading) return <div className="loading">Đang tải...</div>;
-  if (error) return <div className="error">{error}</div>;
-  if (!blog) return null;
+  if (error) return <div className="error" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>{error}</div>;
+  if (!blog) return <div className="error" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>Không tìm thấy bài viết.</div>;
 
   return (
     <>
@@ -92,20 +91,6 @@ const BlogDetail = () => {
         </div>
       </div>
       <Footer />
-      {showUserInfo && user && (
-        <div className="header__user-popup" onClick={() => setShowUserInfo(false)}>
-          <div className="header__user-popup-content" onClick={e => e.stopPropagation()}>
-            <img className="header__user-popup-avatar" src={user.avatar} alt={user.fullName || user.username} />
-            <div className="header__user-popup-name">{user.fullName || user.username}</div>
-            <div className="header__user-popup-username">@{user.username}</div>
-            <div className="header__user-popup-email">{user.email}</div>
-            {user.bio && <div className="header__user-popup-bio">{user.bio}</div>}
-            <button onClick={() => { setShowUserInfo(false); navigate('/profile'); }}>Trang cá nhân</button>
-            <button onClick={() => { setShowUserInfo(false); navigate('/settings'); }}>Cài đặt</button>
-            <button className="logout-btn">Đăng xuất</button>
-          </div>
-        </div>
-      )}
     </>
   );
 };
