@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RecipeAuthorInfo.scss';
+import { followUser } from '../../api/user';
 
 const RecipeAuthorInfo = ({
   avatar,
@@ -12,11 +13,28 @@ const RecipeAuthorInfo = ({
   authorId
 }) => {
   const navigate = useNavigate();
+
   const handleClick = () => {
     if (authorId) {
       navigate(`/profile/${authorId}`);
     }
   };
+
+  const handleFollow = async (e) => {
+    e.stopPropagation();
+    if (!authorId) {
+      console.error("Cannot follow user: authorId is missing.");
+      return;
+    }
+    try {
+      const result = await followUser(authorId);
+      console.log('Follow user response:', result);
+      alert(result.message || 'Theo dõi thành công!');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Có lỗi xảy ra khi theo dõi.');
+    }
+  };
+
   return (
     <div className="recipe-author-info">
       <h2 className="recipe-author-title" onClick={handleClick} style={{cursor: authorId ? 'pointer' : 'default', color: authorId ? '#2e7d32' : undefined}}>
@@ -42,7 +60,11 @@ const RecipeAuthorInfo = ({
               </span>
             )}
           </div>
-          <button className="recipe-author-friend-btn">Kết Bạn Bếp</button>
+          {authorId && (
+            <button className="recipe-author-friend-btn" onClick={handleFollow}>
+              Theo dõi
+            </button>
+          )}
         </div>
       </div>
       <div className="recipe-author-desc">{description || 'Chưa có mô tả.'}</div>

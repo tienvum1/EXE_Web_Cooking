@@ -114,3 +114,97 @@
   text-align: center;
   align-items: center ;
 }
+
+// Add styles for the edit profile form
+.edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Center form content
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 24px; // Space below title
+    color: #333; // Darker color for title
+  }
+
+  form {
+    width: 100%;
+    max-width: 400px; // Limit form width for better readability
+    display: flex;
+    flex-direction: column;
+    gap: 16px; // Space between form groups
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-weight: 500;
+      margin-bottom: 8px; // Space below label
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="email"], // Assuming you might add email later
+    input[type="password"] { // Assuming you might add password later
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff; // Highlight on focus
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      &:disabled {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: center; // Center buttons
+    gap: 16px; // Space between buttons
+    margin-top: 24px; // Space above buttons
+
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s, opacity 0.2s;
+
+      &[type="submit"] {
+        background-color: #28a745; // Green for Save
+        color: white;
+
+        &:hover {
+          background-color: #218838;
+        }
+      }
+
+      &[type="button"] { // For Cancel button
+        background-color: #6c757d; // Grey for Cancel
+        color: white;
+
+        &:hover {
+          background-color: #5a6268;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

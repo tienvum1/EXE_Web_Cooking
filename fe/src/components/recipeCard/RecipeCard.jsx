@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RecipeCard.scss';
 
-const RecipeCard = ({ id, image, title, time, type, author }) => {
+const RecipeCard = ({ id, mainImage, title, time, type, author }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -13,7 +13,7 @@ const RecipeCard = ({ id, image, title, time, type, author }) => {
   return (
     <div className="recipe-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
       <div className="recipe-card__image-box">
-        <img src={image} alt={title} className="recipe-card__image" />
+        <img src={mainImage} alt={title} className="recipe-card__image" />
       </div>
 
       <div className="recipe-card__content">
@@ -21,10 +21,7 @@ const RecipeCard = ({ id, image, title, time, type, author }) => {
 
         <div className="recipe-card__info">
           <span>
-            <i className="far fa-clock" /> {time}
-          </span>
-          <span>
-            <i className="fas fa-utensils" /> {type} 
+            <i className="far fa-clock" /> {time} phút
           </span>
         </div>
 

@@ -1,152 +1,154 @@
+// Basic styles for Authentication Pages (Login, Signup, Verify Email, Set Password)
+
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f8f8; // Light background color
+}
+
 .auth-container {
-    max-width: 400px;
-    margin: 48px auto 64px auto;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 24px #2e7d3211;
-    padding: 36px 28px 28px 28px;
-    text-align: center;
-    font-family: 'Inter', Arial, sans-serif;
+  width: 100%;
+  max-width: 400px; // Limit width for better readability
+  margin: auto; // Center container vertically and horizontally
+  padding: 40px;
+  background-color: #fff; // White background for the form area
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // Subtle shadow
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.auth-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left; // Align labels and inputs to the left
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
   }
-  
-  .auth-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2e7d32;
-    margin-bottom: 18px;
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
   }
-  
-  .auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 18px;
-    input {
-      padding: 13px 16px;
-      border-radius: 10px;
-      border: 1.5px solid #e5e5e5;
-      font-size: 1.08rem;
-      background: #fafafa;
-      outline: none;
-      transition: border 0.2s;
-      &:focus {
-        border: 1.5px solid #2e7d32;
-      }
-    }
+}
+
+.error-message {
+  color: #e53e3e; // Red color for errors
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.success-message {
+    color: #38a169; // Green color for success
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff; // Primary blue color
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
   }
-  
-  .auth-btn {
-    background: #2e7d32;
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+}
+
+.auth-separator {
+  margin: 20px 0;
+  font-size: 14px;
+  color: #aaa;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: #eee;
+  }
+
+  &::before {
+    left: 0;
+  }
+
+  &::after {
+    right: 0;
+  }
+}
+
+.google-login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #db4437; // Google red color
     color: #fff;
-    font-size: 1.15rem;
-    font-weight: 600;
     border: none;
-    border-radius: 10px;
-    padding: 12px 0;
-    margin-top: 4px;
+    border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background 0.18s, transform 0.16s;
-    box-shadow: 0 2px 8px #2e7d3211;
-    &:hover {
-      background: #e67e22;
-      transform: translateY(-2px) scale(1.04);
-    }
-  }
-  
-  .auth-or {
-    margin: 18px 0 10px 0;
-    color: #888;
-    font-size: 1.05rem;
-    font-weight: 500;
-    position: relative;
-    &:before, &:after {
-      content: '';
-      display: inline-block;
-      width: 40px;
-      height: 1.5px;
-      background: #eee;
-      vertical-align: middle;
-      margin: 0 10px;
-    }
-  }
-  
-  .auth-social {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 18px;
-  }
-  
-  .auth-social-btn {
+    transition: background-color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 1.08rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 0;
-    cursor: pointer;
-    transition: background 0.18s, color 0.18s, transform 0.16s;
-    box-shadow: 0 2px 8px #2e7d3211;
-    &.fb {
-      background: #4267B2;
-      color: #fff;
-      &:hover { background: #365899; }
+
+    &:hover {
+      background-color: #c33d2e;
     }
-    &.gg {
-      background: #fff;
-      color: #222;
-      border: 1.5px solid #e5e5e5;
-      &:hover { background: #f4fff4; color: #e67e22; }
-    }
+
+     &:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+
     i {
-      font-size: 1.2rem;
+        font-size: 18px;
     }
-  }
-  
-  .auth-bottom {
-    color: #666;
-    font-size: 1rem;
-    margin-top: 8px;
-    a {
-      color: #e67e22;
+}
+
+.auth-link {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #555;
+
+  a {
+    color: #007bff; // Primary blue color for links
+    text-decoration: none;
+
+    &:hover {
       text-decoration: underline;
-      font-weight: 600;
-      &:hover { color: #2e7d32; }
-    }
-  }.auth-error {
-    color: #e74c3c;
-    background: #fff4f4;
-    border-radius: 8px;
-    padding: 8px 0;
-    margin: 8px 0 0 0;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-  .auth-success {
-    color: #2e7d32;
-    background: #f4fff4;
-    border-radius: 8px;
-    padding: 10px 0;
-    margin: 12px 0 0 0;
-    font-size: 1.05rem;
-    font-weight: 600;
-  }
-  .auth-forgot {
-    text-align: right;
-    margin: 0 0 8px 0;
-    a {
-      color: #e67e22;
-      font-size: 0.98rem;
-      text-decoration: underline;
-      &:hover { color: #2e7d32; }
     }
   }
-  
-  @media (max-width: 600px) {
-    .auth-container { padding: 18px 4vw 18px 4vw; max-width: 98vw; }
-    .auth-title { font-size: 1.25rem; }
-    .auth-btn, .auth-social-btn { font-size: 1rem; padding: 10px 0; }
-  }
+}
+
+// Add Font Awesome for Google icon if not already included globally
+// <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40ZKGwmP4yJzkICNxoBlGsOxXlunuZrl/RgCTyJj/k/PcPuD0NkbXqV+qfSnWTwA6jjz1OWmQYgw==" crossorigin="anonymous" referrerpolicy="no-referrer" />

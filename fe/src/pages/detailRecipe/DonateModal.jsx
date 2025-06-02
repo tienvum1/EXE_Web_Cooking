@@ -3,7 +3,13 @@ import { FaDonate, FaTimes, FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
 import './DonateModal.scss';
 
-const DonateModal = ({ open, onClose, recipeId }) => {
+const DonateModal = ({
+  open,
+  onClose,
+  recipeId,
+  authorId,
+  donationType
+}) => {
   const [donateAmount, setDonateAmount] = useState('');
   const [donateMsg, setDonateMsg] = useState('');
   const [donateLoading, setDonateLoading] = useState(false);
@@ -16,11 +22,24 @@ const DonateModal = ({ open, onClose, recipeId }) => {
     setDonateLoading(true);
     setDonateResult('');
     try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/payment/donate`,
-        { recipeId, amount: Number(donateAmount), message: donateMsg },
-        { withCredentials: true }
-      );
+      const payload = { amount: Number(donateAmount), message: donateMsg };
+      let url = `${process.env.REACT_APP_API_URL}/api/payment`;
+
+      if (donationType === 'recipe') {
+        if (!recipeId) throw new Error('Recipe ID is missing for recipe donation.');
+        url += '/donate';
+        payload.recipeId = recipeId;
+      } else if (donationType === 'blog') {
+        if (!authorId) throw new Error('Author ID is missing for blog donation.');
+        url += '/donate-blog-author';
+        payload.authorId = authorId;
+      } else {
+        throw new Error('Invalid donation type specified.');
+      }
+
+      console.log('Sending donation request to:', url, 'with payload:', payload);
+
+      await axios.post(url, payload, { withCredentials: true });
       setDonateResult('success');
       setTimeout(() => {
         setDonateAmount('');
@@ -29,6 +48,7 @@ const DonateModal = ({ open, onClose, recipeId }) => {
         onClose();
       }, 1500);
     } catch (err) {
+      console.error('Error during donation API call:', err);
       setDonateResult(err.response?.data?.message || 'Donate thất bại!');
     } finally {
       setDonateLoading(false);

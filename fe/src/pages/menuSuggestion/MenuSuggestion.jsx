@@ -4,64 +4,65 @@ import Header from '../../components/header/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Footer from '../../components/footer/Footer';
 import { useNavigate } from 'react-router-dom';
+import { getAIMenuSuggestion } from '../../api/recipe';
 
 // Hàm giả lập AI phân tích (bạn thay bằng API thực tế sau này)
-async function getMenuSuggestionAI(prompt) {
-  // Gửi lên API thực tế ở đây
-  // const res = await fetch('/api/ai-menu', { method: 'POST', body: JSON.stringify({ prompt }) });
-  // return await res.json();
-  // Tạm thời trả về dữ liệu mẫu
-  return [
-    {
-      meal: 'Breakfast',
-      nutrition: { fat: 10, protein: 30, carbs: 40, calories: 400 },
-      recipes: [
-        {
-          name: 'Yến mạch sữa chua trái cây',
-          image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
-          kcal: 200,
-          protein: 8,
-          carbs: 30,
-          fat: 5,
-          time: '10 phút',
-          type: 'Eat Clean',
-        },
-      ],
-    },
-    {
-      meal: 'Lunch',
-      nutrition: { fat: 15, protein: 40, carbs: 60, calories: 600 },
-      recipes: [
-        {
-          name: 'Cơm gạo lứt ức gà',
-          image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
-          kcal: 300,
-          protein: 20,
-          carbs: 40,
-          fat: 7,
-          time: '20 phút',
-          type: 'Eat Clean',
-        },
-      ],
-    },
-    {
-      meal: 'Dinner',
-      nutrition: { fat: 12, protein: 35, carbs: 50, calories: 500 },
-      recipes: [
-        {
-          name: 'Salad cá hồi áp chảo',
-          image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80',
-          kcal: 250,
-          protein: 15,
-          carbs: 20,
-          fat: 8,
-          time: '15 phút',
-          type: 'Salad',
-        },
-      ],
-    },
-  ];
-}
+// async function getMenuSuggestionAI(prompt) {
+//   // Gửi lên API thực tế ở đây
+//   // const res = await fetch('/api/ai-menu', { method: 'POST', body: JSON.stringify({ prompt }) });
+//   // return await res.json();
+//   // Tạm thời trả về dữ liệu mẫu
+//   return [
+//     {
+//       meal: 'Breakfast',
+//       nutrition: { fat: 10, protein: 30, carbs: 40, calories: 400 },
+//       recipes: [
+//         {
+//           name: 'Yến mạch sữa chua trái cây',
+//           image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
+//           kcal: 200,
+//           protein: 8,
+//           carbs: 30,
+//           fat: 5,
+//           time: '10 phút',
+//           type: 'Eat Clean',
+//         },
+//       ],
+//     },
+//     {
+//       meal: 'Lunch',
+//       nutrition: { fat: 15, protein: 40, carbs: 60, calories: 600 },
+//       recipes: [
+//         {
+//           name: 'Cơm gạo lứt ức gà',
+//           image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
+//           kcal: 300,
+//           protein: 20,
+//           carbs: 40,
+//           fat: 7,
+//           time: '20 phút',
+//           type: 'Eat Clean',
+//         },
+//       ],
+//     },
+//     {
+//       meal: 'Dinner',
+//       nutrition: { fat: 12, protein: 35, carbs: 50, calories: 500 },
+//       recipes: [
+//         {
+//           name: 'Salad cá hồi áp chảo',
+//           image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80',
+//           kcal: 250,
+//           protein: 15,
+//           carbs: 20,
+//           fat: 8,
+//           time: '15 phút',
+//           type: 'Salad',
+//         },
+//       ],
+//     },
+//   ];
+// }
 
 const MenuSuggestion = () => {
   const [prompt, setPrompt] = useState('');
@@ -74,10 +75,17 @@ const MenuSuggestion = () => {
     if (!prompt.trim()) return;
     setLoading(true);
     setMenu(null);
-    const result = await getMenuSuggestionAI(prompt);
-    setMenu(result);
-    setLoading(false);
-    navigate('/menu-suggestion/result', { state: { menu: result } });
+    // const result = await getMenuSuggestionAI(prompt);
+    try {
+      const result = await getAIMenuSuggestion(prompt); // Call the actual API
+      setMenu(result);
+      navigate('/menu-suggestion/result', { state: { menu: result } });
+    } catch (error) {
+      console.error('Error getting AI menu suggestion:', error);
+      // Optionally, display an error message to the user
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

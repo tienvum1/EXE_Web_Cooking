@@ -7,6 +7,12 @@ const cookieParser = require('cookie-parser');
 const https = require('https');
 const fs = require('fs');
 const { Server } = require('socket.io');
+const path = require('path');
+const passport = require('passport');
+const session = require('express-session');
+
+// Import Passport configuration
+require('./config/passport')(passport);
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -18,17 +24,50 @@ const commentRoutes = require('./routes/comment');
 const paymentRoutes = require('./routes/payment');
 const transactionRoutes = require('./routes/transaction');
 const notificationRoutes = require('./routes/notification');
+const chatgptRoutes = require('./routes/chatgpt');
+const aiRoutes = require('./routes/ai');
 
 // ... (các route khác nếu cần)
 
 const app = express();
-app.use(cookieParser());
-app.use(cors({
-  origin: [ 'https://localhost:3001'],
-  credentials: true
+
+// Passport and Session middleware
+// Session middleware must be configured before Passport
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(cookieParser());
+const corsOptions = {
+  origin: [ 'https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(express.static('public'));
+
+// Đường dẫn đến thư mục upload
+const uploadDir = path.join(__dirname, 'public/uploads/recipes');
+
+// Kiểm tra và tạo thư mục upload nếu chưa tồn tại
+if (!fs.existsSync(uploadDir)) {
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log(`Thư mục upload created: ${uploadDir}`);
+  } catch (err) {
+    console.error(`Lỗi tạo thư mục upload ${uploadDir}:`, err);
+  }
+} else {
+  console.log(`Thư mục upload already exists: ${uploadDir}`);
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -40,6 +79,8 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/chatgpt', chatgptRoutes);
+app.use('/api/ai', aiRoutes);
 
 
 // ... (các route khác nếu cần)

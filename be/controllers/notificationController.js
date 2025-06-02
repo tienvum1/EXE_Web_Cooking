@@ -11,7 +11,7 @@ exports.createNotification = async (user, type, content, data = {}) => {
 
 exports.getNotifications = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const noti = await Notification.find({ user: userId }).sort({ createdAt: -1 });
     res.json(noti);
   } catch (err) {
@@ -21,7 +21,7 @@ exports.getNotifications = async (req, res) => {
 
 exports.markAsRead = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const { id } = req.params;
     await Notification.updateOne({ _id: id, user: userId }, { $set: { read: true } });
     res.json({ message: 'Đã đánh dấu đã đọc' });

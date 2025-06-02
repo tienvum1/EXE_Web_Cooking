@@ -3,7 +3,7 @@ const Comment = require('../models/Comment');
 // Thêm bình luận
 exports.addComment = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const { recipeId, content } = req.body;
     if (!recipeId || !content) return res.status(400).json({ message: 'Thiếu thông tin' });
     const comment = await Comment.create({ user: userId, recipe: recipeId, content });
@@ -30,7 +30,7 @@ exports.getCommentsByRecipe = async (req, res) => {
 // Xóa bình luận (chỉ cho phép user xóa bình luận của mình)
 exports.deleteComment = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id;
     const { commentId } = req.params;
     const comment = await Comment.findById(commentId);
     if (!comment) return res.status(404).json({ message: 'Không tìm thấy bình luận' });

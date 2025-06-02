@@ -4,6 +4,9 @@ import './BlogDetail.scss';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import { getBlogById } from '../../api/blog';
+import { donate } from '../../api/payment';
+import DonateModal from '../detailRecipe/DonateModal';
+import { FaDonate } from 'react-icons/fa';
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -11,8 +14,9 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showUserInfo, setShowUserInfo] = useState(false);
-  const [user, setUser] = useState(null);
+  const [donationAmount, setDonationAmount] = useState('');
+  const [donationStatus, setDonationStatus] = useState({ message: '', type: null });
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -23,6 +27,7 @@ const BlogDetail = () => {
         setBlog(data);
       } catch (err) {
         setError('Không tìm thấy bài viết.');
+        console.error('Failed to fetch blog:', err);
       } finally {
         setLoading(false);
       }
@@ -30,9 +35,13 @@ const BlogDetail = () => {
     fetchBlog();
   }, [id]);
 
+  const handleDonate = async () => {
+    setIsDonateModalOpen(true);
+  };
+
   if (loading) return <div className="loading">Đang tải...</div>;
-  if (error) return <div className="error">{error}</div>;
-  if (!blog) return null;
+  if (error) return <div className="error" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>{error}</div>;
+  if (!blog) return <div className="error" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>Không tìm thấy bài viết.</div>;
 
   return (
     <>
@@ -69,9 +78,9 @@ const BlogDetail = () => {
             ))}
             {blog.quote && (
               <blockquote className="blog-detail-quote">
-                <span className="quote-icon">“</span>
+                <span className="quote-icon">"</span>
                 {blog.quote}
-                <span className="quote-icon">”</span>
+                <span className="quote-icon">"</span>
               </blockquote>
             )}
           </div>
@@ -89,22 +98,22 @@ const BlogDetail = () => {
               </a>
             </div>
           </div>
+          {blog?.author && (
+            <div className="blog-detail-donate">
+              <h3>Ủng hộ tác giả</h3>
+              <button className="btn donate-btn" onClick={() => setIsDonateModalOpen(true)}><FaDonate /><span>Donate</span></button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
-      {showUserInfo && user && (
-        <div className="header__user-popup" onClick={() => setShowUserInfo(false)}>
-          <div className="header__user-popup-content" onClick={e => e.stopPropagation()}>
-            <img className="header__user-popup-avatar" src={user.avatar} alt={user.fullName || user.username} />
-            <div className="header__user-popup-name">{user.fullName || user.username}</div>
-            <div className="header__user-popup-username">@{user.username}</div>
-            <div className="header__user-popup-email">{user.email}</div>
-            {user.bio && <div className="header__user-popup-bio">{user.bio}</div>}
-            <button onClick={() => { setShowUserInfo(false); navigate('/profile'); }}>Trang cá nhân</button>
-            <button onClick={() => { setShowUserInfo(false); navigate('/settings'); }}>Cài đặt</button>
-            <button className="logout-btn">Đăng xuất</button>
-          </div>
-        </div>
+      {blog?.author && (
+        <DonateModal
+          open={isDonateModalOpen}
+          onClose={() => setIsDonateModalOpen(false)}
+          authorId={blog.author}
+          donationType="blog"
+        />
       )}
     </>
   );

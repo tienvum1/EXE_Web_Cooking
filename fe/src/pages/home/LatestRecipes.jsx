@@ -3,14 +3,17 @@ import RecipeGrid from '../../components/recipeCard/RecipeGrid';
 import { fetchNewestRecipes } from '../../api/recipe';
 import { useNavigate } from 'react-router-dom';
 
-const mapRecipe = (r) => ({
-  id: r._id,
-  image: r.mainImage || '',
-  title: r.title,
-  time: r.cookTime ? `${r.cookTime} Minutes` : '',
-  type: r.type || '',
-  author: r.author?.username || '',
-});
+const mapRecipe = (r) => {
+  return {
+    id: r._id,
+    mainImage: r.mainImage,
+    mainImageType: r.mainImageType,
+    title: r.title,
+    time: r.cookTime ? `${r.cookTime} Minutes` : '',
+    type: r.type || '',
+    author: r.author?.username || '',
+  };
+};
 
 const LatestRecipes = () => {
   const [recipes, setRecipes] = useState([]);

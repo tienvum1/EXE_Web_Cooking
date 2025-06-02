@@ -4,11 +4,14 @@ const TransactionSchema = new mongoose.Schema({
   from: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // null nếu là topup
   to: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },   // null nếu là topup
   amount: { type: Number, required: true },
-  type: { type: String, enum: ['topup', 'donate'], required: true },
-  method: { type: String }, // vnpay, momo, ...
+  type: { type: String, enum: ['topup', 'donate', 'donate-blog', 'withdraw-request'], required: true },
+  method: { type: String }, // vnpay, momo, bank transfer, ...
   recipe: { type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }, // chỉ cho donate
-  status: { type: String, default: 'success' },
-  createdAt: { type: Date, default: Date.now }
+  status: { type: String, enum: ['success', 'pending', 'approved', 'rejected', 'completed'], required: true },
+  createdAt: { type: Date, default: Date.now },
+  bankName: { type: String },
+  accountNumber: { type: String },
+  accountHolderName: { type: String },
 });
 
 module.exports = mongoose.model('Transaction', TransactionSchema); 

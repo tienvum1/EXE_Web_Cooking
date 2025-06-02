@@ -9,7 +9,7 @@ const IngredientsList = ({ mainDish, sauce }) => {
 
   return (
     <div className="ingredients-list">
-      <h2 className="section-title">Ingredients</h2>
+      <h2 className="section-title">Nguyên liệu</h2>
 
       <ul className="ingredient-items">{mainDish.map(renderItem)}</ul>
     
