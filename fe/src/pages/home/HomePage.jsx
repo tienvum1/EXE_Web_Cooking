@@ -3,7 +3,7 @@ import Header from '../../components/header/Header';
 import SearchBar from '../../components/search/SearchBar';
 import Categories from '../../components/category/Categories';
 import WellnessChef from '../../components/wellnessChef/WellnessChef';
-import InstagramFeed from '../../components/instagramFeed/InstagramFeed';
+import InstagramFeed from '../../components/instagramFeed/InstagramFeed.jsx';
 import Footer from '../../components/footer/Footer';
 import Sidebar from '../../components/sidebar/Sidebar';
 import LatestRecipes from './LatestRecipes';
