@@ -58,7 +58,19 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) 
         <div className="time-info">
 
           <div className="item"><FaRegClock /> <span>Cook:</span> {cookTime}</div>
-          <div className="item"><FaUtensils /> <span>{categories}</span></div>
+          <div className="item"><FaUtensils />
+            {
+              categories && Array.isArray(categories) && categories.length > 0 ? (
+                categories.map((category, index) => (
+                  <span key={index} className="category-tag">
+                    {category}{index < categories.length - 1 ? ', ' : ''}
+                  </span>
+                ))
+              ) : (
+                <span>N/A</span>
+              )
+            }
+          </div>
         </div>
 
         <div className="actions">

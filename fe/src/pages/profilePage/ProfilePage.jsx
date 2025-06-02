@@ -4,7 +4,7 @@ import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import Sidebar from '../../components/sidebar/Sidebar';
 import RecipeCard from '../../components/recipeCard/RecipeCard';
-import { getUserWithRecipes, getCurrentUser, updateUserProfile } from '../../api/user';
+import { getUserWithRecipes, getCurrentUser, updateUserProfile, followUser } from '../../api/user';
 import './ProfilePage.scss';
 
 const ProfilePage = () => {
@@ -14,6 +14,8 @@ const ProfilePage = () => {
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [isCurrentUserProfile, setIsCurrentUserProfile] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,9 +23,11 @@ const ProfilePage = () => {
       setError('');
       try {
         let userId = id;
+        const currentUser = await getCurrentUser();
+        let currentUserId = currentUser?._id;
+
         if (!userId) {
-          const currentUser = await getCurrentUser();
-          userId = currentUser?._id;
+          userId = currentUserId;
         }
         if (!userId) {
           setError('Không tìm thấy user.');
@@ -32,10 +36,18 @@ const ProfilePage = () => {
         }
         const data = await getUserWithRecipes(userId);
         setUser(data);
+        const isCurrent = data?._id === currentUserId;
+        setIsCurrentUserProfile(isCurrent);
+
+        if (!isCurrent && currentUser?.following) {
+          setIsFollowing(currentUser.following.includes(data._id));
+        }
+
         if (data) {
           setFormData({
             username: data.username || '',
             fullName: data.fullName || '',
+            introduce: data.introduce || '',
           });
         }
       } catch (err) {
@@ -64,6 +76,7 @@ const ProfilePage = () => {
       // Create a new object with only allowed fields for update
       const dataToUpdate = {
         fullName: formData.fullName,
+        introduce: formData.introduce,
         // Add other fields here if you add them to the form (e.g., bio, introduce)
       };
       const updatedUser = await updateUserProfile(user._id, dataToUpdate); // Call the API with user ID and filtered form data
@@ -79,6 +92,24 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
+  const handleFollowUnfollow = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      if (isFollowing) {
+        await followUser(user._id);
+        setIsFollowing(false);
+      } else {
+        await followUser(user._id);
+        setIsFollowing(true);
+      }
+    } catch (err) {
+      console.error('Error following/unfollowing user:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) return <div className="loading">Đang tải...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!user) return null;
@@ -88,7 +119,44 @@ const ProfilePage = () => {
       <Header />
       <Sidebar />
       <div className="profile-page">
-        {isEditing ? (
+        {/* Always display profile information */}
+        <div className="profile-info">
+          <div className="profile-avatar">
+            {user.avatar ? (
+              <img src={user.avatar} alt="avatar" />
+            ) : (
+              user.fullName ? user.fullName[0] : user.username[0]
+            )}
+          </div>
+          <div className="name">{user.fullName || user.username}</div>
+          <div className="username">@{user.username}</div>
+          <div className="profile-introduce" style={{ marginTop: '10px' }}> Giới thiệu {user.introduce}</div>
+          <div className="profile-stats">
+            <span>
+              <b>{user.following?.length || 0}</b> Đang theo dõi
+            </span>
+            <span>
+              <b>{user.followers?.length || 0}</b> Người theo dõi
+            </span>
+          </div>
+          {/* Conditionally render Edit button */}
+          {isCurrentUserProfile && !isEditing && (
+            <button className="edit-btn" onClick={handleEditClick}>Sửa thông tin cá nhân</button>
+          )}
+          {/* Conditionally render Follow/Unfollow button */}
+          {!isCurrentUserProfile && user && (
+            <button
+              className="follow-btn"
+              onClick={handleFollowUnfollow}
+              disabled={loading}
+            >
+              {isFollowing ? 'Hủy theo dõi' : 'Theo dõi'}
+            </button>
+          )}
+        </div>
+
+        {/* Conditionally render Edit form */}
+        {isCurrentUserProfile && isEditing && (
           <div className="edit-profile-form">
             <h2>Chỉnh sửa thông tin cá nhân</h2>
             <form onSubmit={handleSave}>
@@ -113,34 +181,21 @@ const ProfilePage = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              <div className="form-group" style={{ fontSize: '18px' ,marginBottom: '20px'}}>
+                <label htmlFor="introduce" >Giới thiệu:</label>
+                <textarea
+                  id="introduce"
+                  name="introduce"
+                  value={formData.introduce || ''}
+                  onChange={handleInputChange}
+                  rows="4"
+                ></textarea>
+              </div>
               <div className="form-actions">
                 <button type="submit">Lưu</button>
                 <button type="button" onClick={handleCancel}>Hủy</button>
               </div>
             </form>
-          </div>
-        ) : (
-          <div className="profile-info">
-            <div className="profile-avatar">
-              {user.avatar ? (
-                <img src={user.avatar} alt="avatar" />
-              ) : (
-                user.fullName ? user.fullName[0] : user.username[0]
-              )}
-            </div>
-            <div className="name">{user.fullName || user.username}</div>
-            <div className="username">@{user.username}</div>
-            <div className="profile-stats">
-              <span>
-                {/* Display count of users this user is following */}
-                <b>{user.following?.length || 0}</b> Đang theo dõi
-              </span>
-              <span>
-                {/* Display count of users following this user */}
-                <b>{user.followers?.length || 0}</b> Người theo dõi
-              </span>
-            </div>
-            <button className="edit-btn" onClick={handleEditClick}>Sửa thông tin cá nhân</button>
           </div>
         )}
 
@@ -154,6 +209,7 @@ const ProfilePage = () => {
             {user.recipes && user.recipes.map((recipe) => (
               <RecipeCard
                 key={recipe._id}
+                id={recipe._id}
                 mainImage={recipe.mainImage}
                 title={recipe.title}
                 time={recipe.cookTime}

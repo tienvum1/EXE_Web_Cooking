@@ -4,6 +4,9 @@ import './BlogDetail.scss';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import { getBlogById } from '../../api/blog';
+import { donate } from '../../api/payment';
+import DonateModal from '../detailRecipe/DonateModal';
+import { FaDonate } from 'react-icons/fa';
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -11,6 +14,9 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [donationAmount, setDonationAmount] = useState('');
+  const [donationStatus, setDonationStatus] = useState({ message: '', type: null });
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -28,6 +34,10 @@ const BlogDetail = () => {
     };
     fetchBlog();
   }, [id]);
+
+  const handleDonate = async () => {
+    setIsDonateModalOpen(true);
+  };
 
   if (loading) return <div className="loading">Đang tải...</div>;
   if (error) return <div className="error" style={{ color: 'red', textAlign: 'center', margin: '20px' }}>{error}</div>;
@@ -68,9 +78,9 @@ const BlogDetail = () => {
             ))}
             {blog.quote && (
               <blockquote className="blog-detail-quote">
-                <span className="quote-icon">“</span>
+                <span className="quote-icon">"</span>
                 {blog.quote}
-                <span className="quote-icon">”</span>
+                <span className="quote-icon">"</span>
               </blockquote>
             )}
           </div>
@@ -88,9 +98,23 @@ const BlogDetail = () => {
               </a>
             </div>
           </div>
+          {blog?.author && (
+            <div className="blog-detail-donate">
+              <h3>Ủng hộ tác giả</h3>
+              <button className="btn donate-btn" onClick={() => setIsDonateModalOpen(true)}><FaDonate /><span>Donate</span></button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
+      {blog?.author && (
+        <DonateModal
+          open={isDonateModalOpen}
+          onClose={() => setIsDonateModalOpen(false)}
+          authorId={blog.author}
+          donationType="blog"
+        />
+      )}
     </>
   );
 };

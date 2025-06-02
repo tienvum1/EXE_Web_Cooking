@@ -3,6 +3,7 @@ const Recipe = require('../models/Recipe');
 const bcrypt = require("bcryptjs"); // Import bcrypt
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { createNotification } = require('./notificationController'); // Import createNotification
 
 
 // Lấy thông tin user hiện tại
@@ -83,6 +84,13 @@ exports.followUnfollowUser = async (req, res) => {
       currentUser.following.push(userIdToFollow);
       // Add currentUserId to userToFollow's followers array
       userToFollow.followers.push(currentUserId);
+      // Create follow notification for the user who was followed
+      await createNotification(
+        userToFollow._id, // User to send notification to (the one being followed)
+        'follow', // Notification type
+        `${currentUser.username} đã bắt đầu theo dõi bạn.`, // Content
+        { followerId: currentUserId } // Optional data (e.g., ID of the follower)
+      );
       await currentUser.save();
       await userToFollow.save();
       res.json({ message: 'Theo dõi thành công!' });
@@ -108,6 +116,7 @@ exports.updateUserProfile = async (req, res) => {
     }
 
     const updates = req.body; // Data from the frontend form
+    console.log("updates", updates)
 
     // Prevent updating sensitive fields directly if needed (e.g., role, password)
     const allowedUpdates = ['fullName', 'bio', 'introduce']; // Specify fields allowed to be updated

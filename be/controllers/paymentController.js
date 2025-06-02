@@ -161,3 +161,78 @@ exports.donateToAuthor = async (req, res) => {
     res.status(500).json({ message: 'Lỗi donate', error: err.message });
   }
 };
+
+// API donate cho tác giả blog
+exports.donateToBlogAuthor = async (req, res) => {
+  try {
+    const { authorId, amount, message } = req.body; // Expect authorId instead of recipeId
+    if (!authorId || !amount || amount < 1000) return res.status(400).json({ message: 'Số tiền không hợp lệ' });
+    const userId = req.user.user_id;
+
+    // Lấy tác giả blog
+    const author = await require('../models/User').findById(authorId);
+    if (!author) return res.status(404).json({ message: 'Không tìm thấy tác giả' });
+    if (authorId.toString() === userId) return res.status(400).json({ message: 'Không thể donate cho chính mình' });
+
+    // Tính toán số tiền tác giả nhận được sau khi trừ phí 5%
+    const feePercentage = 0.05;
+    const receivedAmount = amount * (1 - feePercentage);
+
+    // Lấy ví người gửi và nhận
+    const fromWallet = await Wallet.findOne({ user: userId });
+    // Cập nhật ví người nhận (tác giả) với số tiền đã trừ phí
+    const toWallet = await Wallet.findOneAndUpdate(
+      { user: authorId }, // Use authorId
+      { $inc: { balance: receivedAmount } }, // Cộng số tiền đã trừ phí vào ví tác giả
+      { new: true, upsert: true }
+    );
+
+    if (!fromWallet || fromWallet.balance < amount) return res.status(400).json({ message: 'Số dư không đủ' });
+
+    // Trừ tiền từ ví người gửi (số tiền đầy đủ)
+    fromWallet.balance -= amount;
+    await fromWallet.save();
+
+    // Lưu transaction (với số tiền đầy đủ đã gửi)
+    await Transaction.create({
+      from: userId,
+      to: authorId, // Save authorId
+      amount: amount, // Lưu số tiền đầy đủ đã donate
+      type: 'donate-blog', // New type for blog donations
+      message,
+      // recipe: recipeId // Remove recipeId field
+    });
+
+    // Lấy tên tác giả
+    let authorName = author?.name || author?.fullName || author?.username || 'tác giả';
+
+    // Gửi thông báo cho người donate (với số tiền đầy đủ đã gửi)
+    await notificationController.createNotification(
+      userId,
+      'donate',
+      `Bạn đã donate ${amount.toLocaleString('vi-VN')}đ cho ${authorName} cho bài viết.`,
+      { amount, to: authorId, authorName } // Update data
+    );
+
+    // Gửi thông báo cho tác giả nhận donate (với số tiền đã trừ phí)
+    // Lấy tên người gửi
+    let senderName = '';
+    try {
+      const sender = await require('../models/User').findById(userId);
+      senderName = sender?.name || sender?.fullName || sender?.username || 'người dùng';
+    } catch { senderName = 'người dùng'; }
+
+    await notificationController.createNotification(
+      authorId, // Notify the author
+      'receive-blog-donate', // New notification type
+      `Bạn nhận được ${receivedAmount.toLocaleString('vi-VN')}đ donate từ ${senderName} cho bài viết.`,
+      { amount: receivedAmount, from: userId, senderName } // Update data
+    );
+
+    res.json({ message: 'Donate thành công!' });
+
+  } catch (err) {
+    console.error('Lỗi donate blog:', err);
+    res.status(500).json({ message: 'Lỗi donate blog', error: err.message });
+  }
+};

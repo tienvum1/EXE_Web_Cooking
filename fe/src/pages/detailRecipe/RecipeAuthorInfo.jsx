@@ -20,7 +20,8 @@ const RecipeAuthorInfo = ({
     }
   };
 
-  const handleFollow = async () => {
+  const handleFollow = async (e) => {
+    e.stopPropagation();
     if (!authorId) {
       console.error("Cannot follow user: authorId is missing.");
       return;
