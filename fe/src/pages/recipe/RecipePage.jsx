@@ -58,9 +58,10 @@ const RecipePage = () => {
         let url = 'https://localhost:4567/api/recipes';
         if (category) url += `?category=${encodeURIComponent(category)}`;
         const res = await axios.get(url);
+        console.log('Raw recipes data from backend:', res.data);
         const mapped = res.data.map(r => ({
           id: r._id,
-          image: r.mainImage || '',
+          mainImage: r.mainImage || '',
           title: r.title,
           time: r.cookTime || '',
           cookTime: r.cookTime,

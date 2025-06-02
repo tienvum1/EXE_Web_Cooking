@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
 const cloudinary = require('cloudinary').v2;
+const pdf = require('html-pdf'); // Require the html-pdf library
 require('dotenv').config();
 
 // Configure Cloudinary
@@ -556,5 +557,124 @@ exports.updateRecipeStatus = async (req, res) => {
   } catch (err) {
     console.error('Lỗi cập nhật trạng thái recipe:', err);
     res.status(500).json({ message: 'Lỗi cập nhật trạng thái recipe', error: err.message });
+  }
+};
+
+// Placeholder function to generate recipe PDF
+exports.generateRecipePdf = async (req, res) => {
+  try {
+    const recipeId = req.params.id;
+
+    // Fetch recipe data
+    const recipe = await Recipe.findById(recipeId)
+      .populate('author', 'username'); // Populate author details
+
+    if (!recipe) {
+      return res.status(404).json({ message: 'Recipe not found.' });
+    }
+
+    // Construct basic HTML for the PDF
+    // This can be made more elaborate to match frontend styling/layout
+    let htmlContent = `
+      <html>
+      <head>
+        <title>${recipe.title}</title>
+        <style>
+          body { font-family: sans-serif; line-height: 1.6; margin: 20px; color: #333; }
+          h1 { color: #0056b3; text-align: center; margin-bottom: 20px; }
+          h2 { color: #007bff; margin-top: 25px; margin-bottom: 10px; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+          img { max-width: 100%; height: auto; display: block; margin: 10px auto; border: 1px solid #ddd; padding: 5px; }
+          .section { margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; }
+          ul, ol { margin-left: 20px; padding-left: 0; }
+          li { margin-bottom: 8px; padding-left: 10px; border-left: 3px solid #007bff; }
+          p { margin-bottom: 10px; }
+          strong { color: #555; }
+          .user-info { margin-bottom: 15px; font-style: italic; color: #666; }
+          .ingredients li, .steps li { border-left-color: #28a745; }
+          .steps li { border-left-color: #dc3545; }
+        </style>
+      </head>
+      <body>
+        <h1>${recipe.title}</h1>
+        <p class="user-info"><strong>Author:</strong> ${recipe.author ? recipe.author.username : 'N/A'}</p>
+        <p><strong>Description:</strong> ${recipe.desc || 'N/A'}</p>
+        <p><strong>Cook Time:</strong> ${recipe.cookTime || 'N/A'}</p>
+
+        ${recipe.mainImage ? `<div style="text-align: center;"><img src="${recipe.mainImage}" alt="Main Recipe Image" style="max-width: 80%; margin: 20px auto;"/></div>` : ''}
+
+        <div class="section ingredients">
+          <h2>Ingredients</h2>
+          ${recipe.ingredients && recipe.ingredients.length > 0
+            ? `<ul>${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>`
+            : '<p>No ingredients listed.</p>'}
+        </div>
+
+        ${recipe.servings ? `
+          <div class="section">
+            <h2>Servings</h2>
+            <p>${recipe.servings}</p>
+          </div>
+        ` : ''}
+
+        <div class="section steps">
+          <h2>Steps</h2>
+          ${recipe.steps && recipe.steps.length > 0
+            ? `<ol>${recipe.steps.map((step, index) => `
+              <li>
+                ${step.text || ''}
+                ${step.images && step.images.length > 0 
+                  ? step.images.map(img => `<img src="${img.url}" alt="Step Image ${index + 1}"/>`).join('') 
+                  : ''}
+              </li>
+            `).join('')}</ol>`
+            : '<p>No steps listed.</p>'}
+        </div>
+
+         ${recipe.nutrition ? `
+          <div class="section">
+            <h2>Nutrition</h2>
+             <p>${recipe.nutrition}</p>
+          </div>
+         ` : ''}
+
+      </body>
+      </html>
+    `;
+
+    // PDF generation options (optional)
+    const options = {
+      format: 'A4',
+      orientation: 'portrait',
+      border: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      },
+      // You might need to configurephantomPath for your system
+      // phantomPath: '/usr/local/bin/phantomjs' 
+    };
+
+    // Generate PDF
+    pdf.create(htmlContent, options).toStream((err, stream) => {
+      if (err) {
+        console.error('Error creating PDF:', err);
+        return res.status(500).json({ message: 'Failed to generate PDF.', error: err.message });
+      }
+
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      
+      // Sanitize the recipe title for the filename
+      const sanitizedTitle = (recipe.title || 'recipe').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      res.setHeader('Content-Disposition', `attachment; filename="${sanitizedTitle}.pdf"`);
+
+      // Pipe the PDF stream to the response
+      stream.pipe(res);
+    });
+
+  } catch (err) {
+    console.error('Error generating recipe PDF:', err);
+    res.status(500).json({ message: 'Failed to generate recipe PDF', error: err.message });
   }
 };

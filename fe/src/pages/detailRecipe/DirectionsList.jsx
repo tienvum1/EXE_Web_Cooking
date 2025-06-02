@@ -7,7 +7,7 @@ const DirectionsList = ({ directions }) => {
 
   return (
     <div className="directions-list">
-      <h2 className="section-title">Directions</h2>
+      <h2 className="section-title">Hướng dẫn</h2>
       {directions.map((step, stepIndex) => (
         <div key={stepIndex} className="direction-step">
           <span className="step-title">{stepIndex + 1}. {step.text}</span>

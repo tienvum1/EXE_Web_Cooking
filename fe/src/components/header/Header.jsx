@@ -1,18 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import './Header.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TopupModal from '../../pages/wallet/StripeTopupModal.jsx';
 import { getMe, logout } from '../../api/auth';
+import RecipeContext from '../../contexts/RecipeContext';
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); 
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [showTopup, setShowTopup] = useState(false);
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const location = useLocation();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -116,6 +119,12 @@ const Header = () => {
     }
   };
 
+  // Consume RecipeContext
+  const { isRecipeAuthor, handleEditRecipe, handleDeleteRecipe } = useContext(RecipeContext);
+
+  // Check if current page is a recipe detail page
+  const isRecipeDetailPage = location.pathname.startsWith('/detail-recipe/') && location.pathname.split('/').length === 3;
+
   if (loading) {
     return <header className="header">Đang tải header...</header>;
   }
@@ -194,6 +203,16 @@ const Header = () => {
                     className="header__user-menu-item"
                     onClick={() => {
                       setMenuOpen(false);
+                      navigate('/withdrawal');
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-wallet"></i> Rút tiền
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
                       navigate('/settings');
                     }}
                     style={{ cursor: 'pointer' }}
@@ -238,6 +257,9 @@ const Header = () => {
               >
                 <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
               </button>
+
+              {/* Conditionally render Edit and Delete buttons for recipe author on detail page */}
+           
             </>
           ) : (
             <button

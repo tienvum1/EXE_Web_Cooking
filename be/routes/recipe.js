@@ -44,8 +44,26 @@ router.get('/me/all-recipes', auth, recipeController.getAllUserRecipes);
 router.get('/me/published-recipes', auth, recipeController.getPublishedUserRecipes);
 router.get('/me/draft-recipes', auth, recipeController.getDraftUserRecipes);
 
-router.put('/:id',auth, recipeController.updateRecipe);
+router.put(
+  '/:id',
+  auth,
+  upload.any(),
+  function (err, req, res, next) {
+    if (err instanceof multer.MulterError) {
+      console.error('Multer error during PUT:', err.field, err.code, err.message);
+      return res.status(400).json({ message: `Upload error: ${err.message} (Field: ${err.field})` });
+    } else if (err) {
+      console.error('Unknown upload error during PUT:', err);
+      return res.status(500).json({ message: 'An unknown error occurred during upload.' });
+    }
+    next();
+  },
+  recipeController.updateRecipe
+);
 router.delete('/:id', auth, recipeController.deleteRecipe);
+
+// Add route for generating recipe PDF
+router.get('/:id/pdf', recipeController.generateRecipePdf);
 
 // Route để lấy danh sách recipe chờ duyệt (Chỉ admin)
 

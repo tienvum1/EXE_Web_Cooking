@@ -16,6 +16,9 @@ const AdminSidebar = () => {
         <li>
           <Link to="/admin/recipes/pendings">Phê Duyệt Recipe</Link>
         </li>
+        <li>
+          <Link to="/admin/withdrawals">Yêu cầu rút tiền</Link>
+        </li>
         {/* Add more admin links here */}
       </ul>
     </div>

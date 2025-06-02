@@ -40,7 +40,13 @@ const Blog = () => {
       setTastyError('');
       try {
         const data = await fetchMostLikedRecipes();
-        setTastyRecipes(data);
+        const mappedRecipes = data.map(r => ({
+          _id: r._id,
+          image: r.mainImage || '',
+          title: r.title,
+          authorName: r.author?.username || 'Ẩn danh',
+        }));
+        setTastyRecipes(mappedRecipes);
       } catch (err) {
         setTastyError('Không thể tải danh sách công thức nổi bật.');
         console.error('Failed to fetch most liked recipes:', err);

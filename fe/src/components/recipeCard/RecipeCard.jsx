@@ -21,10 +21,7 @@ const RecipeCard = ({ id, mainImage, title, time, type, author }) => {
 
         <div className="recipe-card__info">
           <span>
-            <i className="far fa-clock" /> {time}
-          </span>
-          <span>
-            <i className="fas fa-utensils" /> {type} 
+            <i className="far fa-clock" /> {time} phút
           </span>
         </div>
 

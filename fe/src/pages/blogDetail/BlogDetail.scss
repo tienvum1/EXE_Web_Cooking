@@ -5,6 +5,8 @@ $text-muted: #6b7280;
 $bg-light: #f9fafb;
 $border-color: #e5e7eb;
 $font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+$white: #ffffff;
+$gray-medium: #6b7280; // Corrected value or use the one from the blog.scss file if preferred
 
 .blog-detail-wrapper {
   background: $bg-light;
@@ -15,7 +17,7 @@ $font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 .blog-detail-container {
   max-width: 1200px;
   margin: 0 auto;
-  background: #ffffff;
+  background: $white;
   border-radius: 0.75rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
   padding: 3.5rem 3rem;
@@ -239,7 +241,7 @@ $font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   &:hover {
     background: $primary-color;
-    color: #ffffff;
+    color: $white;
     transform: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
@@ -254,6 +256,53 @@ $font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
 .error {
   color: #dc2626;
+}
+
+/* Styles for the Donate Section */
+.blog-detail-donate {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid $border-color;
+  text-align: center;
+
+  h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn.donate-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $secondary-color;
+    color: $white;
+    padding: 0.8rem 2.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.1s ease;
+
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      background-color: $gray-medium;
+      cursor: not-allowed;
+    }
+
+    svg {
+      margin-right: 8px;
+    }
+  }
 }
 
 @media (max-width: 768px) {
@@ -338,5 +387,144 @@ $font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   .loading, .error {
     padding: 2rem;
     font-size: 1.1rem;
+  }
+
+  .blog-detail-donate {
+    h3 {
+      font-size: 1.5rem;
+    }
+
+    .btn.donate-btn {
+      padding: 0.7rem 2rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .blog-detail-donate {
+    h3 {
+      font-size: 1.3rem;
+    }
+
+    .btn.donate-btn {
+      padding: 0.6rem 1.5rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .blog-content-layout {
+    flex-direction: column;
+    gap: 24px;
+
+    .blog-side {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .blog-banner {
+      min-width: 200px;
+      min-height: 160px;
+      padding: 16px;
+    }
+  }
+
+  .blog-search-bar input {
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 600px) {
+  .blog-main-container {
+    padding: 24px 12px;
+
+    .blog-title {
+      font-size: 32px;
+    }
+
+    .blog-desc {
+      font-size: 14px;
+    }
+
+    .blog-search-bar {
+      input {
+        max-width: 200px;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      button {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .blog-card {
+    .blog-card-img {
+      width: 120px;
+      height: 80px;
+    }
+
+    .blog-card-title {
+      font-size: 16px;
+    }
+
+    .blog-card-desc {
+      font-size: 13px;
+    }
+
+    .blog-card-meta {
+      font-size: 12px;
+
+      .blog-card-avatar {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  }
+
+  .tasty-recipes {
+    .tasty-title {
+      font-size: 18px;
+    }
+
+    .tasty-img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .tasty-recipe-title {
+      font-size: 14px;
+    }
+
+    .tasty-recipe-author {
+      font-size: 12px;
+    }
+  }
+
+  .blog-banner {
+    .banner-img {
+      width: 72px;
+      height: 72px;
+    }
+
+    .banner-text {
+      font-size: 16px;
+    }
+  }
+
+  .blog-pagination {
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+    }
+
+    .page-dots {
+      font-size: 16px;
+    }
   }
 }

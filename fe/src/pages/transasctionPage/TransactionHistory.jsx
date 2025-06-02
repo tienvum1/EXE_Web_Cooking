@@ -62,10 +62,23 @@ const TransactionHistory = () => {
             {transactions.map(tx => (
               <tr key={tx._id}>
                 <td>{new Date(tx.createdAt).toLocaleString('vi-VN')}</td>
-                <td>{tx.type === 'topup' ? 'Nạp tiền' : 'Donate'}</td>
+                <td>
+                  {tx.type === 'topup' ? 'Nạp tiền' :
+                   tx.type === 'withdraw-request' ? 'Rút tiền' :
+                   tx.type === 'donate' ? 'Donate' :
+                   tx.type === 'donate-blog' ? 'Donate Blog' :
+                   tx.type}
+                </td>
                 <td>{formatAmount(tx.amount)}</td>
                 <td>{tx.method || '-'}</td>
-                <td>{tx.status === 'success' ? 'Thành công' : tx.status}</td>
+                <td>
+                  {tx.status === 'success' ? 'Thành công' :
+                   tx.status === 'pending' ? 'Chờ duyệt' :
+                   tx.status === 'approved' ? 'Đã duyệt' :
+                   tx.status === 'rejected' ? 'Đã từ chối' :
+                   tx.status === 'completed' ? 'Hoàn thành' :
+                   tx.status}
+                </td>
               </tr>
             ))}
           </tbody>

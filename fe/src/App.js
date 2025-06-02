@@ -28,13 +28,15 @@ import AdminPage from './pages/admin/AdminPage';
 import CreateBlogPage from './pages/admin/CreateBlogPage';
 import AdminRecipeApprovalPage from './pages/admin/AdminRecipeApprovalPage';
 import AdminRecipeDetailApprovalPage from './pages/admin/AdminRecipeDetailApprovalPage';
+import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
 import AdminLayout from './layouts/AdminLayout';
 import ChatBot from './components/sidebar/ChatBot';
 import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import SetPasswordPage from './pages/auth/SetPasswordPage';
 import ChangePasswordPage from './pages/settingPage/ChangePasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
-
+import WithdrawalPage from './pages/withdrawal/WithdrawalPage';
+  
 
 import "./App.css";
 
@@ -76,6 +78,8 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/settings/change-password" element={<ChangePasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/withdrawal" element={<WithdrawalPage />} />
+        
         <Route
           path="/admin"
           element={<AdminLayout><AdminPage /></AdminLayout>}
@@ -91,6 +95,10 @@ function App() {
         <Route
           path="/admin/recipes/:id"
           element={<AdminLayout><AdminRecipeDetailApprovalPage /></AdminLayout>}
+        />
+        <Route
+          path="/admin/withdrawals"
+          element={<AdminLayout><AdminWithdrawalsPage /></AdminLayout>}
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

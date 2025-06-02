@@ -5,6 +5,8 @@ import Footer from '../../components/footer/Footer';
 import axios from 'axios';
 import './CreateRecipe.scss';
 import categoriesData from '../../components/category/categoriesData';
+import { useLocation } from 'react-router-dom';
+import { fetchRecipeApproveById } from '../../api/recipe';
 
 const CreateRecipe = () => {
   const [title, setTitle] = useState('');
@@ -22,6 +24,48 @@ const CreateRecipe = () => {
   const [message, setMessage] = useState('');
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:4567';
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const recipeId = queryParams.get('id');
+
+  React.useEffect(() => {
+    const loadRecipeData = async () => {
+      if (recipeId) {
+        setLoading(true);
+        try {
+          const data = await fetchRecipeApproveById(recipeId);
+          if (data) {
+            setTitle(data.title || '');
+            setDesc(data.desc || '');
+            setServings(data.servings || '');
+            setCookTime(data.cookTime || '');
+            setIngredients(data.ingredients && Array.isArray(data.ingredients) && data.ingredients.length > 0 ? data.ingredients : ['']);
+            setSteps(data.steps && Array.isArray(data.steps) && data.steps.length > 0 ? data.steps.map(step => ({ ...step, images: step.images || [] })) : [{ text: '', images: [] }]);
+            setMainImageUrl(data.mainImage || '');
+            setNutrition({
+              calories: data.nutrition?.calories || '',
+              fat: data.nutrition?.fat || '',
+              protein: data.nutrition?.protein || '',
+              carbs: data.nutrition?.carbs || '',
+            });
+            setCategories(data.categories && Array.isArray(data.categories) ? data.categories : []);
+            setMessage('');
+          } else {
+            setMessage('Không tìm thấy công thức để sửa.');
+          }
+        } catch (err) {
+          console.error('Error loading recipe for edit:', err);
+          setMessage('Không thể tải thông tin công thức để sửa.');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadRecipeData();
+  }, [recipeId]);
+
   // Ảnh món ăn
   const handleMainImageChange = (e) => {
     const file = e.target.files[0];
@@ -100,18 +144,24 @@ const CreateRecipe = () => {
         // Thêm file ảnh cho từng bước làm
         if (step.images && Array.isArray(step.images)) {
             step.images.forEach((image, imageIndex) => {
-                // image ở đây là object { file: File, url: URL.createObjectURL(file) }
-                // Chúng ta cần lấy File object thực tế
+                // image ở đây có thể là object { file: File, url: URL.createObjectURL(file) } (new) or { url: string } (existing)
+                // Chúng ta cần lấy File object thực tế cho ảnh mới, hoặc gửi lại URL ảnh cũ
                 if (image.file) {
-                    formData.append(`stepImages[${index}][${imageIndex}]`, image.file);
+                    formData.append(`stepImages[${index}][${imageIndex}]`, image.file); // Append new file
+                } else if (image.url) {
+                     formData.append(`steps[${index}][images][${imageIndex}][url]`, image.url); // Send existing image URL
                 }
             });
         }
     });
 
-    // Thêm file ảnh chính nếu có
+    // Thêm file ảnh chính nếu có file mới được chọn
     if (mainImage) {
         formData.append('mainImage', mainImage);
+    } else if (mainImageUrl) {
+        // If no new file is selected but a main image URL exists, send the URL
+        // This tells the backend to keep the existing image
+        formData.append('mainImageUrl', mainImageUrl);
     }
 
     // Thêm danh mục vào FormData
@@ -120,49 +170,28 @@ const CreateRecipe = () => {
     });
 
     try {
-      // await axios.post(
-      //   `${API_URL}/api/recipes/create`,
-      //   {
-      //     title,
-      //     desc,
-      //     servings,
-      //     cookTime,
-      //     ingredients: ingredients,
-      //     steps: steps.map(s => ({ text: s.text, images: (s.images || []).map(img => img.url) })), // Ảnh bước làm vẫn là URL tạm
-      //     mainImage: mainImageUrl, // Trước đây gửi URL, giờ gửi file
-      //     nutrition,
-      //     status,
-      //     categories,
-      //   },
-      //   { withCredentials: true }
-      // );
+      // Use PUT for update if recipeId exists, otherwise use POST for create
+      const url = recipeId 
+        ? `${API_URL}/api/recipes/${recipeId}` // Update endpoint
+        : `${API_URL}/api/recipes/create`;     // Create endpoint
       
-      // Gửi FormData thay vì JSON
-      await axios.post(
-        `${API_URL}/api/recipes/create`,
-        formData, // Gửi FormData
-        { withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data' // Axios sẽ tự set, nhưng để rõ ràng
-          }
+      const method = recipeId ? axios.put : axios.post; // Use axios.put or axios.post
+
+      await method(url, formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      );
+      });
 
       setMessage(status === 'pending'
-        ? 'Gửi duyệt thành công! Công thức sẽ được kiểm duyệt.'
-        : 'Đã lưu nháp công thức!');
+        ? (recipeId ? 'Cập nhật và gửi duyệt thành công!' : 'Gửi duyệt thành công! Công thức sẽ được kiểm duyệt.')
+        : (recipeId ? 'Đã cập nhật nháp công thức!' : 'Đã lưu nháp công thức!'));
         
-      // Optional: Reset form sau khi submit thành công
-      // setTitle('');
-      // setDesc('');
-      // setServings('');
-      // setCookTime('');
-      // setIngredients(['']);
-      // setSteps([{ text: '', images: [] }]);
-      // setMainImage(null);
-      // setMainImageUrl('');
-      // setNutrition({ calories: '', fat: '', protein: '', carbs: '' });
-      // setCategories([]);
+      // Optional: Redirect after successful save/publish in edit mode
+      if (recipeId && (status === 'pending' || status === 'draft')) {
+         // navigate(`/detail-recipe/${recipeId}`); // Navigate back to detail page after update
+      }
 
     } catch (err) {
       console.error('Lỗi khi gửi form recipe:', err.response?.data || err.message);
@@ -185,8 +214,10 @@ const CreateRecipe = () => {
           <div className="create-recipe-upload-box">
             <label style={{ cursor: 'pointer', display: 'block' }}>
               <div className="upload-icon">
-                {mainImageUrl ? (
-                  <img src={mainImageUrl} alt="main" style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 16 }} />
+                {mainImage ? (
+                  <img src={URL.createObjectURL(mainImage)} alt="main" style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 16 }} />
+                ) : mainImageUrl ? (
+                   <img src={mainImageUrl} alt="main" style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 16 }} />
                 ) : (
                   <i className="fas fa-image"></i>
                 )}
@@ -317,12 +348,12 @@ const CreateRecipe = () => {
         </div>
       </div>
       <div className="create-recipe-actions">
-        <button className="btn-delete"><i className="fas fa-trash-alt"></i> Xóa</button>
+        {recipeId && <button className="btn-delete"><i className="fas fa-trash-alt"></i> Xóa</button>}
         <button className="btn-save" onClick={() => handleSubmit('draft')} disabled={loading}>
-          {loading ? 'Đang lưu...' : 'Lưu và Đóng'}
+          {loading ? 'Đang lưu...' : (recipeId ? 'Cập nhật Nháp' : 'Lưu và Đóng')}
         </button>
         <button className="btn-publish" onClick={() => handleSubmit('pending')} disabled={loading}>
-          {loading ? 'Đang gửi duyệt...' : 'Lên sóng'}
+          {loading ? 'Đang gửi duyệt...' : (recipeId ? 'Cập nhật và Gửi duyệt' : 'Lên sóng')}
         </button>
         {message && <div className="create-recipe-message">{message}</div>}
       </div>

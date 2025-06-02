@@ -236,3 +236,154 @@ exports.donateToBlogAuthor = async (req, res) => {
     res.status(500).json({ message: 'Lỗi donate blog', error: err.message });
   }
 };
+
+// API request withdrawal (User)
+exports.requestWithdrawal = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { amount, bankName, accountNumber, accountHolderName } = req.body;
+
+    // Basic validation
+    if (!amount || amount <= 0 || !bankName || !accountNumber || !accountHolderName) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp đủ thông tin rút tiền hợp lệ.' });
+    }
+
+    const amountNumber = parseFloat(amount);
+    if (isNaN(amountNumber) || amountNumber <= 0) {
+       return res.status(400).json({ message: 'Số tiền rút không hợp lệ.' });
+    }
+
+    // Check user's wallet balance
+    const userWallet = await Wallet.findOne({ user: userId });
+    if (!userWallet || userWallet.balance < amountNumber) {
+      return res.status(400).json({ message: 'Số dư ví không đủ.' });
+    }
+
+    // Deduct amount from wallet immediately and create a pending transaction
+    userWallet.balance -= amountNumber;
+    await userWallet.save();
+
+    const withdrawalTransaction = await Transaction.create({
+      from: userId,
+      to: null, // Withdrawal goes out of the system
+      amount: amountNumber,
+      type: 'withdraw-request',
+      method: 'bank transfer', // Assuming bank transfer for now
+      status: 'pending',
+      bankName,
+      accountNumber,
+      accountHolderName,
+    });
+
+    // Notify admin(s) about the new withdrawal request (assuming admin notification logic exists)
+    // This would likely involve finding admin users and creating notifications for them
+    // For now, we'll just log a message or create a placeholder notification.
+    console.log(`New withdrawal request from user ${userId} for amount ${amountNumber}`);
+    // Example placeholder notification for admin (you'll need to implement finding admins):
+    // const admins = await User.find({ role: 'admin' });
+    // for (const admin of admins) {
+    //   await notificationController.createNotification(
+    //     admin._id,
+    //     'withdrawal-requested',
+    //     `Có yêu cầu rút tiền mới từ ${req.user.username || 'một người dùng'} số tiền ${amountNumber.toLocaleString('vi-VN')}đ.`, // Customize content
+    //     { transactionId: withdrawalTransaction._id, userId: userId, amount: amountNumber }
+    //   );
+    // }
+
+    res.status(201).json({ message: 'Yêu cầu rút tiền đã được gửi thành công và đang chờ duyệt.', transaction: withdrawalTransaction });
+
+  } catch (err) {
+    console.error('Error requesting withdrawal:', err);
+    res.status(500).json({ message: 'Lỗi khi gửi yêu cầu rút tiền.', error: err.message });
+  }
+};
+
+// API get withdrawal requests (Admin only)
+exports.getWithdrawalRequests = async (req, res) => {
+  try {
+    // Ensure user is an admin (implement admin check middleware or in controller)
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Không có quyền truy cập.' });
+    }
+
+    const { status } = req.query; // Allow filtering by status
+    const filter = { type: 'withdraw-request' };
+    if (status) {
+      filter.status = status;
+    }
+
+    const withdrawals = await Transaction.find(filter).populate('from', 'username fullName').sort({ createdAt: -1 }); // Populate user info
+
+    res.json(withdrawals);
+
+  } catch (err) {
+    console.error('Error fetching withdrawal requests:', err);
+    res.status(500).json({ message: 'Lỗi khi lấy danh sách yêu cầu rút tiền.', error: err.message });
+  }
+};
+
+// API update withdrawal status (Admin only)
+exports.updateWithdrawalStatus = async (req, res) => {
+  try {
+    // Ensure user is an admin (implement admin check middleware or in controller)
+     if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Không có quyền truy cập.' });
+    }
+
+    const { id } = req.params; // Transaction ID
+    const { status } = req.body; // New status (approved, rejected, completed)
+
+    // Validate new status
+    const validStatuses = ['approved', 'rejected', 'completed'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Trạng thái cập nhật không hợp lệ.' });
+    }
+
+    const withdrawalTransaction = await Transaction.findOne({ _id: id, type: 'withdraw-request' });
+
+    if (!withdrawalTransaction) {
+      return res.status(404).json({ message: 'Không tìm thấy yêu cầu rút tiền.' });
+    }
+
+    // Prevent updating if already completed or rejected (optional, depends on workflow)
+    if (withdrawalTransaction.status === 'completed' || withdrawalTransaction.status === 'rejected') {
+       return res.status(400).json({ message: `Yêu cầu đã ở trạng thái \'${withdrawalTransaction.status}\'. Không thể cập nhật.` });
+    }
+
+    // Update status
+    withdrawalTransaction.status = status;
+
+    // Handle rejected case: return amount to user's wallet
+    if (status === 'rejected') {
+      const userWallet = await Wallet.findOne({ user: withdrawalTransaction.from });
+      if (userWallet) {
+        userWallet.balance += withdrawalTransaction.amount;
+        await userWallet.save();
+         // Send notification to user about rejection
+        await notificationController.createNotification(
+          withdrawalTransaction.from,
+          'withdrawal-status-update',
+          `Yêu cầu rút tiền ${withdrawalTransaction.amount.toLocaleString('vi-VN')}đ của bạn đã bị từ chối. Số tiền đã được hoàn lại ví.`, // Customize content
+          { transactionId: withdrawalTransaction._id, status: status, amount: withdrawalTransaction.amount }
+        );
+      }
+    }
+     // Handle approved/completed case: Send notification to user
+    if (status === 'approved' || status === 'completed') {
+         await notificationController.createNotification(
+          withdrawalTransaction.from,
+          'withdrawal-status-update',
+          `Yêu cầu rút tiền ${withdrawalTransaction.amount.toLocaleString('vi-VN')}đ của bạn đã được ${status === 'approved' ? 'duyệt' : 'hoàn thành'}.`, // Customize content
+          { transactionId: withdrawalTransaction._id, status: status, amount: withdrawalTransaction.amount }
+        );
+    }
+
+    await withdrawalTransaction.save();
+
+    res.json({ message: `Cập nhật trạng thái yêu cầu rút tiền thành công: ${status}`, transaction: withdrawalTransaction });
+
+  } catch (err) {
+    console.error('Error updating withdrawal status:', err);
+    res.status(500).json({ message: 'Lỗi khi cập nhật trạng thái yêu cầu rút tiền.', error: err.message });
+  }
+};

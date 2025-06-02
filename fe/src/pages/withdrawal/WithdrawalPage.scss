@@ -1,0 +1,28 @@
+.withdrawal-page {
+  padding: 20px;
+  max-width: 600px; /* Limit width for better form display */
+  margin: 40px auto; /* Center the content */
+  background-color: #f9f9f9; /* Light background */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  /* Adjust WithdrawalForm styles when used within the page */
+  .withdrawal-form-overlay {
+    position: static; /* Remove fixed positioning */
+    background-color: transparent; /* Remove overlay background */
+    display: block; /* Display normally within the flow */
+    width: auto;
+    height: auto;
+    z-index: auto;
+  }
+
+  .withdrawal-form {
+    padding: 0; /* Remove padding if page already has it */
+    box-shadow: none; /* Remove shadow if page has it */
+    max-width: none; /* Use page max-width */
+  }
+
+  .withdrawal-form-close {
+    display: none; /* Hide the close button on the page */
+  }
+} 

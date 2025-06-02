@@ -54,3 +54,9 @@ export const getAIMenuSuggestion = async (prompt) => {
     throw error; // Re-throw to be handled by the calling component
   }
 };
+
+// Function to delete a recipe (requires author or admin)
+export const deleteRecipe = async (id) => {
+  const res = await axios.delete(`${API_URL}/api/recipes/${id}`, { withCredentials: true });
+  return res.data;
+};

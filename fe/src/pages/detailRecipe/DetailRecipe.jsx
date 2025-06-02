@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchRecipeApproveById } from '../../api/recipe';
+import { fetchRecipeApproveById, deleteRecipe } from '../../api/recipe';
 import { fetchUserById } from '../../api/user';
+import { getMe } from '../../api/auth';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import RecipeHeader from './RecipeHeader';
@@ -16,6 +17,8 @@ import RecipeComments from './RecipeComments';
 import RecipeAuthorInfo from './RecipeAuthorInfo';
 import logo from '../../assets/images/logo.png';
 import './DetailRecipe.scss';
+import { useNavigate } from 'react-router-dom';
+import RecipeContext from '../../contexts/RecipeContext';
 
 
 const DetailRecipe = () => {
@@ -24,6 +27,8 @@ const DetailRecipe = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [authorInfo, setAuthorInfo] = useState(null);
+  const [isRecipeAuthor, setIsRecipeAuthor] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,12 +38,22 @@ const DetailRecipe = () => {
         const data = await fetchRecipeApproveById(id);
         console.log('Fetched recipe data:', data);
         setRecipeData(data);
+
+        const currentUser = await getMe();
+        if (data.author && currentUser && data.author._id === currentUser._id) {
+          setIsRecipeAuthor(true);
+        } else {
+          setIsRecipeAuthor(false);
+        }
+
         if (data.author && data.author._id) {
           const user = await fetchUserById(data.author._id);
           setAuthorInfo(user);
         }
+
       } catch (err) {
         setError('Không thể tải chi tiết công thức.');
+        console.error('Fetch recipe error:', err);
       } finally {
         setLoading(false);
       }
@@ -46,65 +61,89 @@ const DetailRecipe = () => {
     fetchData();
   }, [id]);
 
+  const handleDeleteRecipe = async () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa công thức này không?')) {
+      try {
+        await deleteRecipe(recipeData._id);
+        alert('Công thức đã bị xóa thành công!');
+        navigate('/recipes');
+      } catch (err) {
+        console.error('Error deleting recipe:', err);
+        alert(`Không thể xóa công thức. ${err.response?.data?.message || 'Lỗi server.'}`);
+      }
+    }
+  };
+
+  const handleEditRecipe = () => {
+    navigate(`/recipes/create?id=${recipeData._id}`);
+  };
+
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
   if (!recipeData) return null;
 
   return (
-    <> <Header />
-     <Sidebar />
-    <div className="detail-layout">
-     
-      <RecipeHeader
-        title={recipeData.title}
-        user={{ name: recipeData.author?.username, date: recipeData.createdAt, avatar: '/avatar.jpg' }}
-        prepTime={recipeData.prepTime || ''}
-        cookTime={recipeData.cookTime || ''}
-        servings={recipeData.servings}
-        recipeId={recipeData._id}
-        authorName={recipeData.author?.username}
-        categories={recipeData.categories}
+    <RecipeContext.Provider value={{
+      isRecipeAuthor,
+      recipeId: recipeData._id,
+      handleEditRecipe,
+      handleDeleteRecipe,
+    }}>
+      <> <Header />
+       <Sidebar />
+      <div className="detail-layout">
+       
+        <RecipeHeader
+          title={recipeData.title}
+          user={{ name: recipeData.author?.username, date: recipeData.createdAt, avatar: '/avatar.jpg' }}
+          prepTime={recipeData.prepTime || ''}
+          cookTime={recipeData.cookTime || ''}
+          servings={recipeData.servings}
+          recipeId={recipeData._id}
+          authorName={recipeData.author?.username}
+          categories={recipeData.categories}
+        />
+        <div className="top-section">
+          <div className="left-col">
+            {console.log('Passing to ImageSection:', { mainImage: recipeData.mainImage, mainImageType: recipeData.mainImageType })}
+            <ImageSection mainImage={recipeData.mainImage} mainImageType={recipeData.mainImageType} alt={recipeData.title} />
+          </div>
+          <div className="right-col">
+            <NutritionInfo
+              calories={recipeData.nutrition?.calories}
+              fat={recipeData.nutrition?.fat}
+              protein={recipeData.nutrition?.protein}
+              carbs={recipeData.nutrition?.carbs}
+            />
+          </div>
+        </div>
+        <p className="description">{recipeData.desc}</p>
+        <div className="ingredients-directions-row">
+          <div className="ingredients-col">
+            <IngredientsList mainDish={recipeData.ingredients} sauce={[]} />
+          </div>
+          <div className="directions-col">
+            {console.log('Passing to DirectionsList:', { directions: recipeData.steps })}
+            <DirectionsList directions={recipeData.steps} />
+          </div>
+        </div>
+       
+      </div>
+      <RecipeComments recipeId={recipeData._id} />
+      <RecipeAuthorInfo
+        avatar={authorInfo?.avatar}
+        name={authorInfo?.fullName || authorInfo?.username}
+        username={`@${authorInfo?.username}`}
+        time={recipeData.createdAt}
+        location={authorInfo?.location || ''}
+        description={authorInfo?.bio || authorInfo?.introduce || ''}
+        authorId={authorInfo?._id}
       />
-      <div className="top-section">
-        <div className="left-col">
-          {console.log('Passing to ImageSection:', { mainImage: recipeData.mainImage, mainImageType: recipeData.mainImageType })}
-          <ImageSection mainImage={recipeData.mainImage} mainImageType={recipeData.mainImageType} alt={recipeData.title} />
-        </div>
-        <div className="right-col">
-          <NutritionInfo
-            calories={recipeData.nutrition?.calories}
-            fat={recipeData.nutrition?.fat}
-            protein={recipeData.nutrition?.protein}
-            carbs={recipeData.nutrition?.carbs}
-          />
-        </div>
-      </div>
-      <p className="description">{recipeData.desc}</p>
-      <div className="ingredients-directions-row">
-        <div className="ingredients-col">
-          <IngredientsList mainDish={recipeData.ingredients} sauce={[]} />
-        </div>
-        <div className="directions-col">
-          {console.log('Passing to DirectionsList:', { directions: recipeData.steps })}
-          <DirectionsList directions={recipeData.steps} />
-        </div>
-      </div>
-     
-    </div>
-    <RecipeComments recipeId={recipeData._id} />
-    <RecipeAuthorInfo
-      avatar={authorInfo?.avatar}
-      name={authorInfo?.fullName || authorInfo?.username}
-      username={`@${authorInfo?.username}`}
-      time={recipeData.createdAt}
-      location={authorInfo?.location || ''}
-      description={authorInfo?.bio || authorInfo?.introduce || ''}
-      authorId={authorInfo?._id}
-    />
-    <RecommendedRecipes />
-  
-    <Footer />
-    </>
+      <RecommendedRecipes />
+    
+      <Footer />
+      </>
+    </RecipeContext.Provider>
   );
 };
 
