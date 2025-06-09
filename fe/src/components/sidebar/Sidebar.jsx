@@ -22,6 +22,7 @@ const Sidebar = () => {
   const [allRecipesCount, setAllRecipesCount] = useState(0);
   const [publishedRecipesCount, setPublishedRecipesCount] = useState(0);
   const [draftRecipesCount, setDraftRecipesCount] = useState(0);
+  const [pendingRecipesCount, setPendingRecipesCount] = useState(0);
 
   // Assume `isAuthenticated` is a boolean value indicating user's authentication status
   // You need to replace `isAuthenticated` with the actual way you track authentication status
@@ -117,6 +118,22 @@ const Sidebar = () => {
     // Add dependency that tracks authentication status here
   }, [/* add authentication dependency here */]);
 
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/pendings`, { withCredentials: true });
+        setPendingRecipesCount(res.data.length);
+      } catch (err) {
+        console.error("Failed to fetch pending recipes count:", err);
+        setPendingRecipesCount(0);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchPendingCount();
+    }
+  }, [/* add authentication dependency here */]);
+
   return (
     <>
       <button className="sidebar__toggle-btn" onClick={() => setOpen(!open)}>
@@ -170,6 +187,11 @@ const Sidebar = () => {
             <FaLock className="sidebar__icon" />
             <span>Món Nháp</span>
             <span className="sidebar__count">{draftRecipesCount} món</span>
+          </div>
+          <div className="sidebar__subitem" onClick={()=> navigate('/pending-recipes')}>
+            <FaCheck className="sidebar__icon" />
+            <span>Đang chờ duyệt</span>
+            <span className="sidebar__count">{pendingRecipesCount} món</span>
           </div>
         </div>
       </div>

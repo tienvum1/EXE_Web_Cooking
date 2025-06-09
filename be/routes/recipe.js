@@ -32,9 +32,11 @@ router.post(
 
 router.get('/', recipeController.getAll);
 router.get('/newest', recipeController.getNewest);
-router.get('/pendings', auth, recipeController.getPendingRecipes);
 router.get('/most-liked', recipeController.getMostLiked);
+// Route để lấy danh sách recipe chờ duyệt (Chỉ admin)
+router.get('/pendings', auth, recipeController.getPendingRecipes);
 router.get('/pendings/:id', auth, recipeController.getRecipeById);
+
 router.get('/:id', recipeController.getRecipeApproveById);
 router.get('/author/:id', recipeController.getAuthorRecipeById);
 router.get('/find-by-ingredient', recipeController.findByIngredient);
@@ -43,6 +45,7 @@ router.get('/search', recipeController.search);
 router.get('/me/all-recipes', auth, recipeController.getAllUserRecipes);
 router.get('/me/published-recipes', auth, recipeController.getPublishedUserRecipes);
 router.get('/me/draft-recipes', auth, recipeController.getDraftUserRecipes);
+router.get('/me/pendings', auth, recipeController.getUserPendingRecipes);
 
 router.put(
   '/:id',
@@ -65,7 +68,6 @@ router.delete('/:id', auth, recipeController.deleteRecipe);
 // Add route for generating recipe PDF
 router.get('/:id/pdf', recipeController.generateRecipePdf);
 
-// Route để lấy danh sách recipe chờ duyệt (Chỉ admin)
 
 
 // Route để cập nhật trạng thái recipe (Chỉ admin)

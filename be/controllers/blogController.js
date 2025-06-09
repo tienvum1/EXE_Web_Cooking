@@ -87,6 +87,91 @@ exports.createBlog = async (req, res) => {
   }
 };
 
+// Cập nhật blog
+exports.updateBlog = async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const updates = req.body;
+    const userId = req.user.user_id;
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return res.status(404).json({ message: 'Không tìm thấy blog.' });
+    }
+
+    // Kiểm tra quyền: Chỉ admin hoặc tác giả blog mới có quyền sửa
+    if (req.user.role !== 'admin' && blog.author.toString() !== userId) {
+      return res.status(403).json({ message: 'Bạn không có quyền sửa blog này.' });
+    }
+
+    // Xử lý upload ảnh mới nếu có
+    let imageUrl = blog.image; // Giữ nguyên ảnh cũ mặc định
+    if (req.file) {
+      // Nếu có ảnh cũ trên Cloudinary, xóa nó đi
+      if (blog.image) {
+        // Cần trích xuất public_id từ URL Cloudinary
+        const publicId = blog.image.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(`blog_images/${publicId}`); // Xóa ảnh cũ
+      }
+      imageUrl = req.file.path; // Lấy URL ảnh mới từ Cloudinary
+    }
+
+    // Cập nhật các trường của blog
+    blog.title = updates.title || blog.title;
+    blog.desc = updates.desc || blog.desc;
+    blog.content = updates.content || blog.content;
+    blog.image = imageUrl; // Cập nhật ảnh
+    blog.quote = updates.quote || blog.quote; // Cập nhật quote
+    blog.updatedAt = new Date(); // Cập nhật thời gian chỉnh sửa
+
+    // Xử lý tags và sections nếu có trong updates
+    if (updates.tags) {
+      blog.tags = JSON.parse(updates.tags);
+    }
+    if (updates.sections) {
+      blog.sections = JSON.parse(updates.sections);
+    }
+
+    const updatedBlog = await blog.save();
+    res.json(updatedBlog);
+
+  } catch (err) {
+    console.error('Lỗi cập nhật blog:', err);
+    res.status(500).json({ message: 'Lỗi cập nhật blog', error: err.message });
+  }
+};
+
+// Xóa blog
+exports.deleteBlog = async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const userId = req.user.user_id;
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return res.status(404).json({ message: 'Không tìm thấy blog.' });
+    }
+
+    // Kiểm tra quyền: Chỉ admin hoặc tác giả blog mới có quyền xóa
+    if (req.user.role !== 'admin' && blog.author.toString() !== userId) {
+      return res.status(403).json({ message: 'Bạn không có quyền xóa blog này.' });
+    }
+
+    // Xóa ảnh của blog trên Cloudinary nếu có
+    if (blog.image) {
+      const publicId = blog.image.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`blog_images/${publicId}`);
+    }
+
+    await blog.deleteOne();
+    res.json({ message: 'Blog đã được xóa thành công.' });
+
+  } catch (err) {
+    console.error('Lỗi xóa blog:', err);
+    res.status(500).json({ message: 'Lỗi xóa blog', error: err.message });
+  }
+};
+
 // Lấy tất cả blog
 exports.getAllBlogs = async (req, res) => {
   try {

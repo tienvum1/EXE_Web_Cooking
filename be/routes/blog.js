@@ -11,4 +11,10 @@ router.post('/', auth, blogController.uploadBlogImage, blogController.createBlog
 router.get('/', blogController.getAllBlogs);
 router.get('/:id', blogController.getBlogById);
 
+// Route for updating a blog (requires auth and image upload middleware)
+router.put('/:id', auth, blogController.uploadBlogImage, blogController.updateBlog);
+
+// Route for deleting a blog (requires auth middleware)
+router.delete('/:id', auth, blogController.deleteBlog);
+
 module.exports = router;

@@ -1,5 +1,5 @@
 .notification-page-container {
-  max-width: 600px;
+  max-width: 800px;
   margin: 40px auto 0 auto;
   background: #fff;
   border-radius: 16px;
@@ -13,12 +13,16 @@
   font-size: 1.4rem;
   font-weight: 800;
   margin-bottom: 24px;
+  border-radius: 16px;
+
 }
 
 .noti-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0; 
+  padding :10px;
+
 }
 
 .noti-list li {

@@ -146,7 +146,7 @@ const ProfilePage = () => {
           {/* Conditionally render Follow/Unfollow button */}
           {!isCurrentUserProfile && user && (
             <button
-              className="follow-btn"
+              className={isFollowing ? 'follow-btn unfollow' : 'follow-btn follow'}
               onClick={handleFollowUnfollow}
               disabled={loading}
             >
