@@ -1,14 +1,12 @@
 const categories = [
-  { name: 'Breakfast', icon: '🍳' },
-  { name: 'Lunch', icon: '🥪' },
-  { name: 'Dinner', icon: '🍽️' },
-  { name: 'Dessert', icon: '🍰' },
-  { name: 'Salad', icon: '🥗' },
-  { name: 'Vegetarian', icon: '🥦' },
-  { name: 'Meat', icon: '🥩' },
-  { name: 'Seafood', icon: '🦐' },
-
-
+  { name: 'Bữa sáng', icon: '🍳' },
+  { name: 'Bữa trưa', icon: '🥪' },
+  { name: 'Bữa tối', icon: '🍽️' },
+  { name: 'Tráng miệng', icon: '🍰' },
+  { name: 'Món salad', icon: '🥗' },
+  { name: 'Món chay', icon: '🥦' },
+  { name: 'Món thịt', icon: '🥩' },
+  { name: 'Hải sản', icon: '🦐' },
 ];
 
 export default categories; 

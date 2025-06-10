@@ -1,51 +1,80 @@
 @import './_shared';
+
 .nutrition-info {
-    background: #6edc7d;
-    border-radius: 22px;
-    padding: 32px 40px 28px 40px;
-    color: #222;
-    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.07);
-    min-width: 240px;
-    max-width: 340px;
-    height: 100%; // Thêm dòng này
+  background: #2ecc71;
+  border-radius: 16px;
+  padding: 24px;
+  color: #000000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  min-width: 280px;
+  max-width: 360px;
+  height: 80%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    font-family: 'Inter', 'Arial', sans-serif;
-    .nutrition-title {
-      font-size: 1.18rem;
-      font-weight: 700;
-      margin-bottom: 18px;
-      color: #1a1a1a;
+  margin: 12px 0;
+  font-family: 'Inter', 'Arial', sans-serif;
+  border: 1px solid #e0e0e0;
+
+  .nutrition-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #000000;
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .nutrition-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
     }
-    .nutrition-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.08rem;
+
+    span:first-child {
+      color: #000000;
       font-weight: 500;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #8ee6a3;
-      padding-bottom: 6px;
-      &:last-child {
-        border-bottom: none;
-      }
-      span:first-child {
-        color: #222;
-      }
+    }
+
+    span:last-child {
+      color: #333;
+      font-weight: 600;
+      background: #f8f8f8;
+      padding: 4px 12px;
+      border-radius: 8px;
+      min-width: 80px;
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .nutrition-info {
+    padding: 20px;
+    border-radius: 12px;
+    min-width: 0;
+    max-width: 100%;
+    margin: 8px 0;
+
+    .nutrition-title {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
+
+    .nutrition-row {
+      font-size: 0.95rem;
+      padding: 10px 0;
+
       span:last-child {
-        color: #222;
-        font-weight: 600;
+        padding: 3px 10px;
+        min-width: 70px;
       }
     }
   }
-  
-  @media (max-width: 640px) {
-    .nutrition-info {
-      padding: 18px 16px 14px 16px;
-      border-radius: 14px;
-      min-width: 0;
-      max-width: 100%;
-    }
-  }
+}

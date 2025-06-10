@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchRecipeApproveById, deleteRecipe } from '../../api/recipe';
+import { fetchRecipeApproveById, deleteRecipe, toggleLike, checkLikeStatus } from '../../api/recipe';
 import { fetchUserById } from '../../api/user';
 import { getMe } from '../../api/auth';
 import Header from '../../components/header/Header';
@@ -19,7 +19,7 @@ import logo from '../../assets/images/logo.png';
 import './DetailRecipe.scss';
 import { useNavigate } from 'react-router-dom';
 import RecipeContext from '../../contexts/RecipeContext';
-
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 const DetailRecipe = () => {
   const { id } = useParams();
@@ -28,6 +28,7 @@ const DetailRecipe = () => {
   const [error, setError] = useState('');
   const [authorInfo, setAuthorInfo] = useState(null);
   const [isRecipeAuthor, setIsRecipeAuthor] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +52,12 @@ const DetailRecipe = () => {
           setAuthorInfo(user);
         }
 
+        // Check if user has liked the recipe
+        if (currentUser) {
+          const likeStatus = await checkLikeStatus(id);
+          setIsLiked(likeStatus.liked);
+        }
+
       } catch (err) {
         setError('Không thể tải chi tiết công thức.');
         console.error('Fetch recipe error:', err);
@@ -60,6 +67,24 @@ const DetailRecipe = () => {
     };
     fetchData();
   }, [id]);
+
+  const handleLike = async () => {
+    try {
+      if (!recipeData?._id) {
+        throw new Error('Không tìm thấy ID công thức');
+      }
+
+      const response = await toggleLike(recipeData._id);
+      if (response.likes !== undefined) {
+        setRecipeData(prev => ({ ...prev, likes: response.likes }));
+        setIsLiked(response.liked);
+      }
+    } catch (err) {
+      console.error('Error toggling like:', err);
+      const errorMessage = err.response?.data?.message || 'Có lỗi xảy ra khi thực hiện thao tác like';
+      alert(errorMessage);
+    }
+  };
 
   const handleDeleteRecipe = async () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa công thức này không?')) {
@@ -107,6 +132,13 @@ const DetailRecipe = () => {
           <div className="left-col">
             {console.log('Passing to ImageSection:', { mainImage: recipeData.mainImage, mainImageType: recipeData.mainImageType })}
             <ImageSection mainImage={recipeData.mainImage} mainImageType={recipeData.mainImageType} alt={recipeData.title} />
+            <button 
+              className={`like-button ${isLiked ? 'liked' : ''}`}
+              onClick={handleLike}
+            >
+              {isLiked ? <FaHeart /> : <FaRegHeart />}
+              <span>{recipeData.likes || 0} likes</span>
+            </button>
           </div>
           <div className="right-col">
             <NutritionInfo

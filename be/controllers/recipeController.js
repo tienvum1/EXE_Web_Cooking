@@ -520,6 +520,25 @@ exports.getPendingRecipes = async (req, res) => {
   }
 };
 
+// Lấy tất cả recipe có trạng thái 'pending' (chờ duyệt) của người dùng hiện tại
+exports.getUserPendingRecipes = async (req, res) => {
+  try {
+    // Đảm bảo người dùng đã đăng nhập để lấy user_id
+    if (!req.user || !req.user.user_id) {
+      return res.status(401).json({ message: 'Bạn chưa đăng nhập.' });
+    }
+
+    const recipes = await Recipe.find({ author: req.user.user_id, status: 'pending' })
+      .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất trước
+      .populate('author', 'username createdAt');
+    
+    res.json(recipes);
+  } catch (err) {
+    console.error('Lỗi lấy danh sách recipe đang chờ duyệt của người dùng:', err);
+    res.status(500).json({ message: 'Lỗi lấy danh sách recipe đang chờ duyệt của người dùng', error: err.message });
+  }
+};
+
 // Cập nhật trạng thái của một recipe (duyệt/từ chối)
 exports.updateRecipeStatus = async (req, res) => {
   try {
@@ -678,3 +697,4 @@ exports.generateRecipePdf = async (req, res) => {
     res.status(500).json({ message: 'Failed to generate recipe PDF', error: err.message });
   }
 };
+

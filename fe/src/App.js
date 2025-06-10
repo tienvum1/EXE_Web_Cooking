@@ -36,7 +36,10 @@ import SetPasswordPage from './pages/auth/SetPasswordPage';
 import ChangePasswordPage from './pages/settingPage/ChangePasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import WithdrawalPage from './pages/withdrawal/WithdrawalPage';
-
+import PendingUserRecipesPage from './pages/recipePages/PendingUserRecipesPage.jsx';
+import AdminBlogManagementPage from './pages/admin/AdminBlogManagementPage.jsx';
+import AdminEditBlogPage from './pages/admin/AdminEditBlogPage.jsx';
+import AdminProtectedRoute from './components/AdminProtectedRoute/AdminProtectedRoute.jsx';
 
   
 
@@ -81,27 +84,38 @@ function App() {
         <Route path="/settings/change-password" element={<ChangePasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/withdrawal" element={<WithdrawalPage />} />
+        <Route path="/pending-recipes"  element ={<PendingUserRecipesPage/>} />
         
-        <Route
-          path="/admin"
-          element={<AdminLayout><AdminPage /></AdminLayout>}
-        />
-         <Route
-          path="/admin/create-blog"
-          element={<AdminLayout><CreateBlogPage /></AdminLayout>}
-        />
-        <Route
-          path="/admin/recipes/pendings"
-          element={<AdminLayout><AdminRecipeApprovalPage /></AdminLayout>}
-        />
-        <Route
-          path="/admin/recipes/:id"
-          element={<AdminLayout><AdminRecipeDetailApprovalPage /></AdminLayout>}
-        />
-        <Route
-          path="/admin/withdrawals"
-          element={<AdminLayout><AdminWithdrawalsPage /></AdminLayout>}
-        />
+        <Route path="/admin" element={<AdminProtectedRoute />}>
+          <Route
+            index
+            element={<AdminLayout><AdminPage /></AdminLayout>}
+          />
+          <Route
+            path="create-blog"
+            element={<AdminLayout><CreateBlogPage /></AdminLayout>}
+          />
+          <Route
+            path="blogs"
+            element={<AdminLayout><AdminBlogManagementPage /></AdminLayout>}
+          />
+          <Route
+            path="blogs/edit/:id"
+            element={<AdminLayout><AdminEditBlogPage /></AdminLayout>}
+          />
+          <Route
+            path="recipes/pendings"
+            element={<AdminLayout><AdminRecipeApprovalPage /></AdminLayout>}
+          />
+          <Route
+            path="recipes/:id"
+            element={<AdminLayout><AdminRecipeDetailApprovalPage /></AdminLayout>}
+          />
+          <Route
+            path="withdrawals"
+            element={<AdminLayout><AdminWithdrawalsPage /></AdminLayout>}
+          />
+        </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <ChatBot />

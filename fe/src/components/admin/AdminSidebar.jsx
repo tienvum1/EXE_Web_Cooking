@@ -12,7 +12,9 @@ const AdminSidebar = () => {
         <li>
           <Link to="/admin/create-blog">Tạo Bài Blog Mới</Link>
         </li>
-
+        <li>
+          <Link to="/admin/blogs">Quản lý Blog</Link>
+        </li>
         <li>
           <Link to="/admin/recipes/pendings">Phê Duyệt Recipe</Link>
         </li>

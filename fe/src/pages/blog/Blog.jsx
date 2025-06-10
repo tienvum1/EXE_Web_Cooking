@@ -5,6 +5,7 @@ import logo from '../../assets/images/logo.png'
 import { useNavigate } from 'react-router-dom';
 import { getAllBlogs } from '../../api/blog';
 import { fetchMostLikedRecipes } from '../../api/recipe';
+import Sidebar from '../../components/sidebar/Sidebar';
 import './Blog.scss';
 
 const Blog = () => {
@@ -64,6 +65,7 @@ const Blog = () => {
   return (
     <>
       <Header />
+      <Sidebar />
       <div className="blog-main-container">
         <h1 className="blog-title">Blog & Article</h1>
         <p className="blog-desc"> Explore the world of healthy eating, tasty recipes, and expert tips to elevate your cooking skills.</p>

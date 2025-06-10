@@ -1,88 +1,197 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MenuSuggestion.scss';
 import Header from '../../components/header/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Footer from '../../components/footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import { getAIMenuSuggestion } from '../../api/recipe';
-
-// Hàm giả lập AI phân tích (bạn thay bằng API thực tế sau này)
-// async function getMenuSuggestionAI(prompt) {
-//   // Gửi lên API thực tế ở đây
-//   // const res = await fetch('/api/ai-menu', { method: 'POST', body: JSON.stringify({ prompt }) });
-//   // return await res.json();
-//   // Tạm thời trả về dữ liệu mẫu
-//   return [
-//     {
-//       meal: 'Breakfast',
-//       nutrition: { fat: 10, protein: 30, carbs: 40, calories: 400 },
-//       recipes: [
-//         {
-//           name: 'Yến mạch sữa chua trái cây',
-//           image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
-//           kcal: 200,
-//           protein: 8,
-//           carbs: 30,
-//           fat: 5,
-//           time: '10 phút',
-//           type: 'Eat Clean',
-//         },
-//       ],
-//     },
-//     {
-//       meal: 'Lunch',
-//       nutrition: { fat: 15, protein: 40, carbs: 60, calories: 600 },
-//       recipes: [
-//         {
-//           name: 'Cơm gạo lứt ức gà',
-//           image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
-//           kcal: 300,
-//           protein: 20,
-//           carbs: 40,
-//           fat: 7,
-//           time: '20 phút',
-//           type: 'Eat Clean',
-//         },
-//       ],
-//     },
-//     {
-//       meal: 'Dinner',
-//       nutrition: { fat: 12, protein: 35, carbs: 50, calories: 500 },
-//       recipes: [
-//         {
-//           name: 'Salad cá hồi áp chảo',
-//           image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80',
-//           kcal: 250,
-//           protein: 15,
-//           carbs: 20,
-//           fat: 8,
-//           time: '15 phút',
-//           type: 'Salad',
-//         },
-//       ],
-//     },
-//   ];
-// }
+import axios from 'axios';
 
 const MenuSuggestion = () => {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
-  const [menu, setMenu] = useState(null);
+  const [allRecipes, setAllRecipes] = useState([]);
   const navigate = useNavigate();
+
+  // Lấy tất cả công thức khi component mount
+  useEffect(() => {
+    const fetchAllRecipes = async () => {
+      try {
+        const response = await axios.get('https://localhost:4567/api/recipes');
+        setAllRecipes(response.data);
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+      }
+    };
+    fetchAllRecipes();
+  }, []);
+
+  // Phân tích yêu cầu người dùng
+  const analyzeRequirements = (text) => {
+    const requirements = {
+      mealCount: 3, // Mặc định 3 bữa
+      maxCalories: null,
+      maxTime: null,
+      includeIngredients: [],
+      excludeIngredients: [],
+      dietType: null,
+      preferences: []
+    };
+
+    // Phân tích số bữa
+    const mealCountMatch = text.match(/(\d+)\s*bữa/);
+    if (mealCountMatch) {
+      requirements.mealCount = parseInt(mealCountMatch[1]);
+    }
+
+    // Phân tích calories
+    const caloriesMatch = text.match(/(\d+)\s*kcal/);
+    if (caloriesMatch) {
+      requirements.maxCalories = parseInt(caloriesMatch[1]);
+    }
+
+    // Phân tích thời gian
+    const timeMatch = text.match(/(\d+)\s*phút/);
+    if (timeMatch) {
+      requirements.maxTime = parseInt(timeMatch[1]);
+    }
+
+    // Phân tích loại chế độ ăn
+    const dietTypes = ['eat clean', 'giảm cân', 'tăng cân', 'healthy', 'vegetarian', 'vegan'];
+    dietTypes.forEach(type => {
+      if (text.toLowerCase().includes(type)) {
+        requirements.dietType = type;
+      }
+    });
+
+    // Phân tích nguyên liệu
+    const includeMatch = text.match(/với\s*([^,.]+)/);
+    if (includeMatch) {
+      requirements.includeIngredients = includeMatch[1].split(',').map(i => i.trim());
+    }
+
+    const excludeMatch = text.match(/không\s*([^,.]+)/);
+    if (excludeMatch) {
+      requirements.excludeIngredients = excludeMatch[1].split(',').map(i => i.trim());
+    }
+
+    return requirements;
+  };
+
+  // Lọc công thức theo yêu cầu
+  const filterRecipes = (recipes, requirements) => {
+    return recipes.filter(recipe => {
+      // Kiểm tra calories
+      if (requirements.maxCalories && recipe.nutrition?.calories > requirements.maxCalories) {
+        return false;
+      }
+
+      // Kiểm tra thời gian
+      if (requirements.maxTime && recipe.cookTime > requirements.maxTime) {
+        return false;
+      }
+
+      // Kiểm tra nguyên liệu cần có
+      if (requirements.includeIngredients.length > 0) {
+        const hasAllIngredients = requirements.includeIngredients.every(ingredient =>
+          recipe.ingredients.some(recipeIngredient =>
+            recipeIngredient.toLowerCase().includes(ingredient.toLowerCase())
+          )
+        );
+        if (!hasAllIngredients) return false;
+      }
+
+      // Kiểm tra nguyên liệu không được có
+      if (requirements.excludeIngredients.length > 0) {
+        const hasExcludedIngredient = requirements.excludeIngredients.some(ingredient =>
+          recipe.ingredients.some(recipeIngredient =>
+            recipeIngredient.toLowerCase().includes(ingredient.toLowerCase())
+          )
+        );
+        if (hasExcludedIngredient) return false;
+      }
+
+      // Kiểm tra loại chế độ ăn
+      if (requirements.dietType) {
+        if (requirements.dietType === 'vegetarian' && recipe.type?.toLowerCase().includes('meat')) {
+          return false;
+        }
+        if (requirements.dietType === 'vegan' && 
+            (recipe.type?.toLowerCase().includes('meat') || recipe.type?.toLowerCase().includes('dairy'))) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  };
+
+  // Tạo thực đơn
+  const generateMenu = (recipes, requirements) => {
+    const meals = ['Bữa sáng', 'Bữa trưa', 'Bữa tối'];
+    const menu = [];
+
+    for (let i = 0; i < requirements.mealCount; i++) {
+      const mealName = meals[i] || `Bữa ${i + 1}`;
+      const filteredRecipes = filterRecipes(recipes, requirements);
+      
+      // Lấy ngẫu nhiên 2-3 món cho mỗi bữa
+      const recipeCount = Math.floor(Math.random() * 2) + 2;
+      const selectedRecipes = [];
+      
+      for (let j = 0; j < recipeCount; j++) {
+        if (filteredRecipes.length > 0) {
+          const randomIndex = Math.floor(Math.random() * filteredRecipes.length);
+          selectedRecipes.push(filteredRecipes[randomIndex]);
+          filteredRecipes.splice(randomIndex, 1);
+        }
+      }
+
+      // Tính toán dinh dưỡng
+      const nutrition = selectedRecipes.reduce((acc, recipe) => ({
+        calories: (acc.calories || 0) + (recipe.nutrition?.calories || 0),
+        protein: (acc.protein || 0) + (recipe.nutrition?.protein || 0),
+        carbs: (acc.carbs || 0) + (recipe.nutrition?.carbs || 0),
+        fat: (acc.fat || 0) + (recipe.nutrition?.fat || 0)
+      }), {});
+
+      menu.push({
+        meal: mealName,
+        recipes: selectedRecipes.map(recipe => ({
+          _id: recipe._id,
+          name: recipe.title,
+          image: recipe.mainImage,
+          kcal: recipe.nutrition?.calories || 0,
+          protein: recipe.nutrition?.protein || 0,
+          carbs: recipe.nutrition?.carbs || 0,
+          fat: recipe.nutrition?.fat || 0,
+          time: `${recipe.cookTime} phút`,
+          type: recipe.type
+        })),
+        nutrition
+      });
+    }
+
+    return menu;
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
     if (!prompt.trim()) return;
+    
     setLoading(true);
-    setMenu(null);
-    // const result = await getMenuSuggestionAI(prompt);
+
     try {
-      const result = await getAIMenuSuggestion(prompt); // Call the actual API
-      setMenu(result);
-      navigate('/menu-suggestion/result', { state: { menu: result } });
+      // Phân tích yêu cầu
+      const requirements = analyzeRequirements(prompt);
+      
+      // Tạo thực đơn
+      const suggestedMenu = generateMenu(allRecipes, requirements);
+      
+      // Chuyển đến trang kết quả với thực đơn đã tạo
+      navigate('/menu-suggestion/result', { state: { menu: suggestedMenu } });
     } catch (error) {
-      console.error('Error getting AI menu suggestion:', error);
-      // Optionally, display an error message to the user
+      console.error('Error generating menu:', error);
+      alert('Có lỗi xảy ra khi tạo thực đơn. Vui lòng thử lại!');
     } finally {
       setLoading(false);
     }
@@ -110,44 +219,6 @@ const MenuSuggestion = () => {
             </button>
           </div>
         </form>
-        {menu && (
-          <div className="menu-suggestion-result-v2">
-            <h1 className="menu-title">Menu gợi ý cho bạn</h1>
-            <div className="menu-suggestion-list">
-              {menu.map((meal, idx) => (
-                <div className="menu-meal-row" key={meal.meal}>
-                  <div className="menu-meal-main">
-                    <h2 className="menu-meal-title">{meal.meal}</h2>
-                    <div className="menu-meal-recipes">
-                      {meal.recipes.map((r, i) => (
-                        <div className="menu-recipe-card" key={i}>
-                          <div className="menu-recipe-imgbox">
-                            <img src={r.image} alt={r.name} />
-                          </div>
-                          <div className="menu-recipe-info">
-                            <div className="menu-recipe-name">{r.name}</div>
-                            <div className="menu-recipe-nutri">{r.kcal} kcal<br/>Protein: {r.protein}g, Carbs: {r.carbs}g, Fat: {r.fat}g</div>
-                            <div className="menu-recipe-meta">
-                              <span><i className="far fa-clock"></i> {r.time}</span>
-                              <span><i className="fas fa-utensils"></i> {r.type}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="menu-meal-nutrition">
-                    <div className="nutrition-title">Nutrition Information</div>
-                    <div className="nutrition-row"><span>Total Fat</span><span>{meal.nutrition.fat} g</span></div>
-                    <div className="nutrition-row"><span>Protein</span><span>{meal.nutrition.protein} g</span></div>
-                    <div className="nutrition-row"><span>Carbohydrate</span><span>{meal.nutrition.carbs} g</span></div>
-                    <div className="nutrition-row"><span>Calories</span><span>{meal.nutrition.calories} kcal</span></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
       <Footer />
     </>

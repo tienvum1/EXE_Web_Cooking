@@ -9,9 +9,31 @@ import categoriesData from '../../components/category/categoriesData';
 import './RecipePage.scss';
 
 const SidebarFilter = ({ filters, setFilters }) => {
+  const [includeIngredients, setIncludeIngredients] = useState('');
+  const [excludeIngredients, setExcludeIngredients] = useState('');
+
+  const handleApplyFilters = () => {
+    setFilters(prev => ({
+      ...prev,
+      includeIngredients: includeIngredients.split(',').map(i => i.trim()).filter(i => i),
+      excludeIngredients: excludeIngredients.split(',').map(i => i.trim()).filter(i => i)
+    }));
+  };
+
+  const handleClearFilters = () => {
+    setIncludeIngredients('');
+    setExcludeIngredients('');
+    setFilters(prev => ({
+      ...prev,
+      includeIngredients: [],
+      excludeIngredients: []
+    }));
+  };
+
   return (
     <aside className="sidebar-filter">
       <h3>Bộ lọc nâng cao</h3>
+      
       <div className="sidebar-filter-section">
         <label>Thời gian nấu (phút):</label>
         <input
@@ -22,6 +44,7 @@ const SidebarFilter = ({ filters, setFilters }) => {
           onChange={e => setFilters(f => ({ ...f, maxCookTime: e.target.value }))}
         />
       </div>
+
       <div className="sidebar-filter-section">
         <label>Lượng calories tối đa:</label>
         <input
@@ -31,6 +54,41 @@ const SidebarFilter = ({ filters, setFilters }) => {
           value={filters.maxCalories || ''}
           onChange={e => setFilters(f => ({ ...f, maxCalories: e.target.value }))}
         />
+      </div>
+
+      <div className="sidebar-filter-section">
+        <label>Hiển thị các món với:</label>
+        <textarea
+          placeholder="Gõ vào tên các nguyên liệu, phân cách bằng dấu phẩy..."
+          value={includeIngredients}
+          onChange={e => setIncludeIngredients(e.target.value)}
+          rows={3}
+        />
+      </div>
+
+      <div className="sidebar-filter-section">
+        <label>Hiển thị các món không có:</label>
+        <textarea
+          placeholder="Gõ vào tên các nguyên liệu, phân cách bằng dấu phẩy..."
+          value={excludeIngredients}
+          onChange={e => setExcludeIngredients(e.target.value)}
+          rows={3}
+        />
+      </div>
+
+      <div className="filter-buttons">
+        <button 
+          className="apply-filter-btn"
+          onClick={handleApplyFilters}
+        >
+          Áp dụng bộ lọc
+        </button>
+        <button 
+          className="clear-filter-btn"
+          onClick={handleClearFilters}
+        >
+          Bỏ sàng lọc
+        </button>
       </div>
     </aside>
   );
@@ -47,7 +105,12 @@ const RecipePage = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filters, setFilters] = useState({ maxCookTime: '', maxCalories: '' });
+  const [filters, setFilters] = useState({ 
+    maxCookTime: '', 
+    maxCalories: '',
+    includeIngredients: [],
+    excludeIngredients: []
+  });
   const [savedIds, setSavedIds] = useState([]);
 
   useEffect(() => {
@@ -101,7 +164,24 @@ const RecipePage = () => {
     const matchSearch = recipe.title.toLowerCase().includes(search.toLowerCase());
     const matchCookTime = !filters.maxCookTime || (parseInt(recipe.cookTime) || 0) <= parseInt(filters.maxCookTime);
     const matchCalories = !filters.maxCalories || recipe.calories <= parseInt(filters.maxCalories);
-    return matchSearch && matchCookTime && matchCalories;
+    
+    // Kiểm tra nguyên liệu cần có
+    const matchIncludeIngredients = filters.includeIngredients.length === 0 || 
+      filters.includeIngredients.every(ingredient => 
+        recipe.ingredients.some(recipeIngredient => 
+          recipeIngredient.toLowerCase().includes(ingredient.toLowerCase())
+        )
+      );
+
+    // Kiểm tra nguyên liệu không được có
+    const matchExcludeIngredients = filters.excludeIngredients.length === 0 ||
+      !filters.excludeIngredients.some(ingredient =>
+        recipe.ingredients.some(recipeIngredient =>
+          recipeIngredient.toLowerCase().includes(ingredient.toLowerCase())
+        )
+      );
+
+    return matchSearch && matchCookTime && matchCalories && matchIncludeIngredients && matchExcludeIngredients;
   });
 
   // Chọn category filter

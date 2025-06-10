@@ -5,13 +5,13 @@ $hover-shadow: #2e7d3222;
 $font-family: 'Inter', Arial, sans-serif;
 
 .recipe-page-container {
-  max-width: 1500px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 40px 16px 64px;
+  padding: 30px 16px 64px;
   font-family: $font-family;
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  gap: 1.5rem;
 
   @media (max-width: 900px) {
     flex-direction: column;
@@ -142,53 +142,135 @@ $font-family: 'Inter', Arial, sans-serif;
 
 // ====== Sidebar Filter ======
 .sidebar-filter {
-  min-width: 240px;
-  max-width: 280px;
-  background: #f8f6f2;
-  border-radius: 12px;
-  padding: 1.5rem 1.2rem;
-  box-shadow: 0 2px 12px $primary-shadow;
+  min-width: 280px;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.8rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.5rem;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
 
   h3 {
-    font-size: 1.18rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: $primary-color;
-    margin-bottom: 0.7rem;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #f0f0f0;
   }
 
   .sidebar-filter-section {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.6rem;
 
     label {
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: #444;
-      font-weight: 500;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+
+      &::before {
+        content: '•';
+        color: $primary-color;
+        font-size: 1.2rem;
+      }
     }
 
     input[type="number"] {
-      background: #fff;
-      border: 1.5px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 0.5rem 0.8rem;
-      font-size: 1rem;
-      color: $primary-color;
-      transition: border 0.2s;
+      background: #f8f8f8;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+      color: #333;
+      transition: all 0.2s;
+      width: 100%;
 
       &:focus {
-        border-color: #3dd056;
+        border-color: $primary-color;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+
+    textarea {
+      background: #f8f8f8;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+      color: #333;
+      transition: all 0.2s;
+      width: 100%;
+      resize: vertical;
+      min-height: 80px;
+
+      &:focus {
+        border-color: $primary-color;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        outline: none;
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+
+    button {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+
+      &.apply-filter-btn {
+        background: $primary-color;
+        color: white;
+
+        &:hover {
+          background: darken($primary-color, 5%);
+          transform: translateY(-1px);
+        }
+      }
+
+      &.clear-filter-btn {
+        background: #f0f0f0;
+        color: #666;
+
+        &:hover {
+          background: #e5e5e5;
+          transform: translateY(-1px);
+        }
       }
     }
   }
 
   @media (max-width: 900px) {
     max-width: 100%;
-    padding: 1rem 0.5rem;
-    margin-right: 0;
-    box-shadow: none;
+    position: static;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
   }
 }

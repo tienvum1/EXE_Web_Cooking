@@ -60,3 +60,15 @@ export const deleteRecipe = async (id) => {
   const res = await axios.delete(`${API_URL}/api/recipes/${id}`, { withCredentials: true });
   return res.data;
 };
+
+// Like/Unlike a recipe
+export const toggleLike = async (recipeId) => {
+  const res = await axios.post(`${API_URL}/api/recipes/like`, { recipeId }, { withCredentials: true });
+  return res.data;
+};
+
+// Check if user has liked a recipe
+export const checkLikeStatus = async (recipeId) => {
+  const res = await axios.get(`${API_URL}/api/recipes/like-status/${recipeId}`, { withCredentials: true });
+  return res.data;
+};
