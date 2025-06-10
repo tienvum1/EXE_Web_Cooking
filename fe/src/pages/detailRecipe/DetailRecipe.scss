@@ -128,3 +128,32 @@
     }
   }
 }
+
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 2px solid #e74c3c;
+  border-radius: 20px;
+  background: white;
+  color: #e74c3c;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+
+  &:hover {
+    background: #e74c3c;
+    color: white;
+  }
+
+  &.liked {
+    background: #e74c3c;
+    color: white;
+  }
+
+  svg {
+    font-size: 1.2rem;
+  }
+}

@@ -11,6 +11,7 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) 
   const [donateMsg, setDonateMsg] = useState('');
   const [donateLoading, setDonateLoading] = useState(false);
   const [donateResult, setDonateResult] = useState('');
+  const [shareSuccess, setShareSuccess] = useState(false);
 
   const { isRecipeAuthor, handleEditRecipe, handleDeleteRecipe } = useContext(RecipeContext);
 
@@ -39,6 +40,30 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) 
     } catch (err) {
       console.error('Error downloading PDF:', err);
       alert('Lỗi khi tải xuống PDF. Vui lòng thử lại.');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      // Lấy URL hiện tại
+      const currentUrl = window.location.href;
+      
+      // Thử sử dụng Web Share API nếu trình duyệt hỗ trợ
+      if (navigator.share) {
+        await navigator.share({
+          title: title,
+          url: currentUrl
+        });
+      } else {
+        // Nếu không hỗ trợ Web Share API, copy URL vào clipboard
+        await navigator.clipboard.writeText(currentUrl);
+        setShareSuccess(true);
+        // Reset trạng thái sau 2 giây
+        setTimeout(() => setShareSuccess(false), 2000);
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+      alert('Không thể chia sẻ. Vui lòng thử lại.');
     }
   };
 
@@ -81,7 +106,14 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) 
             <FaDownload />
             <span>Tải xuống PDF</span>
           </button>
-          <button className="btn"><FaShareAlt /><span>Share</span></button>
+          <button 
+            className={`btn ${shareSuccess ? 'success' : ''}`} 
+            onClick={handleShare}
+            aria-label={'Chia sẻ công thức'}
+          >
+            <FaShareAlt />
+            <span>{shareSuccess ? 'Đã sao chép!' : 'Chia sẻ'}</span>
+          </button>
           <button className="btn donate-btn" onClick={() => setShowDonate(true)}><FaDonate /><span>Donate</span></button>
 
           {isRecipeAuthor && (

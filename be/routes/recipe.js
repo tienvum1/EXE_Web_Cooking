@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const recipeController = require('../controllers/recipeController');
+const likeController = require('../controllers/likeController');
 const auth = require('../middlewares/auth');
 const multer = require('multer');
 const path = require('path');
@@ -29,6 +30,10 @@ router.post(
   recipeController.create
 );
 // ====================================================================
+
+// Like routes - đặt trước route /:id để tránh conflict
+router.post('/like', auth, likeController.likeRecipe);
+router.get('/like-status/:recipeId', auth, likeController.checkLikeStatus);
 
 router.get('/', recipeController.getAll);
 router.get('/newest', recipeController.getNewest);
@@ -67,8 +72,6 @@ router.delete('/:id', auth, recipeController.deleteRecipe);
 
 // Add route for generating recipe PDF
 router.get('/:id/pdf', recipeController.generateRecipePdf);
-
-
 
 // Route để cập nhật trạng thái recipe (Chỉ admin)
 router.put('/:id/status', auth, recipeController.updateRecipeStatus);

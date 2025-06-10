@@ -1,8 +1,9 @@
 @import './_shared'; // đường dẫn tùy vào cấu trúc thư mục của bạn
 
 .recommended-recipes {
-  max-width: 1200px; // Tăng nhẹ để phù hợp với các màn hình lớn hơn
-  margin: $spacing-unit * 4 auto; // Tăng margin để tạo không gian thoáng hơn
+  width: 100%;
+  max-width: 1200px;
+  margin: $spacing-unit * 2 auto;
   padding: 0 $spacing-unit * 2;
   background: linear-gradient(180deg, $background-light 0%, $white 100%); // Thêm gradient nhẹ để tạo chiều sâu
   border-radius: $border-radius * 1.5; // Bo góc lớn hơn cho cảm giác mềm mại
@@ -14,12 +15,12 @@
     font-weight: 700;
     color: $primary-text;
     text-align: center;
-    align-items: center;
-    margin-bottom: $spacing-unit * 3; // Tăng khoảng cách để tạo không gian
+    margin-bottom: $spacing-unit * 4; // Tăng khoảng cách để tạo không gian
     text-transform: uppercase;
     letter-spacing: 1.5px; // Tăng khoảng cách chữ cho sang trọng
     position: relative; // Để thêm hiệu ứng gạch chân
     display: inline-block;
+    width: 100%;
 
     // Thêm gạch chân gradient
     &::after {
@@ -37,15 +38,33 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); // Tăng kích thước tối thiểu của card để rộng rãi hơn
-    gap: 19px ; // Tăng khoảng cách giữa các card
-    justify-items: center;
-    padding: $spacing-unit; // Thêm padding để không sát lề
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    justify-items: stretch;
+    padding: $spacing-unit;
     transition: $transition;
 
-    // Hiệu ứng khi hover vào grid (tăng nhẹ khoảng cách)
-    &:hover {
-      gap: $spacing-unit * 2.8;
+    // Đảm bảo mỗi item có kích thước đồng nhất
+    > * {
+      width: 100%;
+      height: 100%;
+      min-width: 0; // Cho phép item co lại khi cần
+    }
+
+    // Responsive adjustments
+    @media screen and (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media screen and (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
   }
 
@@ -63,11 +82,6 @@
         height: 3px;
       }
     }
-
-    &__grid {
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: $spacing-unit * 2;
-    }
   }
 
   @include responsive("sm") {
@@ -81,12 +95,6 @@
         width: 40px;
         bottom: -6px;
       }
-    }
-
-    &__grid {
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: $spacing-unit * 1.5;
-      padding: $spacing-unit / 2;
     }
   }
 }

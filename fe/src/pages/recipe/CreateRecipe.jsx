@@ -245,19 +245,19 @@ const CreateRecipe = () => {
               <div className="nutrition-title">Thông tin dinh dưỡng (trên 1 khẩu phần)</div>
               <div className="nutrition-fields">
                 <div className="nutrition-field">
-                  <label>Calories</label>
+                  <label>Calo</label>
                   <input type="number" min="0" placeholder="kcal" value={nutrition.calories} onChange={e => setNutrition(n => ({ ...n, calories: e.target.value }))} />
                 </div>
                 <div className="nutrition-field">
-                  <label>Fat</label>
+                  <label>Chất béo</label>
                   <input type="number" min="0" placeholder="g" value={nutrition.fat} onChange={e => setNutrition(n => ({ ...n, fat: e.target.value }))} />
                 </div>
                 <div className="nutrition-field">
-                  <label>Protein</label>
+                  <label>Đạm</label>
                   <input type="number" min="0" placeholder="g" value={nutrition.protein} onChange={e => setNutrition(n => ({ ...n, protein: e.target.value }))} />
                 </div>
                 <div className="nutrition-field">
-                  <label>Carbs</label>
+                  <label>Tinh bột</label>
                   <input type="number" min="0" placeholder="g" value={nutrition.carbs} onChange={e => setNutrition(n => ({ ...n, carbs: e.target.value }))} />
                 </div>
               </div>
