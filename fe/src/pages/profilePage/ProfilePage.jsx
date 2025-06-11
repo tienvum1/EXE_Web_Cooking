@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import Sidebar from '../../components/sidebar/Sidebar';
 import RecipeCard from '../../components/recipeCard/RecipeCard';
-import { getUserWithRecipes, getCurrentUser, updateUserProfile, followUser } from '../../api/user';
+import { getUserWithRecipes, getCurrentUser, updateUserProfile, followUser, updateUserAvatar } from '../../api/user';
 import './ProfilePage.scss';
 
 const ProfilePage = () => {
@@ -16,6 +16,8 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({});
   const [isCurrentUserProfile, setIsCurrentUserProfile] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,6 +112,43 @@ const ProfilePage = () => {
     }
   };
 
+  const handleAvatarClick = () => {
+    if (isCurrentUserProfile && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Vui lòng chọn file ảnh');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Kích thước ảnh không được vượt quá 5MB');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const updatedUser = await updateUserAvatar(formData);
+      setUser(updatedUser);
+    } catch (err) {
+      console.error('Error uploading avatar:', err);
+      alert('Không thể cập nhật ảnh đại diện. Vui lòng thử lại sau.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   if (loading) return <div className="loading">Đang tải...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!user) return null;
@@ -121,16 +160,36 @@ const ProfilePage = () => {
       <div className="profile-page">
         {/* Always display profile information */}
         <div className="profile-info">
-          <div className="profile-avatar">
-            {user.avatar ? (
+          <div 
+            className={`profile-avatar ${isCurrentUserProfile ? 'editable' : ''}`}
+            onClick={handleAvatarClick}
+          >
+            {uploadingAvatar ? (
+              <div className="uploading-spinner">Đang tải lên...</div>
+            ) : user.avatar ? (
               <img src={user.avatar} alt="avatar" />
             ) : (
-              user.fullName ? user.fullName[0] : user.username[0]
+              <div className="avatar-placeholder">
+                {user.fullName ? user.fullName[0] : user.username[0]}
+              </div>
             )}
+            {isCurrentUserProfile && (
+              <div className="avatar-edit-overlay">
+                <i className="fas fa-camera"></i>
+                <span>Thay đổi ảnh</span>
+              </div>
+            )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
           </div>
           <div className="name">{user.fullName || user.username}</div>
           <div className="username">@{user.username}</div>
-          <div className="profile-introduce" style={{ marginTop: '10px' }}> Giới thiệu {user.introduce}</div>
+          <div className="profile-introduce" style={{ marginTop: '10px' }}>  {user.introduce}</div>
           <div className="profile-stats">
             <span>
               <b>{user.following?.length || 0}</b> Đang theo dõi

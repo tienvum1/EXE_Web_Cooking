@@ -10,8 +10,8 @@ const settings = [
   'Điều khoản Dịch Vụ và Chính sách',
   'Những câu hỏi thường gặp',
   'Góp Ý',
-  'Tải ứng dụng Cookpad để tham gia cộng đồng nấu ăn tại gia lớn nhất Việt Nam!',
-  'Cộng tác với Cookpad',
+  'Tải ứng dụng Fitmeal để tham gia cộng đồng nấu ăn tại gia lớn nhất Việt Nam!',
+  'Cộng tác với Fitmeal',
 ];
 
 const SettingPage = () => (

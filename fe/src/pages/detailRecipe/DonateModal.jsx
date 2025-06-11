@@ -24,10 +24,11 @@ const DonateModal = ({
     try {
       const payload = { amount: Number(donateAmount), message: donateMsg };
       let url = `${process.env.REACT_APP_API_URL}/api/payment`;
+      console.log(donationType);
 
       if (donationType === 'recipe') {
         if (!recipeId) throw new Error('Recipe ID is missing for recipe donation.');
-        url += '/donate';
+        url += '/donate-recipe';
         payload.recipeId = recipeId;
       } else if (donationType === 'blog') {
         if (!authorId) throw new Error('Author ID is missing for blog donation.');

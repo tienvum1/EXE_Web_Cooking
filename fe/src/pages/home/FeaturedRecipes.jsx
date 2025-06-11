@@ -7,7 +7,7 @@ const mapRecipe = (r) => ({
   id: r._id,
   mainImage: r.mainImage || '',
   title: r.title,
-  time: r.cookTime ? `${r.cookTime} Minutes` : '',
+  time: r.cookTime ? `${r.cookTime}` : '',
   type: r.type || '',
   author: r.author?.username || '',
 });
@@ -28,11 +28,11 @@ const FeaturedRecipes = () => {
   return (
     <section style={{ margin: '2rem 0' }}>
       {/* Title */}
-      <h2 style={styles.title}>Featured Delicious Recipes</h2>
+      <h2 style={styles.title}>Công Thức Món Ngon Đặc Sắc</h2>
 
       {/* Description */}
       <p style={styles.description}>
-        Enjoy our most popular and highly rated dishes, selected just for you.
+      Tận hưởng những công thức nổi bật, được nhiều người đánh giá cao 
       </p>
 
       {/* View All Button */}

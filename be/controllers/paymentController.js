@@ -143,6 +143,7 @@ exports.donateToAuthor = async (req, res) => {
       type: "donate",
       message,
       recipe: recipeId,
+      status : "success",
     });
 
     // Lấy tên tác giả và tên món ăn
@@ -203,6 +204,7 @@ exports.donateToAuthor = async (req, res) => {
         from: userId,
         recipeTitle,
         senderName,
+        
       } // Lưu số tiền nhận được vào data
     );
 

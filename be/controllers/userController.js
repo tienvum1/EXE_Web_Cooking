@@ -265,3 +265,30 @@ exports.resetPassword = async (req, res) => {
     res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn." });
   }
 };
+
+exports.uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'Không tìm thấy file ảnh' });
+    }
+
+    const userId = req.user._id;
+    const avatarPath = `/uploads/avatars/${req.file.filename}`;
+
+    // Cập nhật avatar trong database
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { avatar: avatarPath },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+    }
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    res.status(500).json({ message: 'Lỗi khi upload ảnh đại diện' });
+  }
+};

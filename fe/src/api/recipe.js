@@ -13,7 +13,9 @@ export const fetchRecipeById = async (id) => {
   return res.data;
 };
 export const fetchRecipeApproveById = async (id) => {
-  const res = await axios.get(`${API_URL}/api/recipes/${id}`, { withCredentials: true });
+  const res = await axios.get(`${API_URL}/api/recipes/${id}`, {
+    withCredentials: true
+  });
   return res.data;
 };
 export const fetchNewestRecipes = async () => {

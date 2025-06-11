@@ -58,6 +58,7 @@ app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads')); 
 
 // Đường dẫn đến thư mục upload
 const uploadDir = path.join(__dirname, 'public/uploads/recipes');

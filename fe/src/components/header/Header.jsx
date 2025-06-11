@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import TopupModal from '../../pages/wallet/StripeTopupModal.jsx';
 import { getMe, logout } from '../../api/auth';
 import RecipeContext from '../../contexts/RecipeContext';
+import axios from 'axios';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false); 
@@ -14,6 +15,8 @@ const Header = () => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
+  const [hasNewTransactions, setHasNewTransactions] = useState(false);
 
   const location = useLocation();
 
@@ -125,6 +128,36 @@ const Header = () => {
   // Check if current page is a recipe detail page
   const isRecipeDetailPage = location.pathname.startsWith('/detail-recipe/') && location.pathname.split('/').length === 3;
 
+  // Function to check for new notifications and transactions
+  const checkNewItems = async () => {
+    if (!user?._id) return;
+    
+    try {
+      // Check for new notifications
+      const notificationsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/notifications/unread`, {
+        withCredentials: true
+      });
+      setHasNewNotifications(notificationsRes.data.length > 0);
+
+      // Check for new transactions
+      const transactionsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions/recent`, {
+        withCredentials: true
+      });
+      setHasNewTransactions(transactionsRes.data.some(t => !t.isRead));
+    } catch (error) {
+      console.error('Error checking new items:', error);
+    }
+  };
+
+  // Check for new items periodically
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkNewItems();
+      const interval = setInterval(checkNewItems, 30000); // Check every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, user?._id]);
+
   if (loading) {
     return <header className="header">Đang tải header...</header>;
   }
@@ -147,10 +180,10 @@ const Header = () => {
         <div className="header__logo" style={{cursor: 'pointer'}} onClick={() => navigate('/')}>FitMeal</div>
 
         <nav className="header__nav">
-          <a href="/">Home</a>
-          <a href="/recipes">Recipes</a>
-          <a href="/blog">Blog</a>
-          <a href="/menu-suggestion">Menu Suggestion</a>
+          <a href="/">Trang chủ</a>
+          <a href="/recipes">Công thức</a>
+          <a href="/blog">Bài viết</a>
+          <a href="/menu-suggestion">Gợi ý menu</a>
           <div className="header__dropdown">
             <span className="header__dropdown-toggle" tabIndex={0}>
               Công cụ tính các chỉ số
@@ -161,7 +194,7 @@ const Header = () => {
               <a href="/tools/bmr-tdee">Công cụ tính BMR và TDEE</a>
             </div>
           </div>
-          <a href="/about">About Us</a>
+          <a href="/about">Giới thiệu </a>
         </nav>
         <div className="header__actions">
           {isAuthenticated ? (
@@ -170,6 +203,24 @@ const Header = () => {
                 {user?.avatar
                   ? <img src={user.avatar} alt="avatar" />
                   : (user?.username ? user.username[0].toUpperCase() : 'U')}
+                {hasNewNotifications && (
+                  <span className="notification-badge" style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-5px',
+                    backgroundColor: '#ff4444',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '18px',
+                    height: '18px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <i className="fas fa-bell"></i>
+                  </span>
+                )}
               </div>
               {menuOpen && isAuthenticated && (
                 <div className="header__user-menu" ref={menuRef}>
@@ -238,6 +289,54 @@ const Header = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <i className="fas fa-paper-plane"></i> Gửi Góp Ý
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/notifications');
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-bell"></i> Thông báo
+                    {hasNewNotifications && (
+                      <span style={{
+                        backgroundColor: '#ff4444',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        fontSize: '12px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginLeft: '8px'
+                      }}>!</span>
+                    )}
+                  </div>
+                  <div
+                    className="header__user-menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/transactions');
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <i className="fas fa-exchange-alt"></i> Giao dịch
+                    {hasNewTransactions && (
+                      <span style={{
+                        backgroundColor: '#ff4444',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        fontSize: '12px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginLeft: '8px'
+                      }}>!</span>
+                    )}
                   </div>
                   <div className="header__user-menu-divider"></div>
                   <div className="header__user-menu-item header__user-menu-logout" onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Thoát</div>

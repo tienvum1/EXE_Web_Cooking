@@ -166,12 +166,15 @@ exports.getRecipeApproveById = async (req, res) => {
     if (req.user && req.user.role === 'admin') {
       recipe = await Recipe.findById(recipeId).populate('author', 'username createdAt');
     } else {
-      // For regular users, only fetch if status is 'approved'
-      recipe = await Recipe.findOne({ _id: recipeId, status: 'approved' }).populate('author', 'username createdAt');
+      // For non-authenticated users and regular users, only fetch if status is 'approved'
+      recipe = await Recipe.findOne({ _id: recipeId, status: 'approved' })
+        .populate('author', 'username createdAt');
     }
 
     if (!recipe) {
-      const message = (req.user && req.user.role === 'admin') ? 'Không tìm thấy recipe.' : 'Không tìm thấy recipe hoặc recipe chưa được duyệt.';
+      const message = (req.user && req.user.role === 'admin') 
+        ? 'Không tìm thấy recipe.' 
+        : 'Không tìm thấy recipe hoặc recipe chưa được duyệt.';
       return res.status(404).json({ message: message });
     }
 

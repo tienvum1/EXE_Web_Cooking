@@ -5,7 +5,7 @@ import './RecipeHeader.scss';
 import DonateModal from './DonateModal';
 import RecipeContext from '../../contexts/RecipeContext';
 
-const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) => {
+const RecipeHeader = ({ title, user, cookTime, recipeId,categories }) => {
   const [showDonate, setShowDonate] = useState(false);
   const [donateAmount, setDonateAmount] = useState('');
   const [donateMsg, setDonateMsg] = useState('');
@@ -81,7 +81,7 @@ const RecipeHeader = ({ title, user, prepTime, cookTime, recipeId,categories }) 
         </div>
 
         <div className="time-info">
-          <div className="item"><FaRegClock /> <span>Cook:</span> {cookTime}</div>
+          <div className="item"><FaRegClock /> <span>Thời gian nấu:</span> {cookTime}</div>
           <div className="item"><FaUtensils />
             {
               categories && Array.isArray(categories) && categories.length > 0 ? (

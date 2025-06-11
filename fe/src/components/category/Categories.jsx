@@ -13,7 +13,7 @@ const Categories = () => {
   return (
     <section className="categories">
       <div className="categories__header">
-        <h2>Categories</h2>
+        <h2>Danh mục món ăn</h2>
       </div>
       <div className="categories__list">
         {categories.map(cat => (
