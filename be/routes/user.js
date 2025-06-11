@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const auth = require('../middlewares/auth');
+const upload = require('../middleware/upload');
 
 router.get('/me', auth, userController.getMe);
+router.post('/avatar', auth, upload.single('avatar'), userController.uploadAvatar);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 router.get('/:id', userController.getUserById);

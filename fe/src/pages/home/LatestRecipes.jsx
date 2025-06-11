@@ -9,7 +9,7 @@ const mapRecipe = (r) => {
     mainImage: r.mainImage,
     mainImageType: r.mainImageType,
     title: r.title,
-    time: r.cookTime ? `${r.cookTime} Minutes` : '',
+    time: r.cookTime ? `${r.cookTime} ` : '',
     type: r.type || '',
     author: r.author?.username || '',
   };
@@ -31,11 +31,11 @@ const LatestRecipes = () => {
   return (
     <section style={{ margin: '2rem 0' }}>
       {/* Title */}
-      <h2 style={styles.title}>Latest Healthy Recipes</h2>
+      <h2 style={styles.title}>Công Thức Ăn Lành Mạnh Mới Nhất</h2>
 
       {/* Description */}
       <p style={styles.description}>
-        Discover the latest, healthy and delicious dishes updated daily.
+      Khám phá những món ăn ngon, bổ dưỡng được cập nhật mỗi ngày.
       </p>
 
       {/* View All button */}

@@ -162,13 +162,13 @@ const SignupPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={8} // Add minLength attribute
+                minLength={8}
               />
               <span
-                className="password-toggle" // Add password toggle span
+                className="password-toggle"
                 onClick={togglePasswordVisibility}
               >
-                {showPassword ? '🙈' : '👁️'} {/* Toggle icon */}
+                {showPassword ? '🙈' : '👁️'}
               </span>
             </div>
           </div>

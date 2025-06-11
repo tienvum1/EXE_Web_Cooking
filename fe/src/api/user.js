@@ -67,3 +67,17 @@ export const changePassword = async (passwordData) => {
     throw error; // Re-throw to be handled by the calling component
   }
 };
+
+export const updateUserAvatar = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/users/avatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

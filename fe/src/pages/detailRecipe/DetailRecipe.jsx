@@ -37,30 +37,36 @@ const DetailRecipe = () => {
       setError('');
       try {
         const data = await fetchRecipeApproveById(id);
+        if (!data) {
+          throw new Error('Không tìm thấy công thức');
+        }
         console.log('Fetched recipe data:', data);
         setRecipeData(data);
 
-        const currentUser = await getMe();
-        if (data.author && currentUser && data.author._id === currentUser._id) {
-          setIsRecipeAuthor(true);
-        } else {
-          setIsRecipeAuthor(false);
-        }
+        try {
+          const currentUser = await getMe();
+          if (data.author && currentUser && data.author._id === currentUser._id) {
+            setIsRecipeAuthor(true);
+          }
 
-        if (data.author && data.author._id) {
-          const user = await fetchUserById(data.author._id);
-          setAuthorInfo(user);
-        }
+          if (data.author && data.author._id) {
+            const user = await fetchUserById(data.author._id);
+            setAuthorInfo(user);
+          }
 
-        // Check if user has liked the recipe
-        if (currentUser) {
-          const likeStatus = await checkLikeStatus(id);
-          setIsLiked(likeStatus.liked);
+          // Check if user has liked the recipe
+          if (currentUser) {
+            const likeStatus = await checkLikeStatus(id);
+            setIsLiked(likeStatus.liked);
+          }
+        } catch (userErr) {
+          console.log('User not authenticated or error fetching user data:', userErr);
+          // Continue with recipe display even if user data fails
         }
 
       } catch (err) {
-        setError('Không thể tải chi tiết công thức.');
         console.error('Fetch recipe error:', err);
+        setError(err.response?.data?.message || 'Không thể tải chi tiết công thức. Vui lòng thử lại sau.');
       } finally {
         setLoading(false);
       }
@@ -120,7 +126,7 @@ const DetailRecipe = () => {
        
         <RecipeHeader
           title={recipeData.title}
-          user={{ name: recipeData.author?.username, date: recipeData.createdAt, avatar: '/avatar.jpg' }}
+          user={{ name: recipeData.author?.username, date: recipeData.createdAt, avatar :authorInfo?.avatar}}
           prepTime={recipeData.prepTime || ''}
           cookTime={recipeData.cookTime || ''}
           servings={recipeData.servings}

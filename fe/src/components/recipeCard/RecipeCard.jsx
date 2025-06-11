@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RecipeCard.scss';
 
-const RecipeCard = ({ id, mainImage, title, time, type, author }) => {
+const RecipeCard = ({ id, mainImage, title, time, author }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
