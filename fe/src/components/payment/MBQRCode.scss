@@ -1,0 +1,120 @@
+.mb-qr-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    .account-info {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+
+        h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+
+            &:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+
+            .label {
+                color: #6c757d;
+                font-weight: 500;
+            }
+
+            .value {
+                color: #2c3e50;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .qr-section {
+        .amount-input {
+            margin-bottom: 1.5rem;
+
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #2c3e50;
+                font-weight: 500;
+            }
+
+            input {
+                width: 100%;
+                padding: 0.8rem;
+                border: 2px solid #e9ecef;
+                border-radius: 6px;
+                font-size: 1rem;
+                transition: border-color 0.3s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: #007bff;
+                }
+            }
+
+            .error-message {
+                color: #dc3545;
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+        }
+
+        .qr-code {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+
+            canvas {
+                margin: 0 auto;
+                padding: 1rem;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .qr-note {
+                margin-top: 1rem;
+                color: #6c757d;
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .mb-qr-container {
+        margin: 1rem;
+        padding: 1rem;
+
+        .account-info {
+            padding: 1rem;
+        }
+
+        .qr-section {
+            .qr-code {
+                canvas {
+                    width: 200px;
+                    height: 200px;
+                }
+            }
+        }
+    }
+} 

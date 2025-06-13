@@ -26,7 +26,7 @@ const transactionRoutes = require('./routes/transaction');
 const notificationRoutes = require('./routes/notification');
 const chatgptRoutes = require('./routes/chatgpt');
 const aiRoutes = require('./routes/ai');
-
+const menuRoutes = require('./routes/menuRoutes');
 
 // ... (các route khác nếu cần)
 
@@ -87,6 +87,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chatgpt', chatgptRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/menus', menuRoutes);
 
 
 // ... (các route khác nếu cần)

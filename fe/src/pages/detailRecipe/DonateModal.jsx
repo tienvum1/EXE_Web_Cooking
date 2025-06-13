@@ -24,23 +24,43 @@ const DonateModal = ({
     try {
       const payload = { amount: Number(donateAmount), message: donateMsg };
       let url = `${process.env.REACT_APP_API_URL}/api/payment`;
-      console.log(donationType);
+      
+      // Debug logs
+      console.log('API URL:', process.env.REACT_APP_API_URL);
+      console.log('Donation Type:', donationType);
+      console.log('Recipe ID:', recipeId);
+      console.log('Author ID:', authorId);
 
       if (donationType === 'recipe') {
-        if (!recipeId) throw new Error('Recipe ID is missing for recipe donation.');
+        if (!recipeId) {
+          console.error('Recipe ID is missing');
+          throw new Error('Recipe ID is missing for recipe donation.');
+        }
         url += '/donate-recipe';
         payload.recipeId = recipeId;
       } else if (donationType === 'blog') {
-        if (!authorId) throw new Error('Author ID is missing for blog donation.');
+        if (!authorId) {
+          console.error('Author ID is missing');
+          throw new Error('Author ID is missing for blog donation.');
+        }
         url += '/donate-blog-author';
         payload.authorId = authorId;
       } else {
+        console.error('Invalid donation type:', donationType);
         throw new Error('Invalid donation type specified.');
       }
 
-      console.log('Sending donation request to:', url, 'with payload:', payload);
+      console.log('Final API URL:', url);
+      console.log('Request Payload:', payload);
 
-      await axios.post(url, payload, { withCredentials: true });
+      const response = await axios.post(url, payload, { 
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('API Response:', response.data);
       setDonateResult('success');
       setTimeout(() => {
         setDonateAmount('');
@@ -50,7 +70,12 @@ const DonateModal = ({
       }, 1500);
     } catch (err) {
       console.error('Error during donation API call:', err);
-      setDonateResult(err.response?.data?.message || 'Donate thất bại!');
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setDonateResult(err.response?.data?.message || 'Donate thất bại! Vui lòng thử lại sau.');
     } finally {
       setDonateLoading(false);
     }

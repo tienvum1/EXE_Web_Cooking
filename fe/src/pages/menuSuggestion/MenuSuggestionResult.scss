@@ -1,0 +1,238 @@
+.menu-result-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  .result-title {
+    font-size: 2.5rem;
+    color: #2d3748;
+    margin-bottom: 2.5rem;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .meal-section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    .meal-title {
+      font-size: 2rem;
+      color: #2d3748;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: 700;
+      position: relative;
+      padding-bottom: 1rem;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, #b2f5c2, #8af49c);
+        border-radius: 2px;
+      }
+    }
+
+    .nutrition-summary {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      h3 {
+        font-size: 1.4rem;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .nutrition-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+
+        .nutrition-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.8rem;
+          padding: 1.2rem;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+          }
+
+          .label {
+            font-size: 1.1rem;
+            color: #4a5568;
+            font-weight: 500;
+          }
+
+          .value {
+            font-size: 1.4rem;
+            color: #2d3748;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .recipes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 1rem 0;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 16px;
+
+    .save-menu-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      width: 100%;
+      max-width: 400px;
+
+      .menu-name-input {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #b2f5c2;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        outline: none;
+        transition: all 0.3s ease;
+        background: #fff;
+
+        &:focus {
+          border-color: #8af49c;
+          box-shadow: 0 0 0 3px rgba(138, 244, 156, 0.2);
+        }
+
+        &::placeholder {
+          color: #a0aec0;
+        }
+      }
+
+      .save-btn {
+        width: 100%;
+        padding: 1.2rem;
+        background: linear-gradient(135deg, #b2f5c2 0%, #8af49c 100%);
+        color: #2d3748;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(138, 244, 156, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+      }
+
+      .save-message {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.1rem;
+
+        &.success {
+          background-color: rgba(138, 244, 156, 0.2);
+          color: #2e7d32;
+        }
+
+        &.error {
+          background-color: rgba(244, 67, 54, 0.1);
+          color: #d32f2f;
+        }
+      }
+    }
+
+    .back-btn {
+      padding: 1.2rem 2.5rem;
+      background: #fff;
+      color: #2d3748;
+      border: 2px solid #b2f5c2;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #f7fff8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(138, 244, 156, 0.2);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-result-page {
+    padding: 1rem;
+
+    .result-title {
+      font-size: 2rem;
+    }
+
+    .meal-section {
+      padding: 1.5rem;
+
+      .meal-title {
+        font-size: 1.8rem;
+      }
+
+      .nutrition-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .recipes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .action-buttons {
+      padding: 1.5rem;
+    }
+  }
+} 

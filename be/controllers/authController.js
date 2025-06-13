@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const validator = require("validator");
 const User = require("../models/User");
 const dotenv = require("dotenv");
+const Wallet = require("../models/Wallet");
 dotenv.config();
 const passport = require("passport"); // Import passport here
 const crypto = require('crypto'); // Import crypto module
@@ -79,6 +80,13 @@ exports.register = async (req, res) => {
     });
 
     await user.save();
+
+    // Tạo wallet mới với số dư 0 cho user
+    const wallet = new Wallet({
+      user: user._id,
+      balance: 0
+    });
+    await wallet.save();
 
     const emailToken = jwt.sign({ user_id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",

@@ -318,7 +318,7 @@ const Header = () => {
                     className="header__user-menu-item"
                     onClick={() => {
                       setMenuOpen(false);
-                      navigate('/transactions');
+                      navigate('/wallet/history');
                     }}
                     style={{ cursor: 'pointer' }}
                   >
