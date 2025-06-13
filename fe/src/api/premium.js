@@ -26,13 +26,3 @@ export const checkPremiumStatus = async () => {
         throw error.response?.data || { message: 'Lỗi khi kiểm tra trạng thái premium' };
     }
 };
-
-// Hủy gói premium
-export const cancelPremium = async () => {
-    try {
-        const response = await axios.post(`${API_URL}/api/premium/cancel`, {}, { withCredentials: true });
-        return response.data;
-    } catch (error) {
-        throw error.response?.data || { message: 'Lỗi khi hủy gói premium' };
-    }
-}; 

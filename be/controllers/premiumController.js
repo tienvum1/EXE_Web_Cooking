@@ -29,7 +29,12 @@ exports.subscribePremium = async (req, res) => {
         if (!wallet || wallet.balance < amount) {
             return res.status(400).json({
                 success: false,
-                message: 'Số dư ví không đủ để đăng ký gói premium'
+                message: 'Số dư ví không đủ để đăng ký gói premium',
+                type: 'error',
+                data: {
+                    requiredAmount: amount,
+                    currentBalance: wallet?.balance || 0
+                }
             });
         }
 
@@ -37,7 +42,11 @@ exports.subscribePremium = async (req, res) => {
         if (user.isPremium && user.endDate > new Date()) {
             return res.status(400).json({
                 success: false,
-                message: 'Bạn đã là thành viên Premium và gói vẫn còn hiệu lực'
+                message: 'Bạn đã là thành viên Premium và gói vẫn còn hiệu lực',
+                type: 'info',
+                data: {
+                    endDate: user.endDate
+                }
             });
         }
 
@@ -75,6 +84,7 @@ exports.subscribePremium = async (req, res) => {
         const response = {
             success: true,
             message: 'Đăng ký gói premium thành công',
+            type: 'success',
             data: {
                 transaction,
                 subscription: {
@@ -91,39 +101,25 @@ exports.subscribePremium = async (req, res) => {
         console.error('Lỗi khi đăng ký gói premium:', error);
         res.status(500).json({
             success: false,
-            message: 'Lỗi khi đăng ký gói premium'
+            message: 'Lỗi khi đăng ký gói premium',
+            type: 'error',
+            error: error.message
         });
     }
 };
 
-// Lấy danh sách gói premium
-exports.getPremiumPackages = async (req, res) => {
-    try {
-        res.json({
-            success: true,
-            data: [{
-                name: 'Gói Premium',
-                price: 25000,
-                duration: 30,
-                description: 'Mở khóa tất cả tính năng đặc biệt',
-                features: ['Bộ lọc nâng cao', 'Gợi ý menu', 'Lưu không giới hạn', 'Tải công thức offline', 'Ưu tiên hỗ trợ']
-            }]
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi khi lấy danh sách gói premium'
-        });
-    }
-};
 
 // Kiểm tra trạng thái premium
 exports.checkPremiumStatus = async (req, res) => {
     try {
         const userId = req.user.user_id;
+        console.log('checkPremiumStatus - User ID:', userId);
+
         const user = await User.findById(userId);
+        console.log('checkPremiumStatus - User found:', user ? 'Yes' : 'No');
 
         if (!user) {
+            console.log('checkPremiumStatus - User not found, sending 404.');
             return res.status(404).json({
                 success: false,
                 message: 'Người dùng không tồn tại'
@@ -132,11 +128,17 @@ exports.checkPremiumStatus = async (req, res) => {
 
         // Kiểm tra xem subscription có hết hạn chưa
         if (user.isPremium && user.endDate < new Date()) {
+            console.log('checkPremiumStatus - Premium expired, updating status.');
             user.isPremium = false;
             await user.save();
         }
 
-        res.json({
+        console.log('checkPremiumStatus - Preparing to send successful response.');
+        console.log('checkPremiumStatus - Type of res:', typeof res);
+        console.log('checkPremiumStatus - res object:', res); 
+
+        // Original complex response
+        return res.json({
             success: true,
             data: {
                 isPremium: user.isPremium,
@@ -146,47 +148,19 @@ exports.checkPremiumStatus = async (req, res) => {
                 }
             }
         });
+
     } catch (error) {
-        console.error('Lỗi khi kiểm tra trạng thái premium:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi khi kiểm tra trạng thái premium'
-        });
+        console.error('Lỗi khi kiểm tra trạng thái premium (catch block):', error);
+        console.log('checkPremiumStatus - Entering catch block for sending error response.');
+        
+        if (res && typeof res.status === 'function' && typeof res.json === 'function') {
+            return res.status(500).json({
+                success: false,
+                message: 'Lỗi khi kiểm tra trạng thái premium',
+                error: error.message
+            });
+        } else {
+            console.error('checkPremiumStatus - Cannot send 500 error response: res object is invalid.', res);
+        }
     }
 };
-
-// Hủy gói premium
-exports.cancelPremium = async (req, res) => {
-    try {
-        const userId = req.user.user_id;
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'Người dùng không tồn tại'
-            });
-        }
-
-        if (!user.isPremium) {
-            return res.status(400).json({
-                success: false,
-                message: 'Bạn chưa đăng ký gói premium'
-            });
-        }
-
-        user.isPremium = false;
-        await user.save();
-
-        res.json({
-            success: true,
-            message: 'Hủy gói premium thành công'
-        });
-    } catch (error) {
-        console.error('Lỗi khi hủy gói premium:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi khi hủy gói premium'
-        });
-    }
-}; 

@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
   followers:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
   resetPasswordToken: String,
   resetPasswordExpires: Date,
-    isPremium: {
+  isPremium: {
       type: Boolean,
       default: false
     },

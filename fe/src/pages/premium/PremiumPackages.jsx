@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { subscribePremium, checkPremiumStatus } from '../../api/premium';
-import { toast } from 'react-toastify';
 import './PremiumPackages.scss';
 import Header from '../../components/header/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
@@ -14,6 +15,7 @@ const PremiumPackages = () => {
     const [isPremium, setIsPremium] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [premiumEndDate, setPremiumEndDate] = useState(null); // New state for end date
     const navigate = useNavigate();
 
     // Kiểm tra trạng thái premium
@@ -21,9 +23,13 @@ const PremiumPackages = () => {
         const checkPremium = async () => {
             try {
                 const response = await checkPremiumStatus();
-                setIsPremium(response.data.isPremium);
+                if (response.data) { // Ensure response.data exists
+                    setIsPremium(response.data.isPremium); // Assuming isPremium is directly in response.data
+                    if (response.data.isPremium && response.data.subscription?.endDate) {
+                        setPremiumEndDate(new Date(response.data.subscription.endDate));
+                    }
+                }
             } catch (error) {
-                toast.error('Không thể tải thông tin gói premium');
                 console.error('Error checking premium status:', error);
             } finally {
                 setLoading(false);
@@ -47,7 +53,6 @@ const PremiumPackages = () => {
     // Xử lý khi nhấn nút đăng ký
     const handleSubscribeClick = () => {
         if (isPremium) {
-            toast.info('Bạn đã là thành viên Premium');
             return;
         }
         setShowConfirmModal(true);
@@ -59,31 +64,56 @@ const PremiumPackages = () => {
             setProcessing(true);
             setShowConfirmModal(false);
             
-            const response = await subscribePremium();
+            console.log('Attempting to subscribe to premium...');
+            const response = await subscribePremium({
+                amount: PREMIUM_PRICE,
+                type: 'register_premium',
+                transferContent: 'register_premium'
+            });
             
-            if (response.data.success) {
-                toast.success('Đăng ký gói premium thành công!');
+            console.log('API response from subscribe:', response);
+            console.log('response.data.success from subscribe:', response.success);
+
+            if (response.success == true) {
+                console.log('Entering success block...');
+                window.alert('Đăng ký gói Premium thành công!');
                 setIsPremium(true);
-                navigate('/profile');
+                setPremiumEndDate(new Date(response.data.data.subscription.endDate)); // Update end date on successful subscription
+                setTimeout(() => {
+                    navigate('/profile');
+                }, 2000);
             } else {
-                handleSubscriptionError(response.data.message);
+                console.log('Entering error block (response.data.success is false) from subscribe...');
+                handleSubscriptionError(response.data);
             }
         } catch (error) {
-            handleSubscriptionError(error.response?.data?.message);
+            console.log('Entering catch block from subscribe...');
+            console.log('Error response from subscribe:', error.response);
+            handleSubscriptionError(error.response?.data || { message: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.' });
         } finally {
             setProcessing(false);
         }
     };
 
     // Xử lý lỗi đăng ký
-    const handleSubscriptionError = (errorMessage) => {
-        if (errorMessage?.toLowerCase().includes('insufficient')) {
-            toast.error('Số dư ví không đủ để đăng ký gói premium. Vui lòng nạp thêm tiền vào ví.');
-        } else if (errorMessage?.toLowerCase().includes('already premium')) {
-            toast.info('Bạn đã là thành viên Premium');
+    const handleSubscriptionError = (errorData) => {
+        console.log('handleSubscriptionError called with:', errorData);
+        const { message, type, data } = errorData || {};
+
+        console.log('Error message from API:', message);
+        console.log('Error type from API:', type);
+        console.log('Error data from API:', data);
+
+        if (!message) {
+            return;
+        }
+
+        if (message.toLowerCase().includes('số dư ví không đủ') || message.toLowerCase().includes('số dư không đủ')) {
+        } else if (message.toLowerCase().includes('đã là thành viên premium')) {
             setIsPremium(true);
-        } else {
-            toast.error(errorMessage || 'Lỗi khi đăng ký gói premium');
+            if (data?.endDate) {
+                setPremiumEndDate(new Date(data.endDate));
+            }
         }
     };
 
@@ -95,31 +125,44 @@ const PremiumPackages = () => {
     // Danh sách tính năng premium
     const premiumFeatures = [
         {
-            icon: '🔍',
-            title: 'Bộ lọc nâng cao',
-            description: 'Tìm kiếm công thức với nhiều tiêu chí hơn như thời gian nấu, calories, nguyên liệu...'
-        },
-        {
-            icon: '📋',
-            title: 'Gợi ý menu',
-            description: 'Nhận gợi ý menu hàng tuần phù hợp với sở thích và nhu cầu của bạn'
+            icon: '✅',
+            title: 'Gợi ý thực đơn nâng cao',
+            description: 'Nhận các gợi ý thực đơn được cá nhân hóa và đa dạng hơn.'
         },
         {
             icon: '💾',
-            title: 'Lưu không giới hạn',
-            description: 'Lưu trữ công thức yêu thích không giới hạn (Gói thường chỉ được lưu 5 món)'
+            title: 'Lưu công thức không giới hạn',
+            description: 'Lưu trữ công thức yêu thích không giới hạn (Gói thường chỉ được lưu 5 món).',
         },
         {
-            icon: '📱',
-            title: 'Tải công thức offline',
-            description: 'Tải công thức về để xem offline, không cần kết nối internet'
+            icon: '🛡️',
+            title: 'Hỗ trợ ưu tiên',
+            description: 'Nhận được sự hỗ trợ nhanh chóng và ưu tiên từ đội ngũ của chúng tôi.'
         },
         {
-            icon: '⭐',
-            title: 'Ưu tiên hỗ trợ',
-            description: 'Được ưu tiên hỗ trợ và giải đáp thắc mắc từ đội ngũ chuyên gia'
+            icon: '🔓',
+            title: 'Truy cập không giới hạn',
+            description: 'Truy cập tất cả các công thức nấu ăn và tính năng mà không có giới hạn.'
+        },
+        {
+            icon: '🚫',
+            title: 'Trải nghiệm không quảng cáo',
+            description: 'Tận hưởng ứng dụng mà không bị gián đoạn bởi quảng cáo.'
+        },
+        {
+            icon: '💰',
+            title: 'Ưu đãi đặc biệt',
+            description: 'Nhận các ưu đãi và khuyến mãi độc quyền chỉ dành cho thành viên Premium.'
         }
     ];
+
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <p>Đang tải...</p>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -143,9 +186,8 @@ const PremiumPackages = () => {
                         <div className="features-grid">
                             {premiumFeatures.map((feature, index) => (
                                 <div key={index} className="feature-card">
-                                    <div className="feature-icon">{feature.icon}</div>
-                                    <h3>{feature.title}</h3>
-                                    <p>{feature.description}</p>
+                                    <h3 className="feature-title">{feature.icon} {feature.title}</h3>
+                                    <p className="feature-description">{feature.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -169,8 +211,7 @@ const PremiumPackages = () => {
                                 <ul>
                                     {premiumFeatures.map((feature, index) => (
                                         <li key={index}>
-                                            <i className="fas fa-check"></i>
-                                            {feature.title}
+                                            <i className="fas fa-check"></i> {feature.title}
                                         </li>
                                     ))}
                                 </ul>
@@ -188,29 +229,20 @@ const PremiumPackages = () => {
                 </div>
 
                 {showConfirmModal && (
-                    <div className="modal-overlay">
+                    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h3>Xác nhận đăng ký gói Premium   </h3>
+                                <h3 id="modal-title">Xác nhận đăng ký gói Premium</h3>
                                 <button className="close-button" onClick={handleCancelSubscribe} aria-label="Đóng">×</button>
                             </div>
                             <div className="modal-body">
-                                <p>Bạn có chắc chắn muốn đăng ký gói Premium với giá {PREMIUM_PRICE.toLocaleString('vi-VN')}₫/tháng?</p>
+                                <p>Bạn có chắc chắn muốn đăng ký gói Premium với giá {PREMIUM_PRICE.toLocaleString('vi-VN')}₫ không?</p>
+                                <p>Gói này sẽ có hiệu lực trong 30 ngày.</p>
                             </div>
-                            <div className="modal-buttons">
-                                <button 
-                                    className="confirm-button"
-                                    onClick={handleConfirmSubscribe}
-                                    disabled={processing}
-                                >
-                                    {processing ? 'Đang xử lý...' : 'Có, đăng ký ngay'}
-                                </button>
-                                <button 
-                                    className="cancel-button"
-                                    onClick={handleCancelSubscribe}
-                                    disabled={processing}
-                                >
-                                    Không, hủy bỏ
+                            <div className="modal-footer">
+                                <button className="cancel-button" onClick={handleCancelSubscribe} disabled={processing}>Hủy</button>
+                                <button className="confirm-button" onClick={handleConfirmSubscribe} disabled={processing}>
+                                    {processing ? 'Đang xác nhận...' : 'Xác nhận'}
                                 </button>
                             </div>
                         </div>
@@ -218,6 +250,18 @@ const PremiumPackages = () => {
                 )}
             </div>
             <Footer />
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </>
     );
 };

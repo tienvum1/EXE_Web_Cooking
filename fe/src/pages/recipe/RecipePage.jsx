@@ -6,9 +6,10 @@ import RecipeGrid from '../../components/recipeCard/RecipeGrid';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import categoriesData from '../../components/category/categoriesData';
+import { checkPremiumStatus } from '../../api/premium';
 import './RecipePage.scss';
 
-const SidebarFilter = ({ filters, setFilters }) => {
+const SidebarFilter = ({ filters, setFilters, isPremium, loadingPremiumStatus }) => {
   const [includeIngredients, setIncludeIngredients] = useState('');
   const [excludeIngredients, setExcludeIngredients] = useState('');
 
@@ -42,6 +43,7 @@ const SidebarFilter = ({ filters, setFilters }) => {
           placeholder="Tối đa..."
           value={filters.maxCookTime || ''}
           onChange={e => setFilters(f => ({ ...f, maxCookTime: e.target.value }))}
+          disabled={!isPremium && !loadingPremiumStatus}
         />
       </div>
 
@@ -53,6 +55,7 @@ const SidebarFilter = ({ filters, setFilters }) => {
           placeholder="Ví dụ: 300"
           value={filters.maxCalories || ''}
           onChange={e => setFilters(f => ({ ...f, maxCalories: e.target.value }))}
+          disabled={!isPremium && !loadingPremiumStatus}
         />
       </div>
 
@@ -63,6 +66,7 @@ const SidebarFilter = ({ filters, setFilters }) => {
           value={includeIngredients}
           onChange={e => setIncludeIngredients(e.target.value)}
           rows={3}
+          disabled={!isPremium && !loadingPremiumStatus}
         />
       </div>
 
@@ -73,19 +77,28 @@ const SidebarFilter = ({ filters, setFilters }) => {
           value={excludeIngredients}
           onChange={e => setExcludeIngredients(e.target.value)}
           rows={3}
+          disabled={!isPremium && !loadingPremiumStatus}
         />
       </div>
+
+      {!loadingPremiumStatus && !isPremium && (
+        <p style={{ color: '#e67e22', fontSize: '0.9em', marginBottom: '1rem', textAlign: 'center' }}>
+          ✨ Bộ lọc nâng cao là tính năng Premium. Vui lòng đăng ký Premium để sử dụng.
+        </p>
+      )}
 
       <div className="filter-buttons">
         <button 
           className="apply-filter-btn"
           onClick={handleApplyFilters}
+          disabled={!isPremium && !loadingPremiumStatus}
         >
           Áp dụng bộ lọc
         </button>
         <button 
           className="clear-filter-btn"
           onClick={handleClearFilters}
+          disabled={!isPremium && !loadingPremiumStatus}
         >
           Bỏ sàng lọc
         </button>
@@ -112,6 +125,25 @@ const RecipePage = () => {
     excludeIngredients: []
   });
   const [savedIds, setSavedIds] = useState([]);
+  const [isPremium, setIsPremium] = useState(false);
+  const [loadingPremiumStatus, setLoadingPremiumStatus] = useState(true);
+
+  useEffect(() => {
+    const fetchPremiumStatus = async () => {
+      try {
+        const response = await checkPremiumStatus();
+        if (response.data) {
+          setIsPremium(response.data.isPremium);
+        }
+      } catch (err) {
+        console.error('Error fetching premium status:', err);
+        setIsPremium(false);
+      } finally {
+        setLoadingPremiumStatus(false);
+      }
+    };
+    fetchPremiumStatus();
+  }, []);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -144,7 +176,6 @@ const RecipePage = () => {
     fetchRecipes();
   }, [category]);
 
-  // Lấy danh sách recipe đã lưu khi mount
   useEffect(() => {
     const fetchSaved = async () => {
       try {
@@ -155,7 +186,6 @@ const RecipePage = () => {
     fetchSaved();
   }, []);
 
-  // Khi queryQ thay đổi (chuyển trang từ search), cập nhật search input
   useEffect(() => {
     setSearch(queryQ);
   }, [queryQ]);
@@ -165,7 +195,6 @@ const RecipePage = () => {
     const matchCookTime = !filters.maxCookTime || (parseInt(recipe.cookTime) || 0) <= parseInt(filters.maxCookTime);
     const matchCalories = !filters.maxCalories || recipe.calories <= parseInt(filters.maxCalories);
     
-    // Kiểm tra nguyên liệu cần có
     const matchIncludeIngredients = filters.includeIngredients.length === 0 || 
       filters.includeIngredients.every(ingredient => 
         recipe.ingredients.some(recipeIngredient => 
@@ -173,7 +202,6 @@ const RecipePage = () => {
         )
       );
 
-    // Kiểm tra nguyên liệu không được có
     const matchExcludeIngredients = filters.excludeIngredients.length === 0 ||
       !filters.excludeIngredients.some(ingredient =>
         recipe.ingredients.some(recipeIngredient =>
@@ -184,19 +212,22 @@ const RecipePage = () => {
     return matchSearch && matchCookTime && matchCalories && matchIncludeIngredients && matchExcludeIngredients;
   });
 
-  // Chọn category filter
   const handleCategoryFilter = (catName) => {
     if (catName === category) {
-      navigate('/recipes'); // Bỏ lọc nếu click lại
+      navigate('/recipes');
     } else {
       navigate(`/recipes?category=${encodeURIComponent(catName)}`);
     }
   };
 
-  // Hàm xử lý lưu/bỏ lưu
   const handleToggleSave = async (recipeId, isSaved) => {
     try {
       if (!isSaved) {
+        const MAX_FREE_SAVED_RECIPES = 5;
+        if (!isPremium && savedIds.length >= MAX_FREE_SAVED_RECIPES) {
+          alert(`Bạn đã đạt giới hạn ${MAX_FREE_SAVED_RECIPES} công thức được lưu. Vui lòng đăng ký gói Premium để lưu không giới hạn!`);
+          return;
+        }
         await axios.post('https://localhost:4567/api/saved-recipes/save', { recipeId }, { withCredentials: true });
         setSavedIds(prev => [...prev, recipeId]);
       } else {
@@ -204,7 +235,16 @@ const RecipePage = () => {
         setSavedIds(prev => prev.filter(id => id !== recipeId));
       }
     } catch (err) {
-      alert('Vui lòng đăng nhập để sử dụng chức năng này!');
+      if (err.response && err.response.status === 403) {
+        alert(err.response.data.message);
+      } else if (err.response && err.response.status === 400 && err.response.data.message === 'Đã lưu công thức này') {
+        console.log('Công thức này đã được lưu.');
+      } else if (err.response && err.response.status === 401) {
+        alert('Vui lòng đăng nhập để sử dụng chức năng này!');
+      } else {
+        console.error('Lỗi khi lưu/bỏ lưu công thức:', err);
+        alert('Đã xảy ra lỗi khi lưu/bỏ lưu công thức. Vui lòng thử lại.');
+      }
     }
   };
 
@@ -213,13 +253,12 @@ const RecipePage = () => {
       <Header />
       <Sidebar />
       <div className="recipe-page-container" style={{ display: 'flex', gap: 32 }}>
-        <SidebarFilter filters={filters} setFilters={setFilters} />
+        <SidebarFilter filters={filters} setFilters={setFilters} isPremium={isPremium} loadingPremiumStatus={loadingPremiumStatus} />
         <div style={{ flex: 1 }}>
           <h1 className="recipe-page-title">
             {category ? `Công thức thuộc danh mục: ${category}` : 'Tất cả công thức'}
           </h1>
           <p className="recipe-page-desc">Khám phá hàng trăm công thức ngon, lành mạnh và dễ làm cho mọi bữa ăn!</p>
-          {/* Category filter */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, margin: '1.2rem 0 1.5rem 0' }}>
             <button
               onClick={() => navigate('/recipes')}

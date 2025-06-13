@@ -4,6 +4,7 @@ import axios from 'axios';
 import './RecipeHeader.scss';
 import DonateModal from './DonateModal';
 import RecipeContext from '../../contexts/RecipeContext';
+import { checkPremiumStatus } from '../../api/premium';
 
 const RecipeHeader = ({ title, user, cookTime, recipeId,categories }) => {
   const [showDonate, setShowDonate] = useState(false);
@@ -12,10 +13,33 @@ const RecipeHeader = ({ title, user, cookTime, recipeId,categories }) => {
   const [donateLoading, setDonateLoading] = useState(false);
   const [donateResult, setDonateResult] = useState('');
   const [shareSuccess, setShareSuccess] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [loadingPremiumStatus, setLoadingPremiumStatus] = useState(true);
 
   const { isRecipeAuthor, handleEditRecipe, handleDeleteRecipe } = useContext(RecipeContext);
 
+  useEffect(() => {
+    const fetchPremiumStatus = async () => {
+      try {
+        const response = await checkPremiumStatus();
+        if (response.data) {
+          setIsPremium(response.data.isPremium);
+        }
+      } catch (err) {
+        console.error('Error fetching premium status in RecipeHeader:', err);
+        setIsPremium(false);
+      } finally {
+        setLoadingPremiumStatus(false);
+      }
+    };
+    fetchPremiumStatus();
+  }, []);
+
   const handleDownloadPdf = async () => {
+    if (!isPremium) {
+      alert('Tính năng tải xuống PDF là tính năng Premium. Vui lòng đăng ký gói Premium để sử dụng.');
+      return;
+    }
     if (!recipeId) return;
     try {
       const response = await axios.get(`https://localhost:4567/api/recipes/${recipeId}/pdf`, {
@@ -99,13 +123,15 @@ const RecipeHeader = ({ title, user, cookTime, recipeId,categories }) => {
 
         <div className="actions">
           <button
-            className={'btn download-pdf-btn'}
+            className={`btn download-pdf-btn ${(!isPremium && !loadingPremiumStatus) ? 'disabled' : ''}`}
             onClick={handleDownloadPdf}
             aria-label={'Tải xuống PDF'}
+            disabled={!isPremium && !loadingPremiumStatus}
           >
             <FaDownload />
             <span>Tải xuống PDF</span>
           </button>
+          {!loadingPremiumStatus && !isPremium  }
           <button 
             className={`btn ${shareSuccess ? 'success' : ''}`} 
             onClick={handleShare}
