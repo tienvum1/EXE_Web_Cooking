@@ -40,8 +40,10 @@ import PendingUserRecipesPage from './pages/recipePages/PendingUserRecipesPage.j
 import AdminBlogManagementPage from './pages/admin/AdminBlogManagementPage.jsx';
 import AdminEditBlogPage from './pages/admin/AdminEditBlogPage.jsx';
 import AdminProtectedRoute from './components/AdminProtectedRoute/AdminProtectedRoute.jsx';
+import MyMenusPage from './pages/myMenus/MyMenusPage.jsx';
+import MenuDetail from "./pages/myMenus/MenuDetail.jsx";
+import MBQRCode from './pages/paymentQR/MBQRCode';
 
-  
 
 import "./App.css";
 
@@ -85,6 +87,9 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/withdrawal" element={<WithdrawalPage />} />
         <Route path="/pending-recipes"  element ={<PendingUserRecipesPage/>} />
+        <Route path="/my-menus" element={<MyMenusPage />} />
+        <Route path="/menu/:menuId" element={<MenuDetail />} />
+        <Route path="/paymentQR" element={<MBQRCode userId={123} />} />
         
         <Route path="/admin" element={<AdminProtectedRoute />}>
           <Route

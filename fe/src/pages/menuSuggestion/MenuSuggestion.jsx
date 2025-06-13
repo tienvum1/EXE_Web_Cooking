@@ -1,226 +1,380 @@
-import React, { useState, useEffect } from 'react';
-import './MenuSuggestion.scss';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { FaCheck, FaSpinner } from "react-icons/fa";
+import "./MenuSuggestion.scss";
 import Header from '../../components/header/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
-import Footer from '../../components/footer/Footer';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+ import Footer from '../../components/footer/Footer';
 
 const MenuSuggestion = () => {
-  const [prompt, setPrompt] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [allRecipes, setAllRecipes] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedMeals, setSelectedMeals] = useState({
+    breakfast: false,
+    lunch: false,
+    dinner: false,
+  });
 
-  // Lấy tất cả công thức khi component mount
-  useEffect(() => {
-    const fetchAllRecipes = async () => {
-      try {
-        const response = await axios.get('https://localhost:4567/api/recipes');
-        setAllRecipes(response.data);
-      } catch (error) {
-        console.error('Error fetching recipes:', error);
-      }
-    };
-    fetchAllRecipes();
-  }, []);
+  const [mealRequirements, setMealRequirements] = useState({
+    breakfast: {
+      cookingTime: "",
+      calories: "",
+      dietType: [],
+      includeIngredients: "",
+      excludeIngredients: "",
+      numberOfRecipes: "1",
+    },
+    lunch: {
+      cookingTime: "",
+      calories: "",
+      dietType: [],
+      includeIngredients: "",
+      excludeIngredients: "",
+      numberOfRecipes: "1",
+    },
+    dinner: {
+      cookingTime: "",
+      calories: "",
+      dietType: [],
+      includeIngredients: "",
+      excludeIngredients: "",
+      numberOfRecipes: "1",
+    },
+  });
 
-  // Phân tích yêu cầu người dùng
-  const analyzeRequirements = (text) => {
-    const requirements = {
-      mealCount: 3, // Mặc định 3 bữa
-      maxCalories: null,
-      maxTime: null,
-      includeIngredients: [],
-      excludeIngredients: [],
-      dietType: null,
-      preferences: []
-    };
+  const dietTypes = [
+    { value: "", label: "Không có yêu cầu đặc biệt", icon: "🍽️" },
+    { value: "vegetarian", label: "Món chay", icon: "🥦" },
+    { value: "meat", label: "Món thịt", icon: "🥩" },
+    { value: "seafood", label: "Hải sản", icon: "🦐" },
+    { value: "salad", label: "Món salad", icon: "🥗" },
+    { value: "dessert", label: "Tráng miệng", icon: "🍰" },
+  ];
 
-    // Phân tích số bữa
-    const mealCountMatch = text.match(/(\d+)\s*bữa/);
-    if (mealCountMatch) {
-      requirements.mealCount = parseInt(mealCountMatch[1]);
-    }
-
-    // Phân tích calories
-    const caloriesMatch = text.match(/(\d+)\s*kcal/);
-    if (caloriesMatch) {
-      requirements.maxCalories = parseInt(caloriesMatch[1]);
-    }
-
-    // Phân tích thời gian
-    const timeMatch = text.match(/(\d+)\s*phút/);
-    if (timeMatch) {
-      requirements.maxTime = parseInt(timeMatch[1]);
-    }
-
-    // Phân tích loại chế độ ăn
-    const dietTypes = ['eat clean', 'giảm cân', 'tăng cân', 'healthy', 'vegetarian', 'vegan'];
-    dietTypes.forEach(type => {
-      if (text.toLowerCase().includes(type)) {
-        requirements.dietType = type;
-      }
-    });
-
-    // Phân tích nguyên liệu
-    const includeMatch = text.match(/với\s*([^,.]+)/);
-    if (includeMatch) {
-      requirements.includeIngredients = includeMatch[1].split(',').map(i => i.trim());
-    }
-
-    const excludeMatch = text.match(/không\s*([^,.]+)/);
-    if (excludeMatch) {
-      requirements.excludeIngredients = excludeMatch[1].split(',').map(i => i.trim());
-    }
-
-    return requirements;
+  const mealLabels = {
+    breakfast: "Bữa sáng",
+    lunch: "Bữa trưa",
+    dinner: "Bữa tối",
   };
 
-  // Lọc công thức theo yêu cầu
-  const filterRecipes = (recipes, requirements) => {
-    return recipes.filter(recipe => {
-      // Kiểm tra calories
-      if (requirements.maxCalories && recipe.nutrition?.calories > requirements.maxCalories) {
-        return false;
-      }
-
-      // Kiểm tra thời gian
-      if (requirements.maxTime && recipe.cookTime > requirements.maxTime) {
-        return false;
-      }
-
-      // Kiểm tra nguyên liệu cần có
-      if (requirements.includeIngredients.length > 0) {
-        const hasAllIngredients = requirements.includeIngredients.every(ingredient =>
-          recipe.ingredients.some(recipeIngredient =>
-            recipeIngredient.toLowerCase().includes(ingredient.toLowerCase())
-          )
-        );
-        if (!hasAllIngredients) return false;
-      }
-
-      // Kiểm tra nguyên liệu không được có
-      if (requirements.excludeIngredients.length > 0) {
-        const hasExcludedIngredient = requirements.excludeIngredients.some(ingredient =>
-          recipe.ingredients.some(recipeIngredient =>
-            recipeIngredient.toLowerCase().includes(ingredient.toLowerCase())
-          )
-        );
-        if (hasExcludedIngredient) return false;
-      }
-
-      // Kiểm tra loại chế độ ăn
-      if (requirements.dietType) {
-        if (requirements.dietType === 'vegetarian' && recipe.type?.toLowerCase().includes('meat')) {
-          return false;
-        }
-        if (requirements.dietType === 'vegan' && 
-            (recipe.type?.toLowerCase().includes('meat') || recipe.type?.toLowerCase().includes('dairy'))) {
-          return false;
-        }
-      }
-
-      return true;
-    });
+  const mealIcons = {
+    breakfast: '🍳',
+    lunch: '🥪',
+    dinner: '🍽️',
   };
 
-  // Tạo thực đơn
-  const generateMenu = (recipes, requirements) => {
-    const meals = ['Bữa sáng', 'Bữa trưa', 'Bữa tối'];
-    const menu = [];
+  const handleMealChange = (meal) => {
+    setSelectedMeals((prev) => ({
+      ...prev,
+      [meal]: !prev[meal],
+    }));
 
-    for (let i = 0; i < requirements.mealCount; i++) {
-      const mealName = meals[i] || `Bữa ${i + 1}`;
-      const filteredRecipes = filterRecipes(recipes, requirements);
-      
-      // Lấy ngẫu nhiên 2-3 món cho mỗi bữa
-      const recipeCount = Math.floor(Math.random() * 2) + 2;
-      const selectedRecipes = [];
-      
-      for (let j = 0; j < recipeCount; j++) {
-        if (filteredRecipes.length > 0) {
-          const randomIndex = Math.floor(Math.random() * filteredRecipes.length);
-          selectedRecipes.push(filteredRecipes[randomIndex]);
-          filteredRecipes.splice(randomIndex, 1);
-        }
-      }
+    // Reset requirements when unchecking a meal
+    if (selectedMeals[meal]) {
+      setMealRequirements((prev) => ({
+        ...prev,
+        [meal]: {
+          cookingTime: "",
+          calories: "",
+          dietType: [],
+          includeIngredients: "",
+          excludeIngredients: "",
+          numberOfRecipes: "1",
+        },
+      }));
+    }
+  };
 
-      // Tính toán dinh dưỡng
-      const nutrition = selectedRecipes.reduce((acc, recipe) => ({
-        calories: (acc.calories || 0) + (recipe.nutrition?.calories || 0),
-        protein: (acc.protein || 0) + (recipe.nutrition?.protein || 0),
-        carbs: (acc.carbs || 0) + (recipe.nutrition?.carbs || 0),
-        fat: (acc.fat || 0) + (recipe.nutrition?.fat || 0)
-      }), {});
+  const handleRequirementChange = (meal, field, value) => {
+    if (field === "dietType") {
+      setMealRequirements((prev) => {
+        const currentDietTypes = prev[meal].dietType;
+        const newDietTypes = currentDietTypes.includes(value)
+          ? currentDietTypes.filter((item) => item !== value)
+          : [...currentDietTypes, value];
 
-      menu.push({
-        meal: mealName,
-        recipes: selectedRecipes.map(recipe => ({
-          _id: recipe._id,
-          name: recipe.title,
-          image: recipe.mainImage,
-          kcal: recipe.nutrition?.calories || 0,
-          protein: recipe.nutrition?.protein || 0,
-          carbs: recipe.nutrition?.carbs || 0,
-          fat: recipe.nutrition?.fat || 0,
-          time: `${recipe.cookTime} phút`,
-          type: recipe.type
-        })),
-        nutrition
+        return {
+          ...prev,
+          [meal]: {
+            ...prev[meal],
+            dietType: newDietTypes,
+          },
+        };
       });
+    } else {
+      setMealRequirements((prev) => ({
+        ...prev,
+        [meal]: {
+          ...prev[meal],
+          [field]: value,
+        },
+      }));
     }
-
-    return menu;
   };
 
-  const handleSubmit = async e => {
+  const validateRequirements = () => {
+    const selectedMealTypes = Object.entries(selectedMeals)
+      .filter(([_, selected]) => selected)
+      .map(([meal]) => meal);
+
+    if (selectedMealTypes.length === 0) {
+      setError("Vui lòng chọn ít nhất một bữa ăn");
+      return false;
+    }
+
+    for (const meal of selectedMealTypes) {
+      const requirements = mealRequirements[meal];
+      if (!requirements.cookingTime || !requirements.calories) {
+        setError(`Vui lòng điền đầy đủ thông tin cho ${mealLabels[meal]}`);
+        return false;
+      }
+
+      if (parseInt(requirements.cookingTime) <= 0) {
+        setError(`Thời gian nấu cho ${mealLabels[meal]} phải lớn hơn 0`);
+        return false;
+      }
+
+      if (parseInt(requirements.calories) <= 0) {
+        setError(`Calories cho ${mealLabels[meal]} phải lớn hơn 0`);
+        return false;
+      }
+
+      if (parseInt(requirements.numberOfRecipes) <= 0) {
+        setError(`Số món ăn cho ${mealLabels[meal]} phải lớn hơn 0`);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!prompt.trim()) return;
-    
-    setLoading(true);
+    setError(null);
+
+    if (!validateRequirements()) {
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      // Phân tích yêu cầu
-      const requirements = analyzeRequirements(prompt);
-      
-      // Tạo thực đơn
-      const suggestedMenu = generateMenu(allRecipes, requirements);
-      
-      // Chuyển đến trang kết quả với thực đơn đã tạo
-      navigate('/menu-suggestion/result', { state: { menu: suggestedMenu } });
+      const selectedMealsData = Object.entries(selectedMeals)
+        .filter(([_, selected]) => selected)
+        .map(([meal]) => ({
+          type: meal,
+          ...mealRequirements[meal],
+          includeIngredients: mealRequirements[meal].includeIngredients
+            .split(",")
+            .map((ing) => ing.trim())
+            .filter(Boolean),
+          excludeIngredients: mealRequirements[meal].excludeIngredients
+            .split(",")
+            .map((ing) => ing.trim())
+            .filter(Boolean),
+          numberOfRecipes: parseInt(mealRequirements[meal].numberOfRecipes),
+        }));
+
+      const response = await axios.post(
+        "https://localhost:4567/api/menus/suggest",
+        {
+          meals: selectedMealsData,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.data) {
+        navigate("/menu-suggestion/result", {
+          state: { menu: response.data },
+        });
+      }
     } catch (error) {
-      console.error('Error generating menu:', error);
-      alert('Có lỗi xảy ra khi tạo thực đơn. Vui lòng thử lại!');
+      console.error("Error generating menu:", error);
+      setError(
+        error.response?.data?.message || "Không thể tạo thực đơn. Vui lòng thử lại!"
+      );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      <Header />
-      <Sidebar />
-      <div className="menu-suggestion-page">
-        <h1 className="menu-title">AI Menu Gợi ý thực đơn</h1>
-        <p className="menu-desc">Nhập yêu cầu/thông tin của bạn vào ô dưới đây, AI sẽ gợi ý thực đơn phù hợp.</p>
-        <form className="menu-form" onSubmit={handleSubmit} style={{ maxWidth: 600, margin: '0 auto' }}>
-          <textarea
-            className="menu-ai-textarea"
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder="Ví dụ: Tôi muốn thực đơn Eat Clean cho 3 bữa, ít tinh bột, nhiều rau, phù hợp giảm cân, thời gian nấu dưới 30 phút..."
-            rows={5}
-            style={{ width: '100%', fontSize: 17, padding: 16, borderRadius: 10, border: '1.5px solid #ddd', marginBottom: 20 }}
-          />
-          <div className="menu-form-actions" style={{ textAlign: 'right' }}>
-            <button type="submit" className="menu-btn menu-btn-submit" disabled={loading}>
-              {loading ? 'Đang phân tích...' : 'Gợi ý thực đơn'}
-            </button>
-          </div>
-        </form>
+    <Header />
+    <Sidebar/>
+    <div className="menu-suggestion-page">
+      <div className="menu-header">
+        <h1 className="menu-title">Gợi Ý Thực Đơn</h1>
+        <p className="menu-desc">
+          Nhận gợi ý thực đơn cá nhân hóa dựa trên sở thích và yêu cầu của bạn
+        </p>
       </div>
-      <Footer />
+
+      {error && (
+        <div className="error-message" role="alert">
+          {error}
+        </div>
+      )}
+
+      <form className="menu-form" onSubmit={handleSubmit}>
+        <div className="meals-section">
+          <h2 className="section-title">Chọn Bữa Ăn</h2>
+          <div className="meals-grid">
+            {Object.entries(selectedMeals).map(([meal, selected]) => (
+              <div key={meal} className={`meal-option ${selected ? "selected" : ""}`}>
+                <label className="meal-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => handleMealChange(meal)}
+                  />
+                  <span className="meal-label">
+                    {mealIcons[meal]}
+                    {mealLabels[meal]}
+                  </span>
+                </label>
+
+                {selected && (
+                  <div className="meal-requirements">
+                    <div className="requirements-row">
+                      <div className="requirement-group">
+                        <label>Thời gian nấu tối đa (phút)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={mealRequirements[meal].cookingTime}
+                          onChange={(e) =>
+                            handleRequirementChange(meal, "cookingTime", e.target.value)
+                          }
+                          placeholder="Nhập thời gian nấu"
+                          required
+                        />
+                      </div>
+
+                      <div className="requirement-group">
+                        <label>Calories tối đa</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={mealRequirements[meal].calories}
+                          onChange={(e) =>
+                            handleRequirementChange(meal, "calories", e.target.value)
+                          }
+                          placeholder="Nhập giới hạn calories"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="requirement-group">
+                      <label>Số món ăn mỗi bữa</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={mealRequirements[meal].numberOfRecipes}
+                        onChange={(e) =>
+                          handleRequirementChange(
+                            meal,
+                            "numberOfRecipes",
+                            e.target.value
+                          )
+                        }
+                        placeholder="Số món ăn (ví dụ: 1-3)"
+                        required
+                      />
+                    </div>
+
+                    <div className="requirement-group">
+                      <label>Thể loại món ăn</label>
+                      <div className="diet-types-grid">
+                        {dietTypes.map((diet) => (
+                          <label
+                            key={diet.value}
+                            className={`diet-type-option ${
+                              mealRequirements[meal].dietType.includes(diet.value)
+                                ? "selected"
+                                : ""
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              name={`diet-${meal}`}
+                              value={diet.value}
+                              checked={mealRequirements[meal].dietType.includes(diet.value)}
+                              onChange={(e) =>
+                                handleRequirementChange(meal, "dietType", e.target.value)
+                              }
+                            />
+                            <span className="diet-type-label">
+                              <span className="diet-icon">{diet.icon}</span>
+                              {diet.label}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="requirements-row">
+                      <div className="requirement-group">
+                        <label htmlFor={`${meal}-includeIngredients`}>Nguyên liệu muốn có (phân cách bằng dấu phẩy)</label>
+                        <input
+                          type="text"
+                          id={`${meal}-includeIngredients`}
+                          value={mealRequirements[meal].includeIngredients}
+                          onChange={(e) =>
+                            handleRequirementChange(
+                              meal,
+                              "includeIngredients",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Ví dụ: gà, bông cải xanh, gạo (để trống nếu không có)"
+                        />
+                      </div>
+
+                      <div className="requirement-group">
+                        <label>Nguyên liệu không muốn có (phân cách bằng dấu phẩy)</label>
+                        <input
+                          type="text"
+                          value={mealRequirements[meal].excludeIngredients}
+                          onChange={(e) =>
+                            handleRequirementChange(
+                              meal,
+                              "excludeIngredients",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Ví dụ: hải sản, đậu phộng (để trống nếu không có)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="menu-btn-submit"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <FaSpinner className="spinner" /> Đang tạo thực đơn...
+            </>
+          ) : (
+            <>
+              <FaCheck /> Tạo Thực Đơn
+            </>
+          )}
+        </button>
+      </form>
+    </div>
+    <Footer />
     </>
   );
 };

@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/User");
+const Wallet = require("../models/Wallet");
 require("dotenv").config();
 
 module.exports = function(passport) {
@@ -73,6 +74,15 @@ module.exports = function(passport) {
                 loginMethods: ['google'] // Indicate Google login method
               });
               await newUser.save();
+
+              // Tạo wallet mới với số dư 0 cho user
+              const wallet = new Wallet({
+                user: newUser._id,
+                balance: 0
+              });
+              await wallet.save();
+              console.log('Google Strategy callback: Created new wallet for user:', newUser._id);
+
               console.log('Google Strategy callback: Calling done() with new user:', newUser._id);
               return done(null, newUser);
             }

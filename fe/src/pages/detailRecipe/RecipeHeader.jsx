@@ -129,6 +129,8 @@ const RecipeHeader = ({ title, user, cookTime, recipeId,categories }) => {
         open={showDonate}
         onClose={() => setShowDonate(false)}
         recipeId={recipeId}
+        authorId={user._id}
+        donationType="recipe"
       />
     </div>
   );
