@@ -345,7 +345,12 @@ const Header = () => {
               <button className="header__new-recipe-btn" onClick={() => navigate('/recipes/create')}>
                 <i className="fas fa-pen"></i> Viết món mới
               </button>
-              <button
+              <button className="header__new-recipe-btn" onClick={() => navigate('/paymentQR')}>
+                
+                <i className="fas fa-wallet"></i> Nộp tiền QR code
+              </button>
+
+              {/* <button
                 className="header__topup-btn"
                 style={{ marginLeft: 10, background: '#ffe082', color: '#222', border: 'none', borderRadius: 18, padding: '8px 20px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.18s' }}
                 onClick={async () => {
@@ -355,7 +360,7 @@ const Header = () => {
                 }}
               >
                 <i className="fas fa-wallet" style={{ marginRight: 6 }}></i> Nạp tiền
-              </button>
+              </button> */}
 
               {/* Conditionally render Edit and Delete buttons for recipe author on detail page */}
            

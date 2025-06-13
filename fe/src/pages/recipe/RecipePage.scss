@@ -142,8 +142,8 @@ $font-family: 'Inter', Arial, sans-serif;
 
 // ====== Sidebar Filter ======
 .sidebar-filter {
-  min-width: 280px;
-  max-width: 320px;
+  min-width: 250px;
+  max-width: 150px;
   background: #fff;
   border-radius: 16px;
   padding: 1.8rem 1.5rem;
@@ -156,7 +156,7 @@ $font-family: 'Inter', Arial, sans-serif;
   height: fit-content;
 
   h3 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 0.5rem;

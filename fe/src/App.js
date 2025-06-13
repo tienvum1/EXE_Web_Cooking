@@ -43,8 +43,8 @@ import AdminProtectedRoute from './components/AdminProtectedRoute/AdminProtected
 import MyMenusPage from './pages/myMenus/MyMenusPage.jsx';
 import MenuDetail from "./pages/myMenus/MenuDetail.jsx";
 import MBQRCode from './pages/paymentQR/MBQRCode';
-
-
+import TopupRequests from "./pages/admin/TopupRequests.jsx";
+import PremiumPackage from "./pages/premium/PremiumPackages.jsx";
 import "./App.css";
 
 // Log environment variables on startup
@@ -89,7 +89,10 @@ function App() {
         <Route path="/pending-recipes"  element ={<PendingUserRecipesPage/>} />
         <Route path="/my-menus" element={<MyMenusPage />} />
         <Route path="/menu/:menuId" element={<MenuDetail />} />
-        <Route path="/paymentQR" element={<MBQRCode userId={123} />} />
+        <Route path="/paymentQR" element={<MBQRCode />} />
+
+        <Route path="/premium" element={<PremiumPackage />} />
+
         
         <Route path="/admin" element={<AdminProtectedRoute />}>
           <Route
@@ -120,6 +123,11 @@ function App() {
             path="withdrawals"
             element={<AdminLayout><AdminWithdrawalsPage /></AdminLayout>}
           />
+          <Route
+            path="topup-requests"
+            element={<AdminLayout><TopupRequests/></AdminLayout>}
+          />
+          
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

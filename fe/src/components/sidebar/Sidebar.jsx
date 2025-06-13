@@ -146,7 +146,7 @@ const Sidebar = () => {
         <div className="sidebar__menu">
           <div className="sidebar__item">
             <FaCrown className="sidebar__icon" />
-            <span>Premium</span>
+            <span onClick={() => navigate('/premium ')}>Premium</span>
           </div>
           <div className="sidebar__item">
             <FaChartBar className="sidebar__icon" />
@@ -162,7 +162,7 @@ const Sidebar = () => {
           </div>
           <div className="sidebar__item">
             <FaBell className="sidebar__icon" />
-            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/my-menus')}>Menu của bạn</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/my-menus')}>Thực đơn của bạn</span>
           </div>
           <div className="sidebar__item sidebar__section">
             <FaBook className="sidebar__icon" />

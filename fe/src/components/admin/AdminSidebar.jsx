@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './AdminSidebar.scss';
+
 const AdminSidebar = () => {
   return (
     <div className="admin-sidebar">
@@ -17,6 +18,9 @@ const AdminSidebar = () => {
         </li>
         <li>
           <Link to="/admin/recipes/pendings">Phê Duyệt Recipe</Link>
+        </li>
+        <li>
+          <Link to="/admin/topup-requests">Yêu cầu nạp tiền</Link>
         </li>
         <li>
           <Link to="/admin/withdrawals">Yêu cầu rút tiền</Link>
