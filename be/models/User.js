@@ -18,7 +18,17 @@ const UserSchema = new mongoose.Schema({
   following:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
   followers:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  isPremium: {
+      type: Boolean,
+      default: false
+    },
+    startDate: {
+      type: Date
+    },
+    endDate: {
+      type: Date
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

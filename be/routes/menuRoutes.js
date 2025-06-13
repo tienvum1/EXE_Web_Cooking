@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const menuController = require('../controllers/menuController');
 const auth = require('../middlewares/auth');
+const { requirePremium } = require('../middlewares/premium');
 
 // Menu suggestion and generation
-router.post('/suggest', auth, menuController.generateSuggestedMenu);
+router.post('/suggest', auth, requirePremium, menuController.generateSuggestedMenu);
 
 // Menu management
 router.post('/save', auth, menuController.saveMenu);
