@@ -34,7 +34,7 @@ const app = express();
 
 // Basic error handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err);
   res.status(500).json({ 
     error: 'Something broke!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
@@ -46,7 +46,10 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none'
+    }
 }));
 
 app.use(passport.initialize());
@@ -59,7 +62,9 @@ const corsOptions = {
     ? ['https://exe-web-cooking.vercel.app', 'https://exe-web-cooking-fe.vercel.app']
     : ['https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 
@@ -103,7 +108,16 @@ app.use('/api/premium', premiumRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  try {
+    res.status(200).json({ 
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({ error: 'Health check failed' });
+  }
 });
 
 // Root endpoint
@@ -122,8 +136,14 @@ const PORT = process.env.PORT || 4567;
 connectDB()
   .then(() => {
     if (process.env.NODE_ENV === 'production') {
-      app.listen(PORT, () => {
+      const server = app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
+      });
+
+      // Handle server errors
+      server.on('error', (error) => {
+        console.error('Server error:', error);
+        process.exit(1);
       });
     } else {
       const sslOptions = {
