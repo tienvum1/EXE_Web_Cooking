@@ -70,7 +70,7 @@ const SignupPage = () => {
           setIsError(true);
           return;
       }
-      const apiUrl = `${backendUrl}/api/auth/register`; // Explicitly append auth route and register path
+      const apiUrl = `https://exe-web-cooking.onrender.com/api/auth/register`; // Explicitly append auth route and register path
       console.log('Attempting registration with API URL:', apiUrl); // Log the API URL
       const response = await axios.post(apiUrl, { name, email, password /*, phone */ }); // Include phone if needed, commented out for now
 
