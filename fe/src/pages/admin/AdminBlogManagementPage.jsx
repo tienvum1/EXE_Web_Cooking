@@ -12,7 +12,7 @@ const AdminBlogManagementPage = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/blogs`, {
+        const res = await axios.get(`https://exe-web-cooking.onrender.com/api/blogs`, {
           withCredentials: true,
         });
         setBlogs(res.data);
@@ -30,7 +30,7 @@ const AdminBlogManagementPage = () => {
   const handleDeleteBlog = async (blogId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa blog này không?')) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/api/blogs/${blogId}`, {
+        await axios.delete(`https://exe-web-cooking.onrender.com/api/blogs/${blogId}`, {
           withCredentials: true,
         });
         setBlogs(blogs.filter(blog => blog._id !== blogId));

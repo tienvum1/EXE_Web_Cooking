@@ -17,7 +17,7 @@ const SavedRecipesPage = () => {
   useEffect(() => {
     const fetchSaved = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/saved-recipes/list`, { withCredentials: true });
+        const res = await axios.get(`https://exe-web-cooking.onrender.com/api/saved-recipes/list`, { withCredentials: true });
         setRecipes(res.data.map(item => item.recipe));
       } catch {
         setRecipes([]);

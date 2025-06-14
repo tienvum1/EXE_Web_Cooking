@@ -14,7 +14,7 @@ const AdminWithdrawalsPage = () => {
     try {
       setLoading(true);
       // Fetch only pending withdrawal requests
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/payment/withdrawals?status=pending`, { withCredentials: true });
+      const res = await axios.get(`https://exe-web-cooking.onrender.com/api/payment/withdrawals?status=pending`, { withCredentials: true });
       setWithdrawalRequests(res.data);
     } catch (err) {
       console.error('Error fetching withdrawal requests:', err);
@@ -31,7 +31,7 @@ const AdminWithdrawalsPage = () => {
   const handleUpdateStatus = async (id, status) => {
     try {
       // Call the backend API to update the status
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/payment/withdrawals/${id}/status`, { status }, { withCredentials: true });
+      await axios.put(`https://exe-web-cooking.onrender.com/api/payment/withdrawals/${id}/status`, { status }, { withCredentials: true });
       // Refresh the list after updating
       fetchWithdrawalRequests();
       alert(`Yêu cầu đã được ${status === 'approved' ? 'duyệt' : 'từ chối'}.`);

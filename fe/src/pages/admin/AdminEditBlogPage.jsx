@@ -23,7 +23,7 @@ const AdminEditBlogPage = () => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/blogs/${id}`, {
+        const res = await axios.get(`https://exe-web-cooking.onrender.com/api/blogs/${id}`, {
           withCredentials: true,
         });
         const fetchedBlog = res.data;
@@ -92,7 +92,7 @@ const AdminEditBlogPage = () => {
     }
 
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/blogs/${id}`, data, {
+      await axios.put(`https://exe-web-cooking.onrender.com/api/blogs/${id}`, data, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

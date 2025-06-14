@@ -7,7 +7,7 @@ import Footer from '../../components/footer/Footer';
 
 const fetchHistory = async () => {
   const res = await axios.get(
-    `${process.env.REACT_APP_API_URL}/api/transactions/history`,
+    `https://exe-web-cooking.onrender.com/api/transactions/history`,
     { withCredentials: true }
   );
   return res.data;

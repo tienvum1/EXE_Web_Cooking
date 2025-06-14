@@ -17,7 +17,7 @@ const WithdrawalForm = ({ open, onClose, userId }) => {
     if (open && userId) {
       const fetchBalance = async () => {
         try {
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/payment/balance`, { withCredentials: true });
+          const res = await axios.get(`https://exe-web-cooking.onrender.com/api/payment/balance`, { withCredentials: true });
           setWalletBalance(res.data.balance);
         } catch (err) {
           console.error('Error fetching wallet balance:', err);
@@ -55,7 +55,7 @@ const WithdrawalForm = ({ open, onClose, userId }) => {
      }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/payment/withdraw`, {
+      const response = await axios.post(`https://exe-web-cooking.onrender.com/api/payment/withdraw`, {
         amount: withdrawalAmount,
         bankName,
         accountNumber,

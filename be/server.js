@@ -80,19 +80,19 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Routes
-app.use("api/auth", authRoutes);
-app.use("api/users", userRoutes);
-app.use("api/recipes", recipeRoutes);
-app.use("api/blogs", blogRoutes);
-app.use("api/saved-recipes", savedRecipeRoutes);
-app.use("api/comments", commentRoutes);
-app.use("api/payment", paymentRoutes);
-app.use("api/transactions", transactionRoutes);
-app.use("api/notifications", notificationRoutes);
-app.use("api/chatgpt", chatgptRoutes);
-app.use("api/ai", aiRoutes);
-app.use("api/menus", menuRoutes);
-app.use("api/premium", premiumRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/recipes", recipeRoutes);
+app.use("/api/blogs", blogRoutes);
+app.use("/api/saved-recipes", savedRecipeRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/chatgpt", chatgptRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/menus", menuRoutes);
+app.use("/api/premium", premiumRoutes);
 
 // ... (các route khác nếu cần)
 

@@ -27,7 +27,7 @@ const VerifyEmailPage = () => {
     const verifyEmail = async () => {
       setIsLoading(true);
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://localhost:4567";
+        const backendUrl = 'https://exe-web-cooking.onrender.com'
         if (!backendUrl) {
             setMessage('Lỗi cấu hình: Không tìm thấy URL backend (REACT_APP_BACKEND_URL).');
             setIsError(true);

@@ -63,7 +63,7 @@ const SignupPage = () => {
     try {
       // Use axios directly for API call
       // Construct the full API URL by appending the auth route and register path
-      const backendUrl = process.env.REACT_APP_BACKEND_URL ; // Use the base backend URL variable
+      const backendUrl = 'https://exe-web-cooking.onrender.com' ; // Use the base backend URL variable
       if (!backendUrl) {
           // Handle case where backend URL is not set
           setMessage('Lỗi cấu hình: Không tìm thấy URL backend (REACT_APP_BACKEND_URL).');
