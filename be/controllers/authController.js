@@ -7,16 +7,16 @@ const dotenv = require("dotenv");
 const Wallet = require("../models/Wallet");
 dotenv.config();
 const passport = require("passport"); // Import passport here
-const crypto = require('crypto'); // Import crypto module
+const crypto = require("crypto"); // Import crypto module
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/cooking';
-const JWT_SECRET = process.env.JWT_SECRET || 'tienvu123';
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/cooking";
+const JWT_SECRET = process.env.JWT_SECRET || "tienvu123";
 
 // Helper function to generate JWT token and set cookie
 const generateTokenAndSetCookie = (user, res) => {
   // Explicitly use asynchronous sign with callback
-  console.log("user trong generateTokenAndSetCookie", user)
+  console.log("user trong generateTokenAndSetCookie", user);
   return new Promise((resolve, reject) => {
     jwt.sign(
       { user_id: user._id, role: user.role },
@@ -34,9 +34,9 @@ const generateTokenAndSetCookie = (user, res) => {
           httpOnly: true,
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
           secure: false, // *** CHANGE THIS TO FALSE FOR LOCAL HTTPS DEBUGGING ***
-          sameSite: 'Lax',
-          path: '/',
-          domain: 'localhost' // *** Explicitly set domain for localhost ***
+          sameSite: "Lax",
+          path: "/",
+          domain: "localhost", // *** Explicitly set domain for localhost ***
         });
         resolve(token);
       }
@@ -69,14 +69,14 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
-      username: email.split('@')[0],
+      username: email.split("@")[0],
       fullName: name,
       email,
       password_hash: hashedPassword,
       phone,
       is_verified: false,
       role: "user",
-      loginMethods: ['password']
+      loginMethods: ["password"],
     });
 
     await user.save();
@@ -84,7 +84,7 @@ exports.register = async (req, res) => {
     // Tạo wallet mới với số dư 0 cho user
     const wallet = new Wallet({
       user: user._id,
-      balance: 0
+      balance: 0,
     });
     await wallet.save();
 
@@ -92,7 +92,7 @@ exports.register = async (req, res) => {
       expiresIn: "1d",
     });
 
-    const verificationUrl = `${process.env.CLIENT_ORIGIN}/verify-email?token=${emailToken}`;
+    const verificationUrl = `https://exe-web-cooking.vercel.app/verify-email?token=${emailToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -120,30 +120,42 @@ exports.register = async (req, res) => {
 // VERIFY EMAIL
 exports.verifyEmail = async (req, res) => {
   const { token } = req.query;
-  console.log('Backend: Verify Email endpoint hit with token:', token); // Log when endpoint is hit
+  console.log("Backend: Verify Email endpoint hit with token:", token); // Log when endpoint is hit
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Backend: Verify Email - Token decoded successfully:', decoded);
+    console.log("Backend: Verify Email - Token decoded successfully:", decoded);
 
     const updatedUser = await User.findByIdAndUpdate(
       decoded.user_id,
       { isActive: true },
       { new: true }
     );
-    console.log('Backend: Verify Email - User updated:', updatedUser);
+    console.log("Backend: Verify Email - User updated:", updatedUser);
 
     if (!updatedUser) {
-      console.error("Error: User not found for verification ID:", decoded.user_id);
-      return res.status(400).json({ message: "Token xác minh không hợp lệ hoặc đã hết hạn." });
+      console.error(
+        "Error: User not found for verification ID:",
+        decoded.user_id
+      );
+      return res
+        .status(400)
+        .json({ message: "Token xác minh không hợp lệ hoặc đã hết hạn." });
     }
 
-    console.log('Backend: Verify Email - Redirecting to login page via CLIENT_ORIGIN:', process.env.CLIENT_ORIGIN);
+    console.log(
+      "Backend: Verify Email - Redirecting to login page via CLIENT_ORIGIN:",
+      process.env.CLIENT_ORIGIN
+    );
     res.redirect(`${process.env.CLIENT_ORIGIN}`);
-
   } catch (err) {
     console.error("Error during email verification:", err.message);
-    res.status(400).json({ message: "Token xác minh không hợp lệ hoặc đã hết hạn." });
-    console.log('Backend: Verify Email - Redirecting to login page on error via CLIENT_ORIGIN:', process.env.CLIENT_ORIGIN);
+    res
+      .status(400)
+      .json({ message: "Token xác minh không hợp lệ hoặc đã hết hạn." });
+    console.log(
+      "Backend: Verify Email - Redirecting to login page on error via CLIENT_ORIGIN:",
+      process.env.CLIENT_ORIGIN
+    );
     res.redirect(`${process.env.CLIENT_ORIGIN}/login?verificationError=true`);
   }
 };
@@ -162,7 +174,7 @@ exports.login = async (req, res) => {
 
     // Find user by email
     const user = await User.findOne({ email });
-console.log("user tim thay sau đăng nhâp ", user) 
+    console.log("user tim thay sau đăng nhâp ", user);
     // Check if user exists and if password login is enabled for this account
     if (!user || !user.loginMethods.includes("password")) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -182,7 +194,7 @@ console.log("user tim thay sau đăng nhâp ", user)
 
     // Generate token and set cookie
     const token = await generateTokenAndSetCookie(user, res);
-  
+
     res.status(200).json({
       message: "Logged in successfully",
       token: token,
@@ -205,7 +217,6 @@ console.log("user tim thay sau đăng nhâp ", user)
   }
 };
 
-
 // LOGOUT
 exports.logout = (req, res) => {
   console.log("Logout endpoint hit");
@@ -214,47 +225,58 @@ exports.logout = (req, res) => {
     secure: true, // Must match login setting (use true for local HTTPS)
     sameSite: "Lax",
     path: "/",
-    domain: 'localhost' // *** Explicitly set domain to match setting ***
+    domain: "localhost", // *** Explicitly set domain to match setting ***
   });
   res.json({ message: "Đăng xuất thành công" });
 };
 
 // GOOGLE LOGIN (Initiate OAuth flow)
 exports.googleLogin = (req, res, next) => {
-    passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' })(req, res, next);
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+  })(req, res, next);
 };
 
 // GOOGLE LOGIN CALLBACK (Handle the callback from Google)
 exports.googleCallback = async (req, res) => {
   if (!req.user) {
-    console.error("Google authentication failed - req.user is null after passport strategy");
-    return res.redirect(`${process.env.CLIENT_ORIGIN}/login?error=google_auth_failed`);
+    console.error(
+      "Google authentication failed - req.user is null after passport strategy"
+    );
+    return res.redirect(
+      `${process.env.CLIENT_ORIGIN}/login?error=google_auth_failed`
+    );
   }
 
   try {
     const user = req.user;
     // Await the asynchronous token generation and cookie setting
     await generateTokenAndSetCookie(user, res);
-    const redirectUrl = `${process.env.CLIENT_ORIGIN}`; 
-    console.log('Redirecting Google authenticated user to:', redirectUrl);
+    const redirectUrl = `${process.env.CLIENT_ORIGIN}`;
+    console.log("Redirecting Google authenticated user to:", redirectUrl);
     res.redirect(redirectUrl);
   } catch (err) {
     console.error("Error in googleCallback after passport auth:", err);
-    res.redirect(`${process.env.CLIENT_ORIGIN}/login?error=google_auth_failed_server`);
+    res.redirect(
+      `${process.env.CLIENT_ORIGIN}/login?error=google_auth_failed_server`
+    );
   }
 };
 
 // Set password for a user (e.g., after Google login for a user without password_hash)
-exports.setPassword = [
+(exports.setPassword = [
   (req, res, next) => {
-      next();
+    next();
   },
   async (req, res) => {
     const { password } = req.body;
     const userId = req.authenticatedUserId;
 
     if (!userId) {
-      console.error("setPassword handler: authenticatedUserId not found in req after middleware.");
+      console.error(
+        "setPassword handler: authenticatedUserId not found in req after middleware."
+      );
       return res
         .status(401)
         .json({ message: "Authentication failed, user ID missing" });
@@ -274,15 +296,17 @@ exports.setPassword = [
       const user = await User.findById(userId);
 
       if (!user) {
-        console.error(`setPassword handler: User not found with ID from token: ${userId}`);
+        console.error(
+          `setPassword handler: User not found with ID from token: ${userId}`
+        );
         return res.status(404).json({ message: "Không tìm thấy người dùng." });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password_hash = hashedPassword;
 
-      if (!user.loginMethods.includes('password')) {
-          user.loginMethods.push('password');
+      if (!user.loginMethods.includes("password")) {
+        user.loginMethods.push("password");
       }
       user.isActive = true; // Có thể cần kích hoạt tài khoản sau khi đặt mật khẩu nếu ban đầu không active
 
@@ -295,34 +319,43 @@ exports.setPassword = [
         .status(500)
         .json({ message: "Đã xảy ra lỗi khi thiết lập mật khẩu." });
     }
-  }],
-
-// Get logged-in user profile
-exports.getMe = async (req, res) => {
-  // req.user contains payload from token (user_id, role)
-  if (!req.user || !req.user.user_id) {
-    return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng.' });
-  }
-  console.log("user id " , req.user.user_id)
-
-  try {
-    // Find the full user document in the database
-    const user = await User.findById(req.user.user_id).select('-password_hash'); // Exclude password hash
-
-    if (!user) {
-      // This case should ideally not happen if token is valid, but good to handle
-      return res.status(404).json({ message: 'Không tìm thấy thông tin người dùng trong database.' });
+  },
+]),
+  // Get logged-in user profile
+  (exports.getMe = async (req, res) => {
+    // req.user contains payload from token (user_id, role)
+    if (!req.user || !req.user.user_id) {
+      return res
+        .status(401)
+        .json({ message: "Không tìm thấy thông tin người dùng." });
     }
+    console.log("user id ", req.user.user_id);
 
-    // Return the full user data (excluding password_hash)
-    res.status(200).json(user);
-    console.log('Backend: getMe sending user data:', user); // Log the user data being sent
+    try {
+      // Find the full user document in the database
+      const user = await User.findById(req.user.user_id).select(
+        "-password_hash"
+      ); // Exclude password hash
 
-  } catch (error) {
-    console.error("Error fetching user data in getMe:", error);
-    res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy thông tin người dùng.' });
-  }
-};
+      if (!user) {
+        // This case should ideally not happen if token is valid, but good to handle
+        return res
+          .status(404)
+          .json({
+            message: "Không tìm thấy thông tin người dùng trong database.",
+          });
+      }
+
+      // Return the full user data (excluding password_hash)
+      res.status(200).json(user);
+      console.log("Backend: getMe sending user data:", user); // Log the user data being sent
+    } catch (error) {
+      console.error("Error fetching user data in getMe:", error);
+      res
+        .status(500)
+        .json({ message: "Đã xảy ra lỗi khi lấy thông tin người dùng." });
+    }
+  });
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -333,14 +366,20 @@ exports.forgotPassword = async (req, res) => {
 
     if (!user) {
       // Return a generic success message to prevent email enumeration
-      return res.json({ message: 'Nếu email của bạn tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến email đó.' });
+      return res.json({
+        message:
+          "Nếu email của bạn tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến email đó.",
+      });
     }
 
     // 2. Generate a unique token
-    const resetToken = crypto.randomBytes(20).toString('hex');
+    const resetToken = crypto.randomBytes(20).toString("hex");
 
     // 3. Hash the token and save to user (store hashed token in DB for security)
-    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
     user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
 
     await user.save();
@@ -359,7 +398,7 @@ exports.forgotPassword = async (req, res) => {
     const mailOptions = {
       to: user.email,
       from: process.env.EMAIL_USER,
-      subject: 'Password Reset Request',
+      subject: "Password Reset Request",
       html: `
         <p>Bạn nhận được email này vì bạn (hoặc người khác) đã yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
         <p>Vui lòng nhấp vào liên kết sau, hoặc dán liên kết này vào trình duyệt của bạn để hoàn tất quá trình:</p>
@@ -371,11 +410,15 @@ exports.forgotPassword = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.json({ message: 'Nếu email của bạn tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến email đó.' });
-
+    res.json({
+      message:
+        "Nếu email của bạn tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến email đó.",
+    });
   } catch (error) {
     console.error("Forgot password error:", error);
-    res.status(500).json({ message: "Đã xảy ra lỗi khi xử lý yêu cầu quên mật khẩu." });
+    res
+      .status(500)
+      .json({ message: "Đã xảy ra lỗi khi xử lý yêu cầu quên mật khẩu." });
   }
 };
 
@@ -388,7 +431,7 @@ exports.resetPassword = async (req, res) => {
 
   try {
     // 1. Hash the token from the URL
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     // 2. Find user by hashed token and check expiry
     const user = await User.findOne({
@@ -397,12 +440,18 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.' });
+      return res
+        .status(400)
+        .json({
+          message: "Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.",
+        });
     }
 
     // 3. Validate the new password
     if (!password || password.length < 6) {
-      return res.status(400).json({ message: 'Mật khẩu mới phải có ít nhất 6 ký tự.' });
+      return res
+        .status(400)
+        .json({ message: "Mật khẩu mới phải có ít nhất 6 ký tự." });
     }
 
     // 4. Hash the new password and update user
@@ -414,8 +463,7 @@ exports.resetPassword = async (req, res) => {
 
     await user.save();
 
-    res.json({ message: 'Mật khẩu của bạn đã được đặt lại thành công.' });
-
+    res.json({ message: "Mật khẩu của bạn đã được đặt lại thành công." });
   } catch (error) {
     console.error("Reset password error:", error);
     res.status(500).json({ message: "Đã xảy ra lỗi khi đặt lại mật khẩu." });
