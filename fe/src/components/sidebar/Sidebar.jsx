@@ -49,7 +49,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchSavedCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/saved-recipes/list`, { withCredentials: true });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/saved-recipes/list`, { withCredentials: true });
         setSavedRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch saved recipes count:", err);
@@ -67,7 +67,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchAllRecipesCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/all-recipes`, { withCredentials: true });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes/me/all-recipes`, { withCredentials: true });
         setAllRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch all recipes count:", err);
@@ -85,7 +85,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchPublishedCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/published-recipes`, { withCredentials: true });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes/me/published-recipes`, { withCredentials: true });
         setPublishedRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch published recipes count:", err);
@@ -103,7 +103,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchDraftCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/draft-recipes`, { withCredentials: true });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes/me/draft-recipes`, { withCredentials: true });
         setDraftRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch draft recipes count:", err);
@@ -121,7 +121,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchPendingCount = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/pendings`, { withCredentials: true });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes/me/pendings`, { withCredentials: true });
         setPendingRecipesCount(res.data.length);
       } catch (err) {
         console.error("Failed to fetch pending recipes count:", err);

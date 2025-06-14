@@ -8,14 +8,14 @@ const API_URL =
 
 // Function to register user
 export const register = async (userData) => {
-  const response = await axios.post(`${API_URL}/api/auth/register`, userData);
+  const response = await axios.post(`${API_URL}api/auth/register`, userData);
   // Optionally, return data or just success statusc
   return response.data;
 };
 
 // Function to login user with email and password
 export const login = async (credentials) => {
-  const response = await axios.post(`${API_URL}/api/auth/login`, credentials, {
+  const response = await axios.post(`${API_URL}api/auth/login`, credentials, {
     withCredentials: true,
   });
   // Server sets HttpOnly cookie, so we don't get the token here directly
@@ -28,7 +28,7 @@ export const logout = async () => {
   try {
     // The backend will clear the HttpOnly cookie
     const response = await axios.post(
-      `${API_URL}/api/auth/logout`,
+      `${API_URL}api/auth/logout`,
       {},
       {
         withCredentials: true,
@@ -46,7 +46,7 @@ export const logout = async () => {
 // Function to initiate Google Login
 export const initiateGoogleLogin = () => {
   // Redirect the browser to the backend's Google OAuth initiation route
-  window.location.href = `${API_URL}/api/auth/google`;
+  window.location.href = `${API_URL}api/auth/google`;
 };
 
 // Function to fetch logged-in user details (requires token cookie)
@@ -57,7 +57,7 @@ export const getMe = async () => {
     // Handle case where token is not found (user not logged in)
     throw new Error("No authentication token found");
   }
-  const response = await axios.get(`${API_URL}/api/auth/me`, {
+  const response = await axios.get(`${API_URL}api/auth/me`, {
     withCredentials: true, // Keep this for potential HttpOnly cookie fallback/compatibility
     headers: {
       Authorization: `Bearer ${token}`, // Add Authorization header
@@ -78,7 +78,7 @@ export const setPassword = async (passwordData, token = null) => {
     };
   }
   const response = await axios.post(
-    `${API_URL}/api/auth/set-password`,
+    `${API_URL}api/auth/set-password`,
     passwordData,
     config
   );
@@ -88,7 +88,7 @@ export const setPassword = async (passwordData, token = null) => {
 // Function to initiate password reset
 export const initiatePasswordReset = async (email) => {
   try {
-    const response = await axios.post(`${API_URL}/api/users/forgot-password`, {
+    const response = await axios.post(`${API_URL}api/users/forgot-password`, {
       email,
     });
     return response.data;
@@ -102,7 +102,7 @@ export const initiatePasswordReset = async (email) => {
 export const resetPassword = async (token, newPassword) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/auth/reset-password/${token}`,
+      `${API_URL}api/auth/reset-password/${token}`,
       { password: newPassword }
     );
     return response.data; // Assuming backend sends a success message
