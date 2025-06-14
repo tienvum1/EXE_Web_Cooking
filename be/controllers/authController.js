@@ -33,11 +33,13 @@ const generateTokenAndSetCookie = (user, res) => {
         res.cookie("token", token, {
           httpOnly: true,
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          secure: false, // *** CHANGE THIS TO FALSE FOR LOCAL HTTPS DEBUGGING ***
-          sameSite: "Lax",
+          secure: true, // ✅ Bắt buộc phải true nếu dùng HTTPS
+          sameSite: "None", // ✅ Cho phép gửi cookie cross-site giữa Vercel FE và Render BE
           path: "/",
-          domain: "localhost", // *** Explicitly set domain for localhost ***
+          // ✅ KHÔNG cần set domain nếu để backend tự xử lý. Nếu muốn:
+          // domain: ".onrender.com", // nếu backend chạy ở onrender
         });
+
         resolve(token);
       }
     );
@@ -339,11 +341,9 @@ exports.googleCallback = async (req, res) => {
 
       if (!user) {
         // This case should ideally not happen if token is valid, but good to handle
-        return res
-          .status(404)
-          .json({
-            message: "Không tìm thấy thông tin người dùng trong database.",
-          });
+        return res.status(404).json({
+          message: "Không tìm thấy thông tin người dùng trong database.",
+        });
       }
 
       // Return the full user data (excluding password_hash)
@@ -440,11 +440,9 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({
-          message: "Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.",
-        });
+      return res.status(400).json({
+        message: "Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.",
+      });
     }
 
     // 3. Validate the new password
