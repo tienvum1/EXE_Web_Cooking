@@ -4,9 +4,6 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const https = require('https');
-const fs = require('fs');
-const { Server } = require('socket.io');
 const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
@@ -112,7 +109,8 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ 
       status: 'ok',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV
+      environment: process.env.NODE_ENV,
+      mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     });
   } catch (error) {
     console.error('Health check error:', error);
