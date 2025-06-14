@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 const passport = require('passport');
 const session = require('express-session');
 const connectDB = require('./config/db');
