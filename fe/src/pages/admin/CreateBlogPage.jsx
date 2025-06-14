@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminPage.scss'; // Create a new SCSS file for admin styles
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:4567';
+const API_URL = 'https://exe-web-cooking.onrender.com';
 
 const CreateBlogPage = () => {
   const [formData, setFormData] = useState({

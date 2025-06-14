@@ -20,7 +20,7 @@ const ChatBot = () => {
     setLoading(true);
     try {
       // Gọi API ChatGPT backend
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/chatgpt`, { message: input }, { withCredentials: true });
+      const res = await axios.post(`https://exe-web-cooking.onrender.com/api/chatgpt`, { message: input }, { withCredentials: true });
       setMessages([...newMessages, { from: 'bot', text: res.data.reply }]);
     } catch (err) {
       setMessages([...newMessages, { from: 'bot', text: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.' }]);

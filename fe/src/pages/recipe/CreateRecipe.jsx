@@ -23,7 +23,7 @@ const CreateRecipe = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const API_URL = process.env.REACT_APP_API_URL || 'https://exe-web-cooking.onrender.com';
+  const API_URL =  'https://exe-web-cooking.onrender.com';
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);

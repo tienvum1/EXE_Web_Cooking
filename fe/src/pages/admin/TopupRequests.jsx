@@ -13,7 +13,7 @@ const TopupRequests = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions/pending-topup`, {
+      const response = await axios.get(`https://exe-web-cooking.onrender.com/api/transactions/pending-topup`, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -40,7 +40,7 @@ const TopupRequests = () => {
   const handleRequest = async (transactionId, action) => {
     try {
       await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/transactions/topup/${transactionId}`,
+        `https://exe-web-cooking.onrender.com/api/transactions/topup/${transactionId}`,
         { action },
         { 
           withCredentials: true,

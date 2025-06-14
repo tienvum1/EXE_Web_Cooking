@@ -35,7 +35,7 @@ const ResetPasswordPage = () => {
     }
     setLoading(true);
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = 'https://exe-web-cooking.onrender.com';
       const apiUrl = `${backendUrl}/api/users/reset-password`;
       const res = await axios.post(apiUrl, { token, password });
       setMsg(res.data.message || 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập.');

@@ -1,8 +1,6 @@
 import axios from "axios";
 
-const API_URL =
-  process.env.REACT_APP_BACKEND_API_URL/api ||
-  "https://exe-web-cooking.onrender.com/api";
+const API_URL = "https://exe-web-cooking.onrender.com";
 
 // Get all menus for a user
 export const getUserMenus = async (userId) => {

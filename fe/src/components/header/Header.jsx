@@ -134,13 +134,13 @@ const Header = () => {
     
     try {
       // Check for new notifications
-      const notificationsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/notifications/unread`, {
+      const notificationsRes = await axios.get(`https://exe-web-cooking.onrender.com/api/notifications/unread`, {
         withCredentials: true
       });
       setHasNewNotifications(notificationsRes.data.length > 0);
 
       // Check for new transactions
-      const transactionsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions/recent`, {
+      const transactionsRes = await axios.get(`https://exe-web-cooking.onrender.com/api/transactions/recent`, {
         withCredentials: true
       });
       setHasNewTransactions(transactionsRes.data.some(t => !t.isRead));

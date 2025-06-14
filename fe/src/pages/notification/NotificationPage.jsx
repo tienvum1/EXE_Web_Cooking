@@ -14,7 +14,7 @@ const NotificationPage = () => {
     const fetchNoti = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/notifications`, { withCredentials: true });
+        const res = await axios.get(`https://exe-web-cooking.onrender.com/api/notifications`, { withCredentials: true });
         setNotifications(res.data);
       } catch {}
       setLoading(false);

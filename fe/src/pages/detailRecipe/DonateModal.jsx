@@ -23,7 +23,7 @@ const DonateModal = ({
     setDonateResult('');
     try {
       const payload = { amount: Number(donateAmount), message: donateMsg };
-      let url = `${process.env.REACT_APP_API_URL}/api/payment`;
+      let url = 'https://exe-web-cooking.onrender.com/api/payment';
       
       // Debug logs
       console.log('API URL:', process.env.REACT_APP_API_URL);

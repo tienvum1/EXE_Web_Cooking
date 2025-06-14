@@ -2,9 +2,7 @@ import axios from "axios";
 
 // Assuming your backend is running on https://localhost:4567 (or the PORT in your .env)
 // and your authentication routes are under /api/auth
-const API_URL =
-  process.env.REACT_APP_BACKEND_API_URL ||
-  "https://exe-web-cooking.onrender.com";
+const API_URL = "https://exe-web-cooking.onrender.com";
 
 // Function to register user
 export const register = async (userData) => {

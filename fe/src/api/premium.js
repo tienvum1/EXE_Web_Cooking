@@ -1,9 +1,6 @@
 import axios from "axios";
 
-const API_URL =
-  process.env.REACT_APP_BACKEND_API_URL ||
-  "https://exe-web-cooking.onrender.com";
-
+const API_URL = "https://exe-web-cooking.onrender.com";
 // Đăng ký gói premium
 export const subscribePremium = async () => {
   try {

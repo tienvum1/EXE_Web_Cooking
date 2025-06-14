@@ -17,7 +17,7 @@ const PublishedRecipesPage = () => {
   useEffect(() => {
     const fetchAllRecipes = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/recipes/me/published-recipes`, { withCredentials: true });
+        const res = await axios.get(`https://exe-web-cooking.onrender.com/api/recipes/me/published-recipes`, { withCredentials: true });
         setRecipes(res.data);
       } catch (err) {
         console.error("Failed to fetch all recipes:", err);
