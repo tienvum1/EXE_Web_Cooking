@@ -4,6 +4,9 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const https = require('https');
+const fs = require('fs');
+const { Server } = require('socket.io');
 const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
@@ -176,3 +179,5 @@ if (global.io) {
     });
   });
 }
+
+module.exports = app;
