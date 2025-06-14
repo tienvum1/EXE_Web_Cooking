@@ -113,7 +113,7 @@ const Sidebar = () => {
 
     // Only fetch if authenticated
     if (isAuthenticated) {
-      fetchDraftCount(0);
+      fetchDraftCount();
     }
     // Add dependency that tracks authentication status here
   }, [/* add authentication dependency here */]);
