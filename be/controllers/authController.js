@@ -222,13 +222,16 @@ exports.login = async (req, res) => {
 // LOGOUT
 exports.logout = (req, res) => {
   console.log("Logout endpoint hit");
+
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true, // Must match login setting (use true for local HTTPS)
-    sameSite: "Lax",
-    path: "/",
-    domain: "localhost", // *** Explicitly set domain to match setting ***
+    secure: true, // ✅ Bắt buộc nếu dùng HTTPS (Render, Vercel đều dùng HTTPS)
+    sameSite: "None", // ✅ Bắt buộc nếu FE và BE khác domain
+    path: "/", // ✅ Xóa toàn bộ token
+    // ❌ KHÔNG nên set domain trừ khi thật sự cần
+    // domain: '.onrender.com' nếu muốn chỉ định rõ
   });
+
   res.json({ message: "Đăng xuất thành công" });
 };
 
