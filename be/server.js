@@ -30,13 +30,18 @@ const aiRoutes = require('./routes/ai');
 const menuRoutes = require('./routes/menuRoutes');
 const premiumRoutes = require('./routes/premiumRoutes');
 
-
-// ... (các route khác nếu cần)
-
 const app = express();
 
+// Basic error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    error: 'Something broke!',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
+
 // Passport and Session middleware
-// Session middleware must be configured before Passport
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
@@ -48,20 +53,23 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(cookieParser());
+
 const corsOptions = {
-  origin: [ 'https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://exe-web-cooking.vercel.app', 'https://exe-web-cooking-fe.vercel.app']
+    : ['https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
   credentials: true,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
-// Middleware for Stripe webhooks - MUST be before express.json()
-app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+// Middleware for Stripe webhooks
+//app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads')); 
+app.use('/uploads', express.static('uploads'));
 
 // Đường dẫn đến thư mục upload
 const uploadDir = path.join(__dirname, 'public/uploads/recipes');
@@ -93,39 +101,60 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/premium', premiumRoutes);
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
-// ... (các route khác nếu cần)
+// Root endpoint
+app.get('/', (req, res) => {
+  res.send('API is running!');
+});
 
-app.get('/', (req, res) => res.send('API is running!'));
+// Error handling for undefined routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
-// Kết nối MongoDB và khởi động server
 const PORT = process.env.PORT || 4567;
 
-const sslOptions = {
-  key: fs.readFileSync('./localhost-key.pem'),
-  cert: fs.readFileSync('./localhost.pem')
-};
-
-const httpsServer = https.createServer(sslOptions, app);
-const io = new Server(httpsServer, { cors: { origin: ['https://localhost:3000', 'http://localhost:3000'], credentials: true } });
-app.set('io', io);
-global.io = io;
-
-// Connect to MongoDB
+// Connect to MongoDB and start server
 connectDB()
   .then(() => {
-    httpsServer.listen(PORT, () => {
-      console.log(`Server running at https://localhost:${PORT}`);
-    });
+    if (process.env.NODE_ENV === 'production') {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    } else {
+      const sslOptions = {
+        key: fs.readFileSync('./localhost-key.pem'),
+        cert: fs.readFileSync('./localhost.pem')
+      };
+      const httpsServer = https.createServer(sslOptions, app);
+      const io = new Server(httpsServer, { 
+        cors: { 
+          origin: ['https://localhost:3000', 'http://localhost:3000'], 
+          credentials: true 
+        } 
+      });
+      app.set('io', io);
+      global.io = io;
+      
+      httpsServer.listen(PORT, () => {
+        console.log(`Server running at https://localhost:${PORT}`);
+      });
+    }
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
+    process.exit(1);
   });
 
 // Socket.io connection
-io.on('connection', (socket) => {
-  // Nhận userId khi client connect
-  socket.on('register', (userId) => {
-    socket.join(userId);
+if (global.io) {
+  global.io.on('connection', (socket) => {
+    socket.on('register', (userId) => {
+      socket.join(userId);
+    });
   });
-});
+}
