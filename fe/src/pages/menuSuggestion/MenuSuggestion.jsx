@@ -178,7 +178,7 @@ const MenuSuggestion = () => {
         }));
 
       const response = await axios.post(
-        "https://localhost:4567/api/menus/suggest",
+        "https://exe-web-cooking.onrender.com/api/menus/suggest",
         {
           meals: selectedMealsData,
         },

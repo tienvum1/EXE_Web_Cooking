@@ -20,7 +20,7 @@ const MenuDetail = () => {
 
     const fetchMenuDetails = async () => {
         try {
-            const response = await axios.get(`https://localhost:4567/api/menus/${menuId}`, {
+            const response = await axios.get(`https://exe-web-cooking.onrender.com/api/menus/${menuId}`, {
                 withCredentials: true
             });
             setMenu(response.data);
@@ -35,7 +35,7 @@ const MenuDetail = () => {
     const handleDeleteMenu = async () => {
         if (window.confirm('Bạn có chắc chắn muốn xóa thực đơn này?')) {
             try {
-                await axios.delete(`https://localhost:4567/api/menus/${menuId}`, {
+                await axios.delete(`https://exe-web-cooking.onrender.com/api/menus/${menuId}`, {
                     withCredentials: true
                 });
                 toast.success('Xóa thực đơn thành công');

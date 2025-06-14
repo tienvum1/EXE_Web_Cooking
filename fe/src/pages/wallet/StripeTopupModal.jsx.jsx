@@ -30,7 +30,7 @@ const StripeTopupForm = ({ onClose }) => {
     try {
       // 1. Gọi BE tạo PaymentIntent
 
-      const res = await axios.post('https://localhost:4567/api/payment/stripe-create', { amount: Number(amount) }, { withCredentials: true });
+      const res = await axios.post('https://exe-web-cooking.onrender.com/api/payment/stripe-create', { amount: Number(amount) }, { withCredentials: true });
 
       const clientSecret = res.data.clientSecret;
 

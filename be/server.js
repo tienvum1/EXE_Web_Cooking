@@ -50,11 +50,7 @@ app.use(passport.session());
 
 app.use(cookieParser());
 const corsOptions = {
-  origin: [
-    "https://localhost:3000",
-    "http://localhost:3000",
-    "https://localhost:5173",
-  ],
+  origin: ["https://exe-web-cooking.vercel.app", "https://localhost:3000"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -113,7 +109,10 @@ const sslOptions = {
 const httpsServer = https.createServer(sslOptions, app);
 const io = new Server(httpsServer, {
   cors: {
-    origin: ["https://localhost:3000", "http://localhost:3000"],
+    origin: [
+      "https://exe-web-cooking.vercel.app",
+      "https://exe-web-cooking.vercel.app",
+    ],
     credentials: true,
   },
 });

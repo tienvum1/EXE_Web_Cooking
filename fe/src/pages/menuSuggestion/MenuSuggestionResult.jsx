@@ -55,7 +55,7 @@ const MenuSuggestionResult = () => {
       setIsSaving(true);
       setSaveMessage('');
       
-      const response = await axios.post('https://localhost:4567/api/menus/save', {
+      const response = await axios.post('https://exe-web-cooking.onrender.com/api/menus/save', {
         menu,
         name: menuName
       }, {

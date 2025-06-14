@@ -15,7 +15,7 @@ const RecipeComments = ({ recipeId }) => {
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await axios.get('https://localhost:4567/api/users/me', { withCredentials: true });
+        const res = await axios.get('https://exe-web-cooking.onrender.com/api/users/me', { withCredentials: true });
         setUserId(res.data._id);
         setCurrentUser(res.data);
       } catch {
@@ -32,7 +32,7 @@ const RecipeComments = ({ recipeId }) => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get(`https://localhost:4567/api/comments/${recipeId}`);
+        const res = await axios.get(`https://exe-web-cooking.onrender.com/api/comments/${recipeId}`);
         setComments(res.data);
       } catch {
         setError('Không thể tải bình luận');
@@ -47,7 +47,7 @@ const RecipeComments = ({ recipeId }) => {
   const handleSend = async () => {
     if (comment.trim() === '') return;
     try {
-      const res = await axios.post('https://localhost:4567/api/comments/add', { recipeId, content: comment }, { withCredentials: true });
+      const res = await axios.post('https://exe-web-cooking.onrender.com/api/comments/add', { recipeId, content: comment }, { withCredentials: true });
       setComments(prev => [res.data, ...prev]);
       setComment('');
     } catch {
@@ -59,7 +59,7 @@ const RecipeComments = ({ recipeId }) => {
   const handleDelete = async (commentId) => {
     if (!window.confirm('Bạn có chắc muốn xóa bình luận này?')) return;
     try {
-      await axios.delete(`https://localhost:4567/api/comments/${commentId}`, { withCredentials: true });
+      await axios.delete(`https://exe-web-cooking.onrender.com/api/comments/${commentId}`, { withCredentials: true });
       setComments(prev => prev.filter(c => c._id !== commentId));
     } catch {
       alert('Không thể xóa bình luận!');
