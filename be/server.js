@@ -4,8 +4,10 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const path = require('path');
+const https = require('https');
 const fs = require('fs');
+const { Server } = require('socket.io');
+const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
 const connectDB = require('./config/db');
@@ -28,51 +30,38 @@ const aiRoutes = require('./routes/ai');
 const menuRoutes = require('./routes/menuRoutes');
 const premiumRoutes = require('./routes/premiumRoutes');
 
+
+// ... (các route khác nếu cần)
+
 const app = express();
 
-// Basic error handling
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: 'Something broke!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
-  });
-});
-
 // Passport and Session middleware
+// Session middleware must be configured before Passport
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { 
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none'
-    }
+    cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(cookieParser());
-
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://exe-web-cooking.vercel.app', 'https://exe-web-cooking-fe.vercel.app']
-    : ['http://localhost:3000', 'http://localhost:5173'],
+  origin: [ 'https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
   credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
-// Middleware for Stripe webhooks
-//app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+// Middleware for Stripe webhooks - MUST be before express.json()
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads')); 
 
 // Đường dẫn đến thư mục upload
 const uploadDir = path.join(__dirname, 'public/uploads/recipes');
@@ -104,47 +93,39 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/premium', premiumRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  try {
-    res.status(200).json({ 
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
-    });
-  } catch (error) {
-    console.error('Health check error:', error);
-    res.status(500).json({ error: 'Health check failed' });
-  }
-});
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.send('API is running!');
-});
+// ... (các route khác nếu cần)
 
-// Error handling for undefined routes
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+app.get('/', (req, res) => res.send('API is running!'));
+
+// Kết nối MongoDB và khởi động server
+const PORT = process.env.PORT || 4567;
+
+const sslOptions = {
+  key: fs.readFileSync('./localhost-key.pem'),
+  cert: fs.readFileSync('./localhost.pem')
+};
+
+const httpsServer = https.createServer(sslOptions, app);
+const io = new Server(httpsServer, { cors: { origin: ['https://localhost:3000', 'http://localhost:3000'], credentials: true } });
+app.set('io', io);
+global.io = io;
 
 // Connect to MongoDB
 connectDB()
   .then(() => {
-    console.log('MongoDB connected successfully');
+    httpsServer.listen(PORT, () => {
+      console.log(`Server running at https://localhost:${PORT}`);
+    });
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
-    process.exit(1);
   });
 
-// Only start the server if we're not in a serverless environment
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4567;
-  app.listen(PORT, () => {
-    console.log(`Development server running on port ${PORT}`);
+// Socket.io connection
+io.on('connection', (socket) => {
+  // Nhận userId khi client connect
+  socket.on('register', (userId) => {
+    socket.join(userId);
   });
-}
-
-module.exports = app;
+});
