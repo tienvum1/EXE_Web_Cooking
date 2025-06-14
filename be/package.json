@@ -9,8 +9,8 @@
     "start": "node api/index.js",
     "dev": "vercel dev",
     "dev:local": "nodemon server.js",
-    "build": "echo 'No build step required for backend'",
-    "vercel-build": "echo 'No build step required for backend'"
+    "build": "echo 'Building...' && mkdir -p public && cp -r api public/",
+    "vercel-build": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +25,8 @@
     "passport": "^0.6.0",
     "express-session": "^1.17.3",
     "cookie-parser": "^1.4.6",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "socket.io": "^4.6.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
