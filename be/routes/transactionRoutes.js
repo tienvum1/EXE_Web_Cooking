@@ -12,7 +12,7 @@ router.get('/history', auth, transactionController.getTransactionHistory);
 router.post('/topup', auth, transactionController.createTopupTransaction);
 
 // Route cho admin
-router.get('/pending-topup', protect, admin, transactionController.getPendingTopupRequests);
-router.put('/topup/:transactionId', protect, admin, transactionController.handleTopupRequest);
+router.get('/pending-topup', auth, admin, transactionController.getPendingTopupRequests);
+router.put('/topup/:transactionId', auth, admin, transactionController.handleTopupRequest);
 
 module.exports = router; 
