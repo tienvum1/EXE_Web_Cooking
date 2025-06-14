@@ -4,12 +4,12 @@
   "engines": {
     "node": "18.x"
   },
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
     "start": "node server.js",
     "dev": "vercel dev",
     "dev:local": "nodemon server.js",
-    "build": "echo 'Building...' && mkdir -p public && cp -r server.js public/",
+    "build": "echo 'Building...' && mkdir -p api && cp server.js api/index.js",
     "vercel-build": "npm run build"
   },
   "keywords": [],
