@@ -167,8 +167,12 @@ exports.getRecipeApproveById = async (req, res) => {
       recipe = await Recipe.findById(recipeId).populate('author', 'username createdAt');
     } else {
       // For non-authenticated users and regular users, only fetch if status is 'approved'
-      recipe = await Recipe.findOne({ _id: recipeId, status: 'approved' })
-        .populate('author', 'username createdAt');
+      recipe = await Recipe.findOne({
+        $or: [
+          { _id: recipeId, status: 'approved' },
+          { _id: recipeId, status: 'pending' }
+        ]
+      }).populate('author', 'username createdAt');
     }
 
     if (!recipe) {

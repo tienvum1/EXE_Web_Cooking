@@ -176,7 +176,12 @@ const PremiumPackages = () => {
 
                 {isPremium && (
                     <div className="premium-badge">
-                        <span>Bạn đang sử dụng tài khoản Premium</span>
+                        <span>Bạn đang sử dụng tài khoản Premium </span>
+                        {premiumEndDate && (
+                            <span className="end-date">
+                                (Hết hạn: {premiumEndDate.toLocaleDateString('vi-VN')})
+                            </span>
+                        )}
                     </div>
                 )}
 
