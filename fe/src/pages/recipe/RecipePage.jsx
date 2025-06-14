@@ -150,7 +150,7 @@ const RecipePage = () => {
       setLoading(true);
       setError('');
       try {
-        let url = 'https://localhost:4567/api/recipes';
+        let url = 'https://exe-web-cooking.onrender.com/api/recipes';
         if (category) url += `?category=${encodeURIComponent(category)}`;
         const res = await axios.get(url);
         console.log('Raw recipes data from backend:', res.data);
@@ -179,7 +179,7 @@ const RecipePage = () => {
   useEffect(() => {
     const fetchSaved = async () => {
       try {
-        const res = await axios.get('https://localhost:4567/api/saved-recipes/list', { withCredentials: true });
+        const res = await axios.get('https://exe-web-cooking.onrender.com/api/saved-recipes/list', { withCredentials: true });
         setSavedIds(res.data.map(item => item.recipe._id));
       } catch {}
     };
@@ -228,10 +228,10 @@ const RecipePage = () => {
           alert(`Bạn đã đạt giới hạn ${MAX_FREE_SAVED_RECIPES} công thức được lưu. Vui lòng đăng ký gói Premium để lưu không giới hạn!`);
           return;
         }
-        await axios.post('https://localhost:4567/api/saved-recipes/save', { recipeId }, { withCredentials: true });
+        await axios.post('https://exe-web-cooking.onrender.com/api/saved-recipes/save', { recipeId }, { withCredentials: true });
         setSavedIds(prev => [...prev, recipeId]);
       } else {
-        await axios.post('https://localhost:4567/api/saved-recipes/unsave', { recipeId }, { withCredentials: true });
+        await axios.post('https://exe-web-cooking.onrender.com/api/saved-recipes/unsave', { recipeId }, { withCredentials: true });
         setSavedIds(prev => prev.filter(id => id !== recipeId));
       }
     } catch (err) {

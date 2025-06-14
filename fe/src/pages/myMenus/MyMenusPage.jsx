@@ -19,7 +19,7 @@ const MyMenusPage = () => {
 
     const fetchMenus = async () => {
         try {
-            const response = await axios.get('https://localhost:4567/api/menus/getMenus',{
+            const response = await axios.get('https://exe-web-cooking.onrender.com/api/menus/getMenus',{
                 withCredentials: true  
             });
             setMenus(response.data);

@@ -42,7 +42,7 @@ const RecipeHeader = ({ title, user, cookTime, recipeId,categories }) => {
     }
     if (!recipeId) return;
     try {
-      const response = await axios.get(`https://localhost:4567/api/recipes/${recipeId}/pdf`, {
+      const response = await axios.get(`https://exe-web-cooking.onrender.com/api/recipes/${recipeId}/pdf`, {
         responseType: 'blob',
         withCredentials: true,
       });
