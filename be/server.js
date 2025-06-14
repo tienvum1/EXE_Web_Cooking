@@ -4,9 +4,6 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const https = require('https');
-const fs = require('fs');
-const { Server } = require('socket.io');
 const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
@@ -60,7 +57,7 @@ app.use(cookieParser());
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://exe-web-cooking.vercel.app', 'https://exe-web-cooking-fe.vercel.app']
-    : ['https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
+    : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -131,52 +128,21 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-const PORT = process.env.PORT || 4567;
-
-// Connect to MongoDB and start server
+// Connect to MongoDB
 connectDB()
   .then(() => {
-    if (process.env.NODE_ENV === 'production') {
-      const server = app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
-
-      // Handle server errors
-      server.on('error', (error) => {
-        console.error('Server error:', error);
-        process.exit(1);
-      });
-    } else {
-      const sslOptions = {
-        key: fs.readFileSync('./localhost-key.pem'),
-        cert: fs.readFileSync('./localhost.pem')
-      };
-      const httpsServer = https.createServer(sslOptions, app);
-      const io = new Server(httpsServer, { 
-        cors: { 
-          origin: ['https://localhost:3000', 'http://localhost:3000'], 
-          credentials: true 
-        } 
-      });
-      app.set('io', io);
-      global.io = io;
-      
-      httpsServer.listen(PORT, () => {
-        console.log(`Server running at https://localhost:${PORT}`);
-      });
-    }
+    console.log('MongoDB connected successfully');
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
 
-// Socket.io connection
-if (global.io) {
-  global.io.on('connection', (socket) => {
-    socket.on('register', (userId) => {
-      socket.join(userId);
-    });
+// Only start the server if we're not in a serverless environment
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4567;
+  app.listen(PORT, () => {
+    console.log(`Development server running on port ${PORT}`);
   });
 }
 
