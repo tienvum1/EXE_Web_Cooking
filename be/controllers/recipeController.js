@@ -1,81 +1,109 @@
-const mongoose = require('mongoose');
-const Recipe = require('../models/Recipe');
-const User = require('../models/User');
-const cloudinary = require('cloudinary').v2;
-const pdf = require('html-pdf'); // Require the html-pdf library
-require('dotenv').config();
+const mongoose = require("mongoose");
+const Recipe = require("../models/Recipe");
+const User = require("../models/User");
+const cloudinary = require("cloudinary").v2;
+const pdf = require("html-pdf"); // Require the html-pdf library
+require("dotenv").config();
 
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-console.log('Cloudinary Config:', {
+console.log("Cloudinary Config:", {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY ? '******' : undefined, // Mask API Key for logs
-  api_secret: process.env.CLOUDINARY_API_SECRET ? '******' : undefined // Mask API Secret
+  api_key: process.env.CLOUDINARY_API_KEY ? "******" : undefined, // Mask API Key for logs
+  api_secret: process.env.CLOUDINARY_API_SECRET ? "******" : undefined, // Mask API Secret
 });
 
 // Middleware to check for admin role (assuming user is attached by auth middleware)
 const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+  if (req.user && req.user.role === "admin") {
     next();
   } else {
-    res.status(403).json({ message: 'Chỉ admin mới có quyền thực hiện thao tác này.' });
+    res
+      .status(403)
+      .json({ message: "Chỉ admin mới có quyền thực hiện thao tác này." });
   }
 };
 
 exports.getAll = async (req, res) => {
   try {
-    const filter = { status: 'approved' };
+    const filter = { status: "approved" };
     if (req.query.category) {
       filter.categories = { $in: [req.query.category] };
     }
-    const recipes = await Recipe.find(filter).populate('author', 'username');
+    const recipes = await Recipe.find(filter).populate("author", "username");
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi lấy danh sách recipe', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Lỗi lấy danh sách recipe", error: err.message });
   }
 };
 
 exports.create = async (req, res) => {
   try {
-    const { title, desc, servings, cookTime, ingredients, steps, nutrition, status, categories } = req.body;
+    const {
+      title,
+      desc,
+      servings,
+      cookTime,
+      ingredients,
+      steps,
+      nutrition,
+      status,
+      categories,
+    } = req.body;
     console.log(req.body);
     const uploadedFiles = req.files; // Array of all uploaded files
 
     // Get main image file info
-    const mainImageFile = uploadedFiles ? uploadedFiles.find(file => file.fieldname === 'mainImage') : null;
+    const mainImageFile = uploadedFiles
+      ? uploadedFiles.find((file) => file.fieldname === "mainImage")
+      : null;
 
     // Upload main image to Cloudinary FIRST
     let mainImageUrl = null;
     if (mainImageFile) {
       try {
         const result = await cloudinary.uploader.upload(
-          `data:${mainImageFile.mimetype};base64,${mainImageFile.buffer.toString('base64')}`,
+          `data:${
+            mainImageFile.mimetype
+          };base64,${mainImageFile.buffer.toString("base64")}`,
           {
-            folder: 'recipe_main_images' // Optional: specify a folder in Cloudinary
+            folder: "recipe_main_images", // Optional: specify a folder in Cloudinary
           }
         );
         mainImageUrl = result.secure_url;
       } catch (uploadErr) {
-        console.error('Lỗi upload ảnh chính lên Cloudinary:', uploadErr);
+        console.error("Lỗi upload ảnh chính lên Cloudinary:", uploadErr);
         // Decide how to handle upload error: reject request, continue without image, etc.
         // For now, we will log and potentially continue without the main image URL
       }
     }
 
     // Get step image files info
-    const stepImageFiles = uploadedFiles ? uploadedFiles.filter(file => file.fieldname.startsWith('stepImages')) : [];
+    const stepImageFiles = uploadedFiles
+      ? uploadedFiles.filter((file) => file.fieldname.startsWith("stepImages"))
+      : [];
 
     // Check required fields
     if (!title || !ingredients || !steps) {
-      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc (title, ingredients, steps)' });
+      return res
+        .status(400)
+        .json({
+          message: "Thiếu thông tin bắt buộc (title, ingredients, steps)",
+        });
     }
-     if (!categories || !Array.isArray(categories) || categories.length === 0) {
-      return res.status(400).json({ message: 'Cần chọn ít nhất 1 danh mục (category) cho món ăn.' });
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
+      return res
+        .status(400)
+        .json({
+          message: "Cần chọn ít nhất 1 danh mục (category) cho món ăn.",
+        });
     }
 
     console.log(req.user.user_id);
@@ -90,65 +118,76 @@ exports.create = async (req, res) => {
       steps: [], // Initialize with empty steps
       mainImage: mainImageUrl, // Save main image URL
       nutrition,
-      status: status || 'draft',
+      status: status || "draft",
       author: req.user.user_id, // Sử dụng user_id từ payload token
-      categories
+      categories,
     });
 
     const recipeId = recipe._id; // Get the generated _id
 
     // Process steps and upload step images using the generated recipeId
-    const parsedSteps = typeof steps === 'string' ? JSON.parse(steps) : steps;
-    const stepsWithImages = await Promise.all(parsedSteps.map(async (step, stepIndex) => {
+    const parsedSteps = typeof steps === "string" ? JSON.parse(steps) : steps;
+    const stepsWithImages = await Promise.all(
+      parsedSteps.map(async (step, stepIndex) => {
         const imagesData = [];
         // Filter step image files belonging to this step based on fieldname
-        const filesForThisStep = stepImageFiles.filter(file =>
+        const filesForThisStep = stepImageFiles.filter(
+          (file) =>
             // Fieldname is typically stepImages[stepIndex][imageIndex]
             file.fieldname.startsWith(`stepImages[${stepIndex}]`) // Filter by step index
         );
 
         // Upload step images to Cloudinary using the recipeId
-        await Promise.all(filesForThisStep.map(async (file) => {
+        await Promise.all(
+          filesForThisStep.map(async (file) => {
             try {
-                const result = await cloudinary.uploader.upload(
-                    `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-                    {
-                        folder: `recipe_step_images/recipe_${recipeId}/step_${stepIndex}` // Use recipeId here!
-                    }
-                );
-                imagesData.push({
-                    url: result.secure_url,
-                    // contentType: file.mimetype, // No longer needed based on comments
-                });
+              const result = await cloudinary.uploader.upload(
+                `data:${file.mimetype};base64,${file.buffer.toString(
+                  "base64"
+                )}`,
+                {
+                  folder: `recipe_step_images/recipe_${recipeId}/step_${stepIndex}`, // Use recipeId here!
+                }
+              );
+              imagesData.push({
+                url: result.secure_url,
+                // contentType: file.mimetype, // No longer needed based on comments
+              });
             } catch (stepUploadErr) {
-                 console.error(`Lỗi upload ảnh bước ${stepIndex} lên Cloudinary:`, stepUploadErr);
-                 // Handle individual step image upload error if necessary
+              console.error(
+                `Lỗi upload ảnh bước ${stepIndex} lên Cloudinary:`,
+                stepUploadErr
+              );
+              // Handle individual step image upload error if necessary
             }
-        }));
+          })
+        );
 
         // Return step object with text and populated images array
         return { text: step.text, images: imagesData };
-    }));
+      })
+    );
 
     // Now, find the recipe again by its id and update it with the stepsWithImages
     // This ensures the _id used for folders is the actual recipe _id
     recipe = await Recipe.findByIdAndUpdate(
-        recipeId,
-        { $set: { steps: stepsWithImages } },
-        { new: true } // Return the updated document
+      recipeId,
+      { $set: { steps: stepsWithImages } },
+      { new: true } // Return the updated document
     );
 
     if (!recipe) {
-         // This should ideally not happen, but handle the case where the recipe was somehow not found after creation
-         return res.status(404).json({ message: 'Recipe not found after initial creation' });
+      // This should ideally not happen, but handle the case where the recipe was somehow not found after creation
+      return res
+        .status(404)
+        .json({ message: "Recipe not found after initial creation" });
     }
 
     // Send the complete recipe object in the response
     res.status(201).json(recipe);
-
   } catch (err) {
-    console.error('Lỗi tạo recipe:', err);
-    res.status(500).json({ message: 'Lỗi tạo recipe', error: err.message });
+    console.error("Lỗi tạo recipe:", err);
+    res.status(500).json({ message: "Lỗi tạo recipe", error: err.message });
   }
 };
 exports.getRecipeApproveById = async (req, res) => {
@@ -157,35 +196,40 @@ exports.getRecipeApproveById = async (req, res) => {
 
     // Validate if the provided ID is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(recipeId)) {
-      return res.status(400).json({ message: 'ID công thức không hợp lệ.' });
+      return res.status(400).json({ message: "ID công thức không hợp lệ." });
     }
 
     let recipe;
 
     // If user is admin, fetch recipe regardless of status
-    if (req.user && req.user.role === 'admin') {
-      recipe = await Recipe.findById(recipeId).populate('author', 'username createdAt');
+    if (req.user && req.user.role === "admin") {
+      recipe = await Recipe.findById(recipeId).populate(
+        "author",
+        "username createdAt"
+      );
     } else {
       // For non-authenticated users and regular users, only fetch if status is 'approved'
       recipe = await Recipe.findOne({
         $or: [
-          { _id: recipeId, status: 'approved' },
-          { _id: recipeId, status: 'pending' }
-        ]
-      }).populate('author', 'username createdAt');
+          { _id: recipeId, status: "approved" },
+          { _id: recipeId, status: "pending" },
+          { _id: recipeId, status: "draft" },
+        ],
+      }).populate("author", "username createdAt");
     }
 
     if (!recipe) {
-      const message = (req.user && req.user.role === 'admin') 
-        ? 'Không tìm thấy recipe.' 
-        : 'Không tìm thấy recipe hoặc recipe chưa được duyệt.';
+      const message =
+        req.user && req.user.role === "admin"
+          ? "Không tìm thấy recipe."
+          : "Không tìm thấy recipe hoặc recipe chưa được duyệt.";
       return res.status(404).json({ message: message });
     }
 
     res.json(recipe);
   } catch (err) {
-    console.error('Lỗi lấy recipe:', err);
-    res.status(500).json({ message: 'Lỗi lấy recipe', error: err.message });
+    console.error("Lỗi lấy recipe:", err);
+    res.status(500).json({ message: "Lỗi lấy recipe", error: err.message });
   }
 };
 
@@ -195,63 +239,79 @@ exports.getRecipeById = async (req, res) => {
 
     // Validate if the provided ID is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(recipeId)) {
-      return res.status(400).json({ message: 'ID công thức không hợp lệ.' });
+      return res.status(400).json({ message: "ID công thức không hợp lệ." });
     }
 
     let recipe;
 
     // If user is admin, fetch recipe regardless of status
-    if (req.user && req.user.role === 'admin') {
-      recipe = await Recipe.findById(recipeId).populate('author', 'username createdAt');
+    if (req.user && req.user.role === "admin") {
+      recipe = await Recipe.findById(recipeId).populate(
+        "author",
+        "username createdAt"
+      );
     } else {
       // For regular users, only fetch if status is 'approved'
-      recipe = await Recipe.findOne({ _id: recipeId, status: 'approved' }).populate('author', 'username createdAt');
+      recipe = await Recipe.findOne({
+        _id: recipeId,
+        status: "approved",
+      }).populate("author", "username createdAt");
     }
 
     if (!recipe) {
-      const message = (req.user && req.user.role === 'admin') ? 'Không tìm thấy recipe.' : 'Không tìm thấy recipe hoặc recipe chưa được duyệt.';
+      const message =
+        req.user && req.user.role === "admin"
+          ? "Không tìm thấy recipe."
+          : "Không tìm thấy recipe hoặc recipe chưa được duyệt.";
       return res.status(404).json({ message: message });
     }
 
     res.json(recipe);
   } catch (err) {
-    console.error('Lỗi lấy recipe:', err);
-    res.status(500).json({ message: 'Lỗi lấy recipe', error: err.message });
+    console.error("Lỗi lấy recipe:", err);
+    res.status(500).json({ message: "Lỗi lấy recipe", error: err.message });
   }
 };
 
 exports.getAuthorRecipeById = async (req, res) => {
   try {
-    const recipes = await Recipe.find({ author: req.params.id }).populate('author', 'username createdAt');
+    const recipes = await Recipe.find({ author: req.params.id }).populate(
+      "author",
+      "username createdAt"
+    );
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi lấy recipe', error: err.message });
+    res.status(500).json({ message: "Lỗi lấy recipe", error: err.message });
   }
 };
 
 // Lấy 8 món ăn mới nhất đã duyệt
 exports.getNewest = async (req, res) => {
   try {
-    const recipes = await Recipe.find({ status: 'approved' })
+    const recipes = await Recipe.find({ status: "approved" })
       .sort({ createdAt: -1 })
       .limit(8)
-      .populate('author', 'username');
+      .populate("author", "username");
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi lấy món ăn mới nhất', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Lỗi lấy món ăn mới nhất", error: err.message });
   }
 };
 
 // Lấy 4 recipe nhiều like nhất đã duyệt
 exports.getMostLiked = async (req, res) => {
   try {
-    const recipes = await Recipe.find({ status: 'approved' })
+    const recipes = await Recipe.find({ status: "approved" })
       .sort({ likes: -1 })
       .limit(4)
-      .populate('author', 'username');
+      .populate("author", "username");
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi lấy recipe nhiều like nhất', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Lỗi lấy recipe nhiều like nhất", error: err.message });
   }
 };
 
@@ -259,17 +319,19 @@ exports.getMostLiked = async (req, res) => {
 exports.findByIngredient = async (req, res) => {
   try {
     const keyword = req.query.ingredient;
-    if (!keyword || keyword.trim() === '') {
-      return res.status(400).json({ message: 'Thiếu tham số ingredient' });
+    if (!keyword || keyword.trim() === "") {
+      return res.status(400).json({ message: "Thiếu tham số ingredient" });
     }
     // Tìm các recipe có ít nhất 1 nguyên liệu chứa từ khoá (không phân biệt hoa thường)
     const recipes = await Recipe.find({
-      status: 'approved',
-      ingredients: { $elemMatch: { $regex: keyword, $options: 'i' } }
-    }).populate('author', 'username');
+      status: "approved",
+      ingredients: { $elemMatch: { $regex: keyword, $options: "i" } },
+    }).populate("author", "username");
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi tìm recipe theo nguyên liệu', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Lỗi tìm recipe theo nguyên liệu", error: err.message });
   }
 };
 
@@ -277,16 +339,16 @@ exports.findByIngredient = async (req, res) => {
 exports.search = async (req, res) => {
   try {
     const q = req.query.q;
-    if (!q || q.trim() === '') {
-      return res.status(400).json({ message: 'Thiếu từ khóa tìm kiếm' });
+    if (!q || q.trim() === "") {
+      return res.status(400).json({ message: "Thiếu từ khóa tìm kiếm" });
     }
     const recipes = await Recipe.find({
-      status: 'approved',
-      title: { $regex: q, $options: 'i' }
-    }).populate('author', 'username');
+      status: "approved",
+      title: { $regex: q, $options: "i" },
+    }).populate("author", "username");
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi tìm kiếm', error: err.message });
+    res.status(500).json({ message: "Lỗi tìm kiếm", error: err.message });
   }
 };
 
@@ -296,13 +358,18 @@ exports.getAllUserRecipes = async (req, res) => {
     const recipes = await Recipe.find({ author: req.user.user_id });
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi lấy tất cả recipe của user', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Lỗi lấy tất cả recipe của user", error: err.message });
   }
 };
 exports.getPublishedUserRecipes = async (req, res) => {
   try {
     // Find published recipes where the author matches the logged-in user's ID
-    const recipes = await Recipe.find({ author: req.user.user_id, status: 'approved' });
+    const recipes = await Recipe.find({
+      author: req.user.user_id,
+      status: "approved",
+    });
 
     res.status(200).json(recipes);
   } catch (error) {
@@ -317,7 +384,10 @@ exports.getDraftUserRecipes = async (req, res) => {
   try {
     // Find draft recipes where the author matches the logged-in user's ID
     console.log(req.user.user_id);
-    const recipes = await Recipe.find({ author: req.user.user_id, status: 'draft' });
+    const recipes = await Recipe.find({
+      author: req.user.user_id,
+      status: "draft",
+    });
 
     res.status(200).json(recipes);
   } catch (error) {
@@ -338,22 +408,28 @@ exports.updateRecipe = async (req, res) => {
     const uploadedFiles = req.files; // Mảng tất cả các file được upload
 
     // Lấy thông tin file ảnh chính mới từ mảng req.files
-    const newMainImageFile = uploadedFiles ? uploadedFiles.find(file => file.fieldname === 'mainImage') : null;
+    const newMainImageFile = uploadedFiles
+      ? uploadedFiles.find((file) => file.fieldname === "mainImage")
+      : null;
     // const newMainImageBuffer = newMainImageFile ? newMainImageFile.buffer : null; // Dữ liệu nhị phân mới
     // const newMainImageType = newMainImageFile ? newMainImageFile.mimetype : null; // Kiểu MIME mới
 
     // Lấy thông tin các file ảnh bước làm mới từ mảng req.files
-    const newStepImageFiles = uploadedFiles ? uploadedFiles.filter(file => file.fieldname.startsWith('stepImages')) : [];
+    const newStepImageFiles = uploadedFiles
+      ? uploadedFiles.filter((file) => file.fieldname.startsWith("stepImages"))
+      : [];
 
     const recipe = await Recipe.findById(recipeId);
 
     if (!recipe) {
-      return res.status(404).json({ message: 'Recipe not found' });
+      return res.status(404).json({ message: "Recipe not found" });
     }
 
     // Kiểm tra quyền: chỉ tác giả mới được sửa
     if (recipe.author.toString() !== userId) {
-      return res.status(403).json({ message: 'Bạn không có quyền sửa recipe này' });
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền sửa recipe này" });
     }
 
     // Nếu có ảnh chính mới upload, upload lên Cloudinary và cập nhật URL
@@ -365,9 +441,11 @@ exports.updateRecipe = async (req, res) => {
       // }
 
       const result = await cloudinary.uploader.upload(
-        `data:${newMainImageFile.mimetype};base64,${newMainImageFile.buffer.toString('base64')}`,
+        `data:${
+          newMainImageFile.mimetype
+        };base64,${newMainImageFile.buffer.toString("base64")}`,
         {
-          folder: 'recipe_main_images' // Optional: specify a folder in Cloudinary
+          folder: "recipe_main_images", // Optional: specify a folder in Cloudinary
         }
       );
       recipe.mainImage = result.secure_url;
@@ -376,69 +454,89 @@ exports.updateRecipe = async (req, res) => {
     // Cập nhật các trường khác từ req.body
     // Có thể cần xử lý đặc biệt cho mảng (ingredients, steps, categories) và object (nutrition)
     // Ví dụ đơn giản: gán trực tiếp (có thể cần refine)
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       // Không ghi đè trường mainImage hoặc mainImageType nếu có trong updates (vì đã xử lý file)
-      if (key !== 'mainImage' && key !== 'mainImageType' && key !== 'stepImages' && key !== 'steps') { // Bỏ qua cả trường steps
+      if (
+        key !== "mainImage" &&
+        key !== "mainImageType" &&
+        key !== "stepImages" &&
+        key !== "steps"
+      ) {
+        // Bỏ qua cả trường steps
         recipe[key] = updates[key];
       }
     });
 
     // Đảm bảo trường status chỉ được update nếu người dùng là admin (tùy logic app)
     // Ở đây, ta cho phép tác giả lưu nháp/gửi duyệt lại, nhưng không tự duyệt
-    if (updates.status && updates.status !== 'approved') {
+    if (updates.status && updates.status !== "approved") {
       recipe.status = updates.status;
-    } else if (updates.status === 'approved' && recipe.status !== 'approved') {
+    } else if (updates.status === "approved" && recipe.status !== "approved") {
       // Nếu tác giả cố gắng tự duyệt recipe chưa duyệt, có thể báo lỗi hoặc bỏ qua
       // Ở đây, ta bỏ qua việc tác giả tự chuyển sang approved
       // Xóa trường status khỏi updates nếu nó là 'approved' để tác giả không thể tự duyệt
       delete updates.status;
     }
     // Cập nhật các trường sau khi xử lý status đặc biệt
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       // Bỏ qua mainImage, mainImageType, stepImages và status
-      if (key !== 'mainImage' && key !== 'mainImageType' && key !== 'stepImages' && key !== 'steps' && key !== 'status') { // Bỏ qua cả trường steps
+      if (
+        key !== "mainImage" &&
+        key !== "mainImageType" &&
+        key !== "stepImages" &&
+        key !== "steps" &&
+        key !== "status"
+      ) {
+        // Bỏ qua cả trường steps
         recipe[key] = updates[key];
       }
     });
     // Cập nhật các mảng và object nested nếu có
     if (updates.ingredients) recipe.ingredients = updates.ingredients;
     // Xử lý cập nhật steps và ảnh bước làm
-    if (updates.steps) { // updates.steps chứa text và có thể metadata ảnh từ FE
-        // Lặp qua các bước được gửi từ frontend
-        const updatedStepsWithImages = await Promise.all(updates.steps.map(async (step, stepIndex) => {
-            const imagesData = [];
+    if (updates.steps) {
+      // updates.steps chứa text và có thể metadata ảnh từ FE
+      // Lặp qua các bước được gửi từ frontend
+      const updatedStepsWithImages = await Promise.all(
+        updates.steps.map(async (step, stepIndex) => {
+          const imagesData = [];
 
-            // Handle existing images (if frontend sends URLs or identifiers)
-            if (step.images) {
-                // Assuming step.images contains objects with a 'url' field for existing images
-                step.images.forEach(existingImage => {
-                    if (existingImage.url) {
-                        imagesData.push({ url: existingImage.url });
-                    }
-                });
-            }
+          // Handle existing images (if frontend sends URLs or identifiers)
+          if (step.images) {
+            // Assuming step.images contains objects with a 'url' field for existing images
+            step.images.forEach((existingImage) => {
+              if (existingImage.url) {
+                imagesData.push({ url: existingImage.url });
+              }
+            });
+          }
 
-            // Filter new files uploaded specifically for this step
-            const filesForThisStep = newStepImageFiles.filter(file => 
-                file.fieldname.startsWith(`stepImages[${stepIndex}]`)
-            );
+          // Filter new files uploaded specifically for this step
+          const filesForThisStep = newStepImageFiles.filter((file) =>
+            file.fieldname.startsWith(`stepImages[${stepIndex}]`)
+          );
 
-            // Upload new images for this step to Cloudinary
-            await Promise.all(filesForThisStep.map(async (file) => {
-                const result = await cloudinary.uploader.upload(
-                    `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-                    {
-                        folder: `recipe_step_images/recipe_${recipeId}/step_${stepIndex}` // Optional: specify a folder
-                    }
-                );
-                imagesData.push({ url: result.secure_url });
-            }));
-            
-            // Trả về object bước làm đã cập nhật (text và mảng ảnh mới + cũ)
-            return { text: step.text, images: imagesData };
-        }));
-        // Cập nhật mảng steps của recipe với dữ liệu mới
-        recipe.steps = updatedStepsWithImages;
+          // Upload new images for this step to Cloudinary
+          await Promise.all(
+            filesForThisStep.map(async (file) => {
+              const result = await cloudinary.uploader.upload(
+                `data:${file.mimetype};base64,${file.buffer.toString(
+                  "base64"
+                )}`,
+                {
+                  folder: `recipe_step_images/recipe_${recipeId}/step_${stepIndex}`, // Optional: specify a folder
+                }
+              );
+              imagesData.push({ url: result.secure_url });
+            })
+          );
+
+          // Trả về object bước làm đã cập nhật (text và mảng ảnh mới + cũ)
+          return { text: step.text, images: imagesData };
+        })
+      );
+      // Cập nhật mảng steps của recipe với dữ liệu mới
+      recipe.steps = updatedStepsWithImages;
     }
     if (updates.nutrition) recipe.nutrition = updates.nutrition;
     if (updates.categories) recipe.categories = updates.categories;
@@ -447,10 +545,11 @@ exports.updateRecipe = async (req, res) => {
     const updatedRecipe = await recipe.save();
 
     res.json(updatedRecipe);
-
   } catch (err) {
-    console.error('Lỗi cập nhật recipe:', err);
-    res.status(500).json({ message: 'Lỗi cập nhật recipe', error: err.message });
+    console.error("Lỗi cập nhật recipe:", err);
+    res
+      .status(500)
+      .json({ message: "Lỗi cập nhật recipe", error: err.message });
   }
 };
 
@@ -458,72 +557,80 @@ exports.updateRecipe = async (req, res) => {
 // @route DELETE /api/recipes/:id
 // @access Private (Author only)
 exports.deleteRecipe = async (req, res) => {
-    try {
-      const recipeId = req.params.id;
-      const userId = req.user.user_id;
-  
-      const recipe = await Recipe.findById(recipeId);
-  
-      if (!recipe) {
-        return res.status(404).json({ message: 'Recipe not found' });
-      }
-  
-      // Kiểm tra quyền: chỉ tác giả mới được xóa
-      if (recipe.author.toString() !== userId) {
-        return res.status(403).json({ message: 'Bạn không có quyền xóa recipe này' });
-      }
-  
-      // Tùy chọn: Xóa file ảnh chính trên server nếu cần
-      // Cần logic để lấy đường dẫn file trên hệ thống từ recipe.mainImage
-      // if (recipe.mainImage && recipe.mainImage !== '/path/to/default/image.jpg') {
-      //   const fs = require('fs');
-      //   const imagePath = path.join(__dirname, '../public', recipe.mainImage); // Giả định cấu trúc thư mục
-      //   fs.unlink(imagePath, (err) => {
-      //     if (err) console.error('Lỗi xóa file ảnh cũ:', err);
-      //   });
-      // }
-  
-      // Tùy chọn: Xóa ảnh trên Cloudinary khi xóa recipe
-      // if (recipe.mainImage) {
-      //   const publicId = recipe.mainImage.split('/').pop().split('.')[0];
-      //   await cloudinary.uploader.destroy(`recipe_main_images/${publicId}`);
-      // }
-      // // Also delete step images if stored in specific folders like above
-      // for (const step of recipe.steps) {
-      //   for (const image of step.images) {
-      //     if (image.url) {
-      //       // Need logic to extract public ID from step image URL and delete from Cloudinary
-      //     }
-      //   }
-      // }
-  
-      // Xóa recipe khỏi database
-      await recipe.deleteOne();
-  
-      res.json({ message: 'Recipe đã được xóa' });
-  
-    } catch (err) {
-      console.error('Lỗi xóa recipe:', err);
-      res.status(500).json({ message: 'Lỗi xóa recipe', error: err.message });
+  try {
+    const recipeId = req.params.id;
+    const userId = req.user.user_id;
+
+    const recipe = await Recipe.findById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
     }
-  };
+
+    // Kiểm tra quyền: chỉ tác giả mới được xóa
+    if (recipe.author.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền xóa recipe này" });
+    }
+
+    // Tùy chọn: Xóa file ảnh chính trên server nếu cần
+    // Cần logic để lấy đường dẫn file trên hệ thống từ recipe.mainImage
+    // if (recipe.mainImage && recipe.mainImage !== '/path/to/default/image.jpg') {
+    //   const fs = require('fs');
+    //   const imagePath = path.join(__dirname, '../public', recipe.mainImage); // Giả định cấu trúc thư mục
+    //   fs.unlink(imagePath, (err) => {
+    //     if (err) console.error('Lỗi xóa file ảnh cũ:', err);
+    //   });
+    // }
+
+    // Tùy chọn: Xóa ảnh trên Cloudinary khi xóa recipe
+    // if (recipe.mainImage) {
+    //   const publicId = recipe.mainImage.split('/').pop().split('.')[0];
+    //   await cloudinary.uploader.destroy(`recipe_main_images/${publicId}`);
+    // }
+    // // Also delete step images if stored in specific folders like above
+    // for (const step of recipe.steps) {
+    //   for (const image of step.images) {
+    //     if (image.url) {
+    //       // Need logic to extract public ID from step image URL and delete from Cloudinary
+    //     }
+    //   }
+    // }
+
+    // Xóa recipe khỏi database
+    await recipe.deleteOne();
+
+    res.json({ message: "Recipe đã được xóa" });
+  } catch (err) {
+    console.error("Lỗi xóa recipe:", err);
+    res.status(500).json({ message: "Lỗi xóa recipe", error: err.message });
+  }
+};
 
 // Lấy tất cả recipe có trạng thái 'pending' (chờ duyệt)
 exports.getPendingRecipes = async (req, res) => {
   try {
     // Chỉ admin mới có thể truy cập
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Chỉ admin mới có quyền xem danh sách chờ duyệt.' });
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Chỉ admin mới có quyền xem danh sách chờ duyệt." });
     }
 
-    const recipes = await Recipe.find({ status: 'pending' })
+    const recipes = await Recipe.find({ status: "pending" })
       .sort({ createdAt: 1 }) // Sắp xếp theo thời gian tạo cũ nhất trước
-      .populate('author', 'username');
-    
+      .populate("author", "username");
+
     res.json(recipes);
   } catch (err) {
-    console.error('Lỗi lấy danh sách recipe chờ duyệt:', err);
-    res.status(500).json({ message: 'Lỗi lấy danh sách recipe chờ duyệt', error: err.message });
+    console.error("Lỗi lấy danh sách recipe chờ duyệt:", err);
+    res
+      .status(500)
+      .json({
+        message: "Lỗi lấy danh sách recipe chờ duyệt",
+        error: err.message,
+      });
   }
 };
 
@@ -532,17 +639,28 @@ exports.getUserPendingRecipes = async (req, res) => {
   try {
     // Đảm bảo người dùng đã đăng nhập để lấy user_id
     if (!req.user || !req.user.user_id) {
-      return res.status(401).json({ message: 'Bạn chưa đăng nhập.' });
+      return res.status(401).json({ message: "Bạn chưa đăng nhập." });
     }
 
-    const recipes = await Recipe.find({ author: req.user.user_id, status: 'pending' })
+    const recipes = await Recipe.find({
+      author: req.user.user_id,
+      status: "pending",
+    })
       .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất trước
-      .populate('author', 'username createdAt');
-    
+      .populate("author", "username createdAt");
+
     res.json(recipes);
   } catch (err) {
-    console.error('Lỗi lấy danh sách recipe đang chờ duyệt của người dùng:', err);
-    res.status(500).json({ message: 'Lỗi lấy danh sách recipe đang chờ duyệt của người dùng', error: err.message });
+    console.error(
+      "Lỗi lấy danh sách recipe đang chờ duyệt của người dùng:",
+      err
+    );
+    res
+      .status(500)
+      .json({
+        message: "Lỗi lấy danh sách recipe đang chờ duyệt của người dùng",
+        error: err.message,
+      });
   }
 };
 
@@ -550,23 +668,27 @@ exports.getUserPendingRecipes = async (req, res) => {
 exports.updateRecipeStatus = async (req, res) => {
   try {
     // Chỉ admin mới có thể truy cập
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Chỉ admin mới có quyền cập nhật trạng thái recipe.' });
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({
+          message: "Chỉ admin mới có quyền cập nhật trạng thái recipe.",
+        });
     }
 
     const recipeId = req.params.id;
     const { status } = req.body; // Trạng thái mới: 'approved', 'rejected', etc.
 
     // Kiểm tra trạng thái mới hợp lệ
-    const validStatuses = ['approved', 'rejected', 'draft', 'pending']; // Thêm các trạng thái hợp lệ khác nếu có
+    const validStatuses = ["approved", "rejected", "draft", "pending"]; // Thêm các trạng thái hợp lệ khác nếu có
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: 'Trạng thái không hợp lệ.' });
+      return res.status(400).json({ message: "Trạng thái không hợp lệ." });
     }
 
     const recipe = await Recipe.findById(recipeId);
 
     if (!recipe) {
-      return res.status(404).json({ message: 'Không tìm thấy recipe.' });
+      return res.status(404).json({ message: "Không tìm thấy recipe." });
     }
 
     // Cập nhật trạng thái và ngày cập nhật
@@ -578,11 +700,15 @@ exports.updateRecipeStatus = async (req, res) => {
     // TODO: Gửi thông báo tới người dùng đã đăng công thức về trạng thái duyệt.
     // Có thể dùng notificationController.createNotification ở đây.
 
-    res.json({ message: `Cập nhật trạng thái recipe thành \'${status}\' thành công.`, recipe });
-
+    res.json({
+      message: `Cập nhật trạng thái recipe thành \'${status}\' thành công.`,
+      recipe,
+    });
   } catch (err) {
-    console.error('Lỗi cập nhật trạng thái recipe:', err);
-    res.status(500).json({ message: 'Lỗi cập nhật trạng thái recipe', error: err.message });
+    console.error("Lỗi cập nhật trạng thái recipe:", err);
+    res
+      .status(500)
+      .json({ message: "Lỗi cập nhật trạng thái recipe", error: err.message });
   }
 };
 
@@ -592,11 +718,13 @@ exports.generateRecipePdf = async (req, res) => {
     const recipeId = req.params.id;
 
     // Fetch recipe data
-    const recipe = await Recipe.findById(recipeId)
-      .populate('author', 'username'); // Populate author details
+    const recipe = await Recipe.findById(recipeId).populate(
+      "author",
+      "username"
+    ); // Populate author details
 
     if (!recipe) {
-      return res.status(404).json({ message: 'Recipe not found.' });
+      return res.status(404).json({ message: "Recipe not found." });
     }
 
     // Construct basic HTML for the PDF
@@ -622,46 +750,79 @@ exports.generateRecipePdf = async (req, res) => {
       </head>
       <body>
         <h1>${recipe.title}</h1>
-        <p class="user-info"><strong>Author:</strong> ${recipe.author ? recipe.author.username : 'N/A'}</p>
-        <p><strong>Description:</strong> ${recipe.desc || 'N/A'}</p>
-        <p><strong>Cook Time:</strong> ${recipe.cookTime || 'N/A'}</p>
+        <p class="user-info"><strong>Author:</strong> ${
+          recipe.author ? recipe.author.username : "N/A"
+        }</p>
+        <p><strong>Description:</strong> ${recipe.desc || "N/A"}</p>
+        <p><strong>Cook Time:</strong> ${recipe.cookTime || "N/A"}</p>
 
-        ${recipe.mainImage ? `<div style="text-align: center;"><img src="${recipe.mainImage}" alt="Main Recipe Image" style="max-width: 80%; margin: 20px auto;"/></div>` : ''}
+        ${
+          recipe.mainImage
+            ? `<div style="text-align: center;"><img src="${recipe.mainImage}" alt="Main Recipe Image" style="max-width: 80%; margin: 20px auto;"/></div>`
+            : ""
+        }
 
         <div class="section ingredients">
           <h2>Ingredients</h2>
-          ${recipe.ingredients && recipe.ingredients.length > 0
-            ? `<ul>${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>`
-            : '<p>No ingredients listed.</p>'}
+          ${
+            recipe.ingredients && recipe.ingredients.length > 0
+              ? `<ul>${recipe.ingredients
+                  .map((ing) => `<li>${ing}</li>`)
+                  .join("")}</ul>`
+              : "<p>No ingredients listed.</p>"
+          }
         </div>
 
-        ${recipe.servings ? `
+        ${
+          recipe.servings
+            ? `
           <div class="section">
             <h2>Servings</h2>
             <p>${recipe.servings}</p>
           </div>
-        ` : ''}
+        `
+            : ""
+        }
 
         <div class="section steps">
           <h2>Steps</h2>
-          ${recipe.steps && recipe.steps.length > 0
-            ? `<ol>${recipe.steps.map((step, index) => `
+          ${
+            recipe.steps && recipe.steps.length > 0
+              ? `<ol>${recipe.steps
+                  .map(
+                    (step, index) => `
               <li>
-                ${step.text || ''}
-                ${step.images && step.images.length > 0 
-                  ? step.images.map(img => `<img src="${img.url}" alt="Step Image ${index + 1}"/>`).join('') 
-                  : ''}
+                ${step.text || ""}
+                ${
+                  step.images && step.images.length > 0
+                    ? step.images
+                        .map(
+                          (img) =>
+                            `<img src="${img.url}" alt="Step Image ${
+                              index + 1
+                            }"/>`
+                        )
+                        .join("")
+                    : ""
+                }
               </li>
-            `).join('')}</ol>`
-            : '<p>No steps listed.</p>'}
+            `
+                  )
+                  .join("")}</ol>`
+              : "<p>No steps listed.</p>"
+          }
         </div>
 
-         ${recipe.nutrition ? `
+         ${
+           recipe.nutrition
+             ? `
           <div class="section">
             <h2>Nutrition</h2>
              <p>${recipe.nutrition}</p>
           </div>
-         ` : ''}
+         `
+             : ""
+         }
 
       </body>
       </html>
@@ -669,39 +830,47 @@ exports.generateRecipePdf = async (req, res) => {
 
     // PDF generation options (optional)
     const options = {
-      format: 'A4',
-      orientation: 'portrait',
+      format: "A4",
+      orientation: "portrait",
       border: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm'
+        top: "20mm",
+        right: "20mm",
+        bottom: "20mm",
+        left: "20mm",
       },
       // You might need to configurephantomPath for your system
-      // phantomPath: '/usr/local/bin/phantomjs' 
+      // phantomPath: '/usr/local/bin/phantomjs'
     };
 
     // Generate PDF
     pdf.create(htmlContent, options).toStream((err, stream) => {
       if (err) {
-        console.error('Error creating PDF:', err);
-        return res.status(500).json({ message: 'Failed to generate PDF.', error: err.message });
+        console.error("Error creating PDF:", err);
+        return res
+          .status(500)
+          .json({ message: "Failed to generate PDF.", error: err.message });
       }
 
       // Set headers for PDF download
-      res.setHeader('Content-Type', 'application/pdf');
-      
+      res.setHeader("Content-Type", "application/pdf");
+
       // Sanitize the recipe title for the filename
-      const sanitizedTitle = (recipe.title || 'recipe').replace(/[^a-zA-Z0-9_\-]/g, '_');
-      res.setHeader('Content-Disposition', `attachment; filename="${sanitizedTitle}.pdf"`);
+      const sanitizedTitle = (recipe.title || "recipe").replace(
+        /[^a-zA-Z0-9_\-]/g,
+        "_"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${sanitizedTitle}.pdf"`
+      );
 
       // Pipe the PDF stream to the response
       stream.pipe(res);
     });
-
   } catch (err) {
-    console.error('Error generating recipe PDF:', err);
-    res.status(500).json({ message: 'Failed to generate recipe PDF', error: err.message });
+    console.error("Error generating recipe PDF:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to generate recipe PDF", error: err.message });
   }
 };
-
