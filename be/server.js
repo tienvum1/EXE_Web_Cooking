@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
+const connectDB = require('./config/db');
 
 // Import Passport configuration
 require('./config/passport')(passport);
@@ -47,8 +48,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(cookieParser());
+
+// Update CORS options for production
 const corsOptions = {
-  origin: [ 'https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://exe-web-cooking.vercel.app', 'https://exe-web-cooking-fe.vercel.app']
+    : ['https://localhost:3000', 'http://localhost:3000', 'https://localhost:5173'],
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -97,25 +102,53 @@ app.use('/api/premium', premiumRoutes);
 
 app.get('/', (req, res) => res.send('API is running!'));
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+// Catch-all route for API
+app.get('/api/*', (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
+});
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
+
 // Kết nối MongoDB và khởi động server
 const PORT = process.env.PORT || 4567;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/cooking';
 
-const sslOptions = {
-  key: fs.readFileSync('./localhost-key.pem'),
-  cert: fs.readFileSync('./localhost.pem')
-};
-
-const httpsServer = https.createServer(sslOptions, app);
-const io = new Server(httpsServer, { cors: { origin: ['https://localhost:3000', 'http://localhost:3000'], credentials: true } });
-app.set('io', io);
-global.io = io;
-
-mongoose.connect(MONGO_URI)
+// Connect to MongoDB
+connectDB()
   .then(() => {
-    httpsServer.listen(PORT, () => {
-      console.log(`Server running at https://localhost:${PORT}`);
-    });
+    if (process.env.NODE_ENV === 'production') {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    } else {
+      const sslOptions = {
+        key: fs.readFileSync('./localhost-key.pem'),
+        cert: fs.readFileSync('./localhost.pem')
+      };
+      const httpsServer = https.createServer(sslOptions, app);
+      const io = new Server(httpsServer, { 
+        cors: { 
+          origin: ['https://localhost:3000', 'http://localhost:3000'], 
+          credentials: true 
+        } 
+      });
+      app.set('io', io);
+      global.io = io;
+      
+      httpsServer.listen(PORT, () => {
+        console.log(`Server running at https://localhost:${PORT}`);
+      });
+    }
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
