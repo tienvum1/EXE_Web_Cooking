@@ -18,7 +18,14 @@ const Footer = () => {
           </div>
 
           <div className="footer__social">
-            <a href="#" aria-label="Facebook"><FaFacebookF /></a>
+          <a 
+      href="https://www.facebook.com/people/Live-Long-Live-Well/61577165199079" 
+      aria-label="Facebook" 
+      target="_blank" 
+      rel="noopener noreferrer"
+    >
+      <FaFacebookF />
+    </a>
             <a href="#" aria-label="Instagram"><FaInstagram /></a>
             <a href="#" aria-label="Twitter"><FaTwitter /></a>
           </div>
