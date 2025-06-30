@@ -25,10 +25,14 @@ exports.getTotalRecipes = async (req, res) => {
 // API: Lấy tổng doanh thu (tính tổng amount của các transaction thành công)
 exports.getTotalRevenue = async (req, res) => {
   try {
-    // Chỉ tính các transaction có status là 'success' và type là topup, donate, donate-blog, register_premium
-    const revenueTypes = ['topup', 'donate', 'donate-blog', 'register_premium'];
     const result = await Transaction.aggregate([
-      { $match: { status: 'success', type: { $in: revenueTypes } } },
+      { $match: {
+        $or: [
+          { type: 'topup', status: 'success', method: 'bank_transfer' },
+          { type: 'donate-blog', status: 'success', method: 'donate' },
+          { type: 'register_premium', status: 'completed' }
+        ]
+      } },
       { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
     ]);
     const totalRevenue = result.length > 0 ? result[0].totalRevenue : 0;
@@ -76,14 +80,17 @@ exports.getRevenueByPeriod = async (req, res) => {
     const { type } = req.query; // type: day, week, month, year
     const { start, end } = getDateRange(type);
     if (!start || !end) return res.status(400).json({ message: 'Tham số type không hợp lệ' });
-    const revenueTypes = ['topup', 'donate', 'donate-blog', 'register_premium'];
     const result = await Transaction.aggregate([
       { $match: {
-          status: 'success',
-          type: { $in: revenueTypes },
-          createdAt: { $gte: start, $lt: end }
-        }
-      },
+        $and: [
+          { createdAt: { $gte: start, $lt: end } },
+          { $or: [
+            { type: 'topup', status: 'success', method: 'bank_transfer' },
+            { type: 'donate-blog', status: 'success', method: 'donate' },
+            { type: 'register_premium', status: 'completed' }
+          ] }
+        ]
+      } },
       { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
     ]);
     const totalRevenue = result.length > 0 ? result[0].totalRevenue : 0;
@@ -104,11 +111,15 @@ exports.getSummaryByPeriod = async (req, res) => {
       Recipe.countDocuments(),
       Transaction.aggregate([
         { $match: {
-            status: 'success',
-            type: { $in: ['topup', 'donate', 'donate-blog', 'register_premium'] },
-            createdAt: { $gte: start, $lt: end }
-          }
-        },
+          $and: [
+            { createdAt: { $gte: start, $lt: end } },
+            { $or: [
+              { type: 'topup', status: 'success', method: 'bank_transfer' },
+              { type: 'donate-blog', status: 'success', method: 'donate' },
+              { type: 'register_premium', status: 'completed' }
+            ] }
+          ]
+        } },
         { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
       ])
     ]);
@@ -145,7 +156,6 @@ exports.getSummaryByMonth = async (req, res) => {
     if (isNaN(y) || isNaN(m) || m < 0 || m > 11) return res.status(400).json({ message: 'Tham số tháng/năm không hợp lệ' });
     const startOfMonth = new Date(y, m, 1);
     const endOfMonth = new Date(y, m + 1, 1);
-    const revenueTypes = ['topup', 'donate', 'donate-blog', 'register_premium'];
 
     if (type === 'day') {
       // Thống kê từng ngày trong tháng
@@ -158,11 +168,15 @@ exports.getSummaryByMonth = async (req, res) => {
           Recipe.countDocuments({ createdAt: { $gte: dayStart, $lt: dayEnd } }),
           Transaction.aggregate([
             { $match: {
-                status: 'success',
-                type: { $in: revenueTypes },
-                createdAt: { $gte: dayStart, $lt: dayEnd }
-              }
-            },
+              $and: [
+                { createdAt: { $gte: dayStart, $lt: dayEnd } },
+                { $or: [
+                  { type: 'topup', status: 'success', method: 'bank_transfer' },
+                  { type: 'donate-blog', status: 'success', method: 'donate' },
+                  { type: 'register_premium', status: 'completed' }
+                ] }
+              ]
+            } },
             { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
           ])
         ]);
@@ -187,11 +201,15 @@ exports.getSummaryByMonth = async (req, res) => {
           Recipe.countDocuments({ createdAt: { $gte: weekStart, $lt: weekEnd } }),
           Transaction.aggregate([
             { $match: {
-                status: 'success',
-                type: { $in: revenueTypes },
-                createdAt: { $gte: weekStart, $lt: weekEnd }
-              }
-            },
+              $and: [
+                { createdAt: { $gte: weekStart, $lt: weekEnd } },
+                { $or: [
+                  { type: 'topup', status: 'success', method: 'bank_transfer' },
+                  { type: 'donate-blog', status: 'success', method: 'donate' },
+                  { type: 'register_premium', status: 'completed' }
+                ] }
+              ]
+            } },
             { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
           ])
         ]);
@@ -211,11 +229,15 @@ exports.getSummaryByMonth = async (req, res) => {
         Recipe.countDocuments({ createdAt: { $gte: startOfMonth, $lt: endOfMonth } }),
         Transaction.aggregate([
           { $match: {
-              status: 'success',
-              type: { $in: revenueTypes },
-              createdAt: { $gte: startOfMonth, $lt: endOfMonth }
-            }
-          },
+            $and: [
+              { createdAt: { $gte: startOfMonth, $lt: endOfMonth } },
+              { $or: [
+                { type: 'topup', status: 'success', method: 'bank_transfer' },
+                { type: 'donate-blog', status: 'success', method: 'donate' },
+                { type: 'register_premium', status: 'completed' }
+              ] }
+            ]
+          } },
           { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
         ])
       ]);
