@@ -29,6 +29,7 @@ const chatgptRoutes = require("./routes/chatgpt");
 const aiRoutes = require("./routes/ai");
 const menuRoutes = require("./routes/menuRoutes");
 const premiumRoutes = require("./routes/premiumRoutes");
+const adminRoutes = require("./routes/admin");
 
 // ... (các route khác nếu cần)
 
@@ -93,6 +94,7 @@ app.use("/api/chatgpt", chatgptRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/premium", premiumRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ... (các route khác nếu cần)
 
