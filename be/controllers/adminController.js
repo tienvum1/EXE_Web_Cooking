@@ -92,3 +92,29 @@ exports.getRevenueByPeriod = async (req, res) => {
     res.status(500).json({ message: 'Lỗi lấy doanh thu theo thời gian', error: err.message });
   }
 };
+
+// API: Tổng hợp user, recipe, revenue theo thời gian (tuần/tháng)
+exports.getSummaryByPeriod = async (req, res) => {
+  try {
+    const { type } = req.query; // type: week, month
+    const { start, end } = getDateRange(type);
+    if (!start || !end) return res.status(400).json({ message: 'Tham số type không hợp lệ' });
+    const [totalUsers, totalRecipes, revenueResult] = await Promise.all([
+      User.countDocuments(),
+      Recipe.countDocuments(),
+      Transaction.aggregate([
+        { $match: {
+            status: 'success',
+            type: { $in: ['topup', 'donate', 'donate-blog', 'register_premium'] },
+            createdAt: { $gte: start, $lt: end }
+          }
+        },
+        { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
+      ])
+    ]);
+    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+    res.json({ totalUsers, totalRecipes, totalRevenue, type });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy tổng hợp thống kê', error: err.message });
+  }
+};

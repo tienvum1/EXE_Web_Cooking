@@ -125,3 +125,10 @@ export const getRevenueByPeriod = async (type) => {
   });
   return res.data;
 };
+
+export const getSummaryByPeriod = async (type) => {
+  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/admin/summary-by-period?type=${type}`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
