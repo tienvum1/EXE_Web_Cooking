@@ -114,6 +114,7 @@ const io = new Server(httpsServer, {
     origin: [
       "https://exe-web-cooking.vercel.app",
       "https://exe-web-cooking.vercel.app",
+      "https://localhost:3000"
     ],
     credentials: true,
   },

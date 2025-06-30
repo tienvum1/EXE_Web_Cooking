@@ -1,7 +1,7 @@
 import axios from "axios";
 
+const API_URL1 = "http://localhost:4999";
 const API_URL = "https://exe-web-cooking.onrender.com";
-
 export const getCurrentUser = async () => {
   const res = await axios.get(`${API_URL}/api/users/me`, {
     withCredentials: true,
@@ -99,35 +99,42 @@ export const updateUserAvatar = async (formData) => {
 };
 
 export const getTotalUsers = async () => {
-  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/users/admin/total-users`, {
+  const res = await axios.get(`${API_URL}/api/users/admin/total-users`, {
     withCredentials: true,
   });
   return res.data;
 };
 
 export const getTotalRecipes = async () => {
-  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/users/admin/total-recipes`, {
+  const res = await axios.get(`${API_URL}/api/users/admin/total-recipes`, {
     withCredentials: true,
   });
   return res.data;
 };
 
 export const getTotalRevenue = async () => {
-  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/users/admin/total-revenue`, {
+  const res = await axios.get(`${API_URL}/api/users/admin/total-revenue`, {
     withCredentials: true,
   });
   return res.data;
 };
 
 export const getRevenueByPeriod = async (type) => {
-  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/admin/revenue-by-period?type=${type}`, {
+  const res = await axios.get(`${API_URL}/api/admin/revenue-by-period?type=${type}`, {
     withCredentials: true,
   });
   return res.data;
 };
 
 export const getSummaryByPeriod = async (type) => {
-  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/admin/summary-by-period?type=${type}`, {
+  const res = await axios.get(`${API_URL}/api/admin/summary-by-period?type=${type}`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+export const getSummaryByMonth = async ({ year, month, type }) => {
+  const res = await axios.get(`${API_URL}/api/admin/summary-by-month?year=${year}&month=${month}&type=${type}`, {
     withCredentials: true,
   });
   return res.data;
