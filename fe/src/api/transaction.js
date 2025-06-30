@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = "https://exe-web-cooking.onrender.com";
+const API_URL1 = "http://localhost:4999";
 // Lấy lịch sử giao dịch
 export const getTransactionHistory = async () => {
   try {
@@ -62,4 +63,11 @@ export const handleTopupRequest = async (transactionId, action) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const getAllTransactions = async () => {
+  const response = await axios.get(`${API_URL}/api/transactions/all`, {
+    withCredentials: true,
+  });
+  return response.data;
 };

@@ -45,6 +45,7 @@ import MenuDetail from "./pages/myMenus/MenuDetail.jsx";
 import MBQRCode from './pages/paymentQR/MBQRCode';
 import TopupRequests from "./pages/admin/TopupRequests.jsx";
 import PremiumPackage from "./pages/premium/PremiumPackages.jsx";
+import AdminTransactionHistory from './pages/transasctionPage/AdminTransactionHistory';
 import "./App.css";
 
 // Log environment variables on startup
@@ -127,7 +128,10 @@ function App() {
             path="topup-requests"
             element={<AdminLayout><TopupRequests/></AdminLayout>}
           />
-          
+          <Route
+            path="transaction-history"
+            element={<AdminLayout><AdminTransactionHistory /></AdminLayout>}
+          />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

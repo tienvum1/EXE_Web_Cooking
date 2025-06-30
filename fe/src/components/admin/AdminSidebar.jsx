@@ -25,6 +25,9 @@ const AdminSidebar = () => {
         <li>
           <Link to="/admin/withdrawals">Yêu cầu rút tiền</Link>
         </li>
+        <li>
+          <Link to="/admin/transaction-history">Lịch sử giao dịch</Link>
+        </li>
         {/* Add more admin links here */}
       </ul>
     </div>

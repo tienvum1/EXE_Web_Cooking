@@ -237,3 +237,13 @@ exports.handleTopupRequest = async (req, res) => {
     }
 };
 
+// Lấy tất cả giao dịch (admin)
+exports.getAllTransactions = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({}).sort({ createdAt: -1 });
+    res.json(transactions);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy tất cả giao dịch', error: err.message });
+  }
+};
+
