@@ -97,3 +97,24 @@ export const updateUserAvatar = async (formData) => {
     throw error;
   }
 };
+
+export const getTotalUsers = async () => {
+  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/users/admin/total-users`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+export const getTotalRecipes = async () => {
+  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/users/admin/total-recipes`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+export const getTotalRevenue = async () => {
+  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/users/admin/total-revenue`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
