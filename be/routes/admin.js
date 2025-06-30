@@ -10,5 +10,7 @@ router.get('/total-users', auth, admin, adminController.getTotalUsers);
 router.get('/total-recipes', auth, admin, adminController.getTotalRecipes);
 // Tổng doanh thu
 router.get('/total-revenue', auth, admin, adminController.getTotalRevenue);
+// Tổng doanh thu theo ngày, tuần, tháng, năm
+router.get('/revenue-by-period', auth, admin, adminController.getRevenueByPeriod);
 
 module.exports = router; 

@@ -118,3 +118,10 @@ export const getTotalRevenue = async () => {
   });
   return res.data;
 };
+
+export const getRevenueByPeriod = async (type) => {
+  const res = await axios.get(`https://exe-web-cooking.onrender.com/api/admin/revenue-by-period?type=${type}`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
