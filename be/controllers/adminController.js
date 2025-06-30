@@ -118,3 +118,115 @@ exports.getSummaryByPeriod = async (req, res) => {
     res.status(500).json({ message: 'Lỗi lấy tổng hợp thống kê', error: err.message });
   }
 };
+
+// Helper: Lấy số tuần trong tháng
+function getWeeksInMonth(year, month) {
+  const weeks = [];
+  let date = new Date(year, month, 1);
+  let week = [];
+  while (date.getMonth() === month) {
+    week.push(new Date(date));
+    if (date.getDay() === 0) { // Chủ nhật kết thúc tuần
+      weeks.push(week);
+      week = [];
+    }
+    date.setDate(date.getDate() + 1);
+  }
+  if (week.length > 0) weeks.push(week);
+  return weeks;
+}
+
+// API: Thống kê theo ngày hoặc tuần của tháng
+exports.getSummaryByMonth = async (req, res) => {
+  try {
+    const { year, month, type } = req.query; // month: 0-11, year: 2024, type: 'day'|'week'
+    const y = parseInt(year);
+    const m = parseInt(month);
+    if (isNaN(y) || isNaN(m) || m < 0 || m > 11) return res.status(400).json({ message: 'Tham số tháng/năm không hợp lệ' });
+    const startOfMonth = new Date(y, m, 1);
+    const endOfMonth = new Date(y, m + 1, 1);
+    const revenueTypes = ['topup', 'donate', 'donate-blog', 'register_premium'];
+
+    if (type === 'day') {
+      // Thống kê từng ngày trong tháng
+      const days = [];
+      for (let d = 1; d <= endOfMonth.getDate() || (new Date(y, m, d)).getMonth() === m; d++) {
+        const dayStart = new Date(y, m, d);
+        const dayEnd = new Date(y, m, d + 1);
+        const [totalUsers, totalRecipes, revenueResult] = await Promise.all([
+          User.countDocuments({ createdAt: { $gte: dayStart, $lt: dayEnd } }),
+          Recipe.countDocuments({ createdAt: { $gte: dayStart, $lt: dayEnd } }),
+          Transaction.aggregate([
+            { $match: {
+                status: 'success',
+                type: { $in: revenueTypes },
+                createdAt: { $gte: dayStart, $lt: dayEnd }
+              }
+            },
+            { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
+          ])
+        ]);
+        days.push({
+          date: dayStart,
+          totalUsers,
+          totalRecipes,
+          totalRevenue: revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0
+        });
+      }
+      return res.json({ type: 'day', days });
+    } else if (type === 'week') {
+      // Thống kê từng tuần trong tháng
+      const weeks = getWeeksInMonth(y, m);
+      const weekStats = [];
+      for (const week of weeks) {
+        const weekStart = week[0];
+        const weekEnd = new Date(week[week.length - 1]);
+        weekEnd.setDate(weekEnd.getDate() + 1);
+        const [totalUsers, totalRecipes, revenueResult] = await Promise.all([
+          User.countDocuments({ createdAt: { $gte: weekStart, $lt: weekEnd } }),
+          Recipe.countDocuments({ createdAt: { $gte: weekStart, $lt: weekEnd } }),
+          Transaction.aggregate([
+            { $match: {
+                status: 'success',
+                type: { $in: revenueTypes },
+                createdAt: { $gte: weekStart, $lt: weekEnd }
+              }
+            },
+            { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
+          ])
+        ]);
+        weekStats.push({
+          weekStart,
+          weekEnd,
+          totalUsers,
+          totalRecipes,
+          totalRevenue: revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0
+        });
+      }
+      return res.json({ type: 'week', weeks: weekStats });
+    } else {
+      // Tổng hợp cả tháng
+      const [totalUsers, totalRecipes, revenueResult] = await Promise.all([
+        User.countDocuments({ createdAt: { $gte: startOfMonth, $lt: endOfMonth } }),
+        Recipe.countDocuments({ createdAt: { $gte: startOfMonth, $lt: endOfMonth } }),
+        Transaction.aggregate([
+          { $match: {
+              status: 'success',
+              type: { $in: revenueTypes },
+              createdAt: { $gte: startOfMonth, $lt: endOfMonth }
+            }
+          },
+          { $group: { _id: null, totalRevenue: { $sum: '$amount' } } }
+        ])
+      ]);
+      return res.json({
+        type: 'month',
+        totalUsers,
+        totalRecipes,
+        totalRevenue: revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy thống kê theo tháng', error: err.message });
+  }
+};
